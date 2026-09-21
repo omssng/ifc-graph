@@ -59,6 +59,10 @@ flowchart LR
   IFC_89["IFC-89<br/>Возможность формирования ТЭП"]
   IFC_91["IFC-91<br/>Состав ТЭП (табл. 7.1)"]
   IFC_103["IFC-103<br/>Значения основных ТЭП в XML"]
+  IFC_104["IFC-104<br/>Этап проектирования RUS_Stage"]
+  IFC_105["IFC-105<br/>Информационные конструкции (вывески)"]
+  IFC_106["IFC-106<br/>Помещения квартир: RUS_Group_*"]
+  IFC_107["IFC-107<br/>Функциональные зоны по ГПЗУ"]
   IFC_96 --> IFC_01
   IFC_96 -.-> IFC_05
   IFC_96 -.-> IFC_11_19
@@ -139,11 +143,9 @@ flowchart LR
   IFC_60 -.-> IFC_71
   IFC_65_66 -.-> IFC_67
   IFC_65_66 -.-> IFC_88_3
-  IFC_64 -.-> IFC_90
   IFC_65_66 -.-> IFC_90
   IFC_70 -.-> IFC_90
   IFC_59 -.-> IFC_90
-  IFC_99 -.-> IFC_90
   IFC_101 -.-> IFC_90
   IFC_90 --> IFC_89
   IFC_89 --> IFC_91
@@ -161,3 +163,26 @@ flowchart LR
   IFC_99 -.-> IFC_44
   IFC_101 -.-> IFC_44
   IFC_102 -.-> IFC_44
+  IFC_02 -.-> IFC_104
+  IFC_60 -.-> IFC_107
+  IFC_60 -.-> IFC_105
+  IFC_72 -.-> IFC_104
+  IFC_72 -.-> IFC_105
+  IFC_72 -.-> IFC_106
+  IFC_72 -.-> IFC_107
+  IFC_73 -.-> IFC_104
+  IFC_73 -.-> IFC_105
+  IFC_73 -.-> IFC_106
+  IFC_73 -.-> IFC_107
+  IFC_95 -.-> IFC_104
+  IFC_95 -.-> IFC_105
+  IFC_95 -.-> IFC_106
+  IFC_64 -.-> IFC_106
+  IFC_99 -.-> IFC_107
+  IFC_105 -.-> IFC_90
+  IFC_106 -.-> IFC_90
+  IFC_107 -.-> IFC_90
+  IFC_104 -.-> IFC_44
+  IFC_105 -.-> IFC_44
+  IFC_106 -.-> IFC_44
+  IFC_107 -.-> IFC_44

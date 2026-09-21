@@ -67,6 +67,10 @@ window.IFC_GRAPH = {
      "IFC-101",
      "IFC-102",
      "IFC-103",
+     "IFC-104",
+     "IFC-105",
+     "IFC-106",
+     "IFC-107",
      "IFC-11-19",
      "IFC-21",
      "IFC-22",
@@ -131,6 +135,10 @@ window.IFC_GRAPH = {
      "IFC-101",
      "IFC-102",
      "IFC-103",
+     "IFC-104",
+     "IFC-105",
+     "IFC-106",
+     "IFC-107",
      "IFC-21",
      "IFC-22",
      "IFC-23",
@@ -347,7 +355,7 @@ window.IFC_GRAPH = {
    "logic": "Первый этап — наличие DWG в комплекте (по списку файлов). Второй — сопоставить поэтажную разбивку модели с планами DWG: для этого нужна привязка элементов к уровням.",
    "note": "",
    "depth": 6,
-   "topo": 51,
+   "topo": 54,
    "A": {
     "desc": [],
     "parents": [
@@ -397,6 +405,10 @@ window.IFC_GRAPH = {
      "IFC-101",
      "IFC-102",
      "IFC-103",
+     "IFC-104",
+     "IFC-105",
+     "IFC-106",
+     "IFC-107",
      "IFC-21",
      "IFC-22",
      "IFC-23",
@@ -462,6 +474,10 @@ window.IFC_GRAPH = {
      "IFC-101",
      "IFC-102",
      "IFC-103",
+     "IFC-104",
+     "IFC-105",
+     "IFC-106",
+     "IFC-107",
      "IFC-21",
      "IFC-22",
      "IFC-23",
@@ -596,6 +612,10 @@ window.IFC_GRAPH = {
      "IFC-100",
      "IFC-102",
      "IFC-103",
+     "IFC-104",
+     "IFC-105",
+     "IFC-106",
+     "IFC-107",
      "IFC-59",
      "IFC-60",
      "IFC-64",
@@ -657,6 +677,10 @@ window.IFC_GRAPH = {
      "IFC-101",
      "IFC-102",
      "IFC-103",
+     "IFC-104",
+     "IFC-105",
+     "IFC-106",
+     "IFC-107",
      "IFC-45",
      "IFC-46",
      "IFC-47",
@@ -723,6 +747,10 @@ window.IFC_GRAPH = {
      "IFC-101",
      "IFC-102",
      "IFC-103",
+     "IFC-104",
+     "IFC-105",
+     "IFC-106",
+     "IFC-107",
      "IFC-46",
      "IFC-47",
      "IFC-50",
@@ -837,7 +865,7 @@ window.IFC_GRAPH = {
    "logic": "",
    "note": "",
    "depth": 5,
-   "topo": 42,
+   "topo": 43,
    "A": {
     "desc": [],
     "parents": [
@@ -1021,7 +1049,7 @@ window.IFC_GRAPH = {
    "logic": "",
    "note": "По сути свод IFC-22, IFC-23, IFC-24: собственной логики почти нет. Хороший кандидат на расчёт по статусам, а не по блокировке.",
    "depth": 5,
-   "topo": 40,
+   "topo": 41,
    "A": {
     "desc": [],
     "parents": [
@@ -1167,7 +1195,7 @@ window.IFC_GRAPH = {
    "logic": "",
    "note": "",
    "depth": 5,
-   "topo": 37,
+   "topo": 38,
    "A": {
     "desc": [],
     "parents": [
@@ -1446,7 +1474,7 @@ window.IFC_GRAPH = {
    "logic": "",
    "note": "",
    "depth": 5,
-   "topo": 41,
+   "topo": 42,
    "A": {
     "desc": [
      "IFC-86"
@@ -1648,7 +1676,7 @@ window.IFC_GRAPH = {
    "logic": "",
    "note": "",
    "depth": 5,
-   "topo": 38,
+   "topo": 39,
    "A": {
     "desc": [],
     "parents": [
@@ -1706,7 +1734,7 @@ window.IFC_GRAPH = {
    "logic": "",
    "note": "",
    "depth": 5,
-   "topo": 39,
+   "topo": 40,
    "A": {
     "desc": [],
     "parents": [
@@ -1766,7 +1794,7 @@ window.IFC_GRAPH = {
    "logic": "",
    "note": "",
    "depth": 6,
-   "topo": 53,
+   "topo": 57,
    "A": {
     "desc": [],
     "parents": [
@@ -1827,6 +1855,10 @@ window.IFC_GRAPH = {
     "desc": [
      "IFC-102",
      "IFC-103",
+     "IFC-104",
+     "IFC-105",
+     "IFC-106",
+     "IFC-107",
      "IFC-59",
      "IFC-70",
      "IFC-71",
@@ -1876,6 +1908,10 @@ window.IFC_GRAPH = {
     "desc": [
      "IFC-102",
      "IFC-103",
+     "IFC-104",
+     "IFC-105",
+     "IFC-106",
+     "IFC-107",
      "IFC-59",
      "IFC-70",
      "IFC-71",
@@ -1925,6 +1961,10 @@ window.IFC_GRAPH = {
     "desc": [
      "IFC-102",
      "IFC-103",
+     "IFC-104",
+     "IFC-105",
+     "IFC-106",
+     "IFC-107",
      "IFC-59",
      "IFC-70",
      "IFC-71",
@@ -1970,7 +2010,7 @@ window.IFC_GRAPH = {
    "logic": "",
    "note": "Самый «нагруженный» дочерний узел ветки ПС: у него больше всего родителей — см. рейтинг хрупкости.",
    "depth": 5,
-   "topo": 49,
+   "topo": 52,
    "A": {
     "desc": [
      "IFC-102",
@@ -2038,7 +2078,7 @@ window.IFC_GRAPH = {
    "logic": "",
    "note": "",
    "depth": 6,
-   "topo": 54,
+   "topo": 58,
    "A": {
     "desc": [],
     "parents": [
@@ -2101,6 +2141,9 @@ window.IFC_GRAPH = {
     "desc": [
      "IFC-100",
      "IFC-103",
+     "IFC-105",
+     "IFC-106",
+     "IFC-107",
      "IFC-64",
      "IFC-65-66",
      "IFC-67",
@@ -2154,7 +2197,7 @@ window.IFC_GRAPH = {
    "logic": "",
    "note": "",
    "depth": 5,
-   "topo": 47,
+   "topo": 48,
    "A": {
     "desc": [
      "IFC-103",
@@ -2211,7 +2254,7 @@ window.IFC_GRAPH = {
    "logic": "",
    "note": "",
    "depth": 5,
-   "topo": 48,
+   "topo": 49,
    "A": {
     "desc": [],
     "parents": [
@@ -2264,10 +2307,11 @@ window.IFC_GRAPH = {
    "logic": "",
    "note": "",
    "depth": 5,
-   "topo": 43,
+   "topo": 44,
    "A": {
     "desc": [
      "IFC-103",
+     "IFC-106",
      "IFC-89",
      "IFC-90",
      "IFC-91"
@@ -2314,8 +2358,8 @@ window.IFC_GRAPH = {
    "amb": "",
    "logic": "",
    "note": "Свод: при жёстком каскаде он пропускался бы при любом падении родителей и терял смысл — считать по статусам, а не по блокировке.",
-   "depth": 9,
-   "topo": 59,
+   "depth": 10,
+   "topo": 63,
    "A": {
     "desc": [],
     "parents": [
@@ -2360,6 +2404,7 @@ window.IFC_GRAPH = {
     "desc": [
      "IFC-102",
      "IFC-103",
+     "IFC-107",
      "IFC-59",
      "IFC-89",
      "IFC-90",
@@ -2569,7 +2614,7 @@ window.IFC_GRAPH = {
    "logic": "",
    "note": "",
    "depth": 4,
-   "topo": 35,
+   "topo": 36,
    "A": {
     "desc": [
      "IFC-102",
@@ -2621,7 +2666,7 @@ window.IFC_GRAPH = {
    "logic": "",
    "note": "",
    "depth": 4,
-   "topo": 36,
+   "topo": 37,
    "A": {
     "desc": [
      "IFC-101",
@@ -2676,10 +2721,11 @@ window.IFC_GRAPH = {
    "logic": "",
    "note": "",
    "depth": 4,
-   "topo": 32,
+   "topo": 33,
    "A": {
     "desc": [
      "IFC-103",
+     "IFC-107",
      "IFC-89",
      "IFC-90",
      "IFC-91"
@@ -2728,7 +2774,7 @@ window.IFC_GRAPH = {
    "logic": "",
    "note": "",
    "depth": 5,
-   "topo": 50,
+   "topo": 53,
    "A": {
     "desc": [
      "IFC-103",
@@ -2784,7 +2830,7 @@ window.IFC_GRAPH = {
    "logic": "Сравнить отметки поверхности покрытий с поверхностью рельефа в границах покрытия; допуск по толщине. Применяется: результат IFC-50 (что считать рельефом) и IFC-51 (что считать покрытием). Если рельефа нет — сверять не с чем.",
    "note": "Рельеф отложен на второй этап.",
    "depth": 4,
-   "topo": 33,
+   "topo": 34,
    "A": {
     "desc": [],
     "parents": [
@@ -2832,7 +2878,7 @@ window.IFC_GRAPH = {
    "logic": "Как IFC-54, но для элементов озеленения: выбрать цветники и клумбы среди элементов IFC-51 и сверить их поверхность с рельефом. Применяется: результаты IFC-50 и IFC-51.",
    "note": "Рельеф отложен на второй этап.",
    "depth": 4,
-   "topo": 34,
+   "topo": 35,
    "A": {
     "desc": [],
     "parents": [
@@ -2880,7 +2926,7 @@ window.IFC_GRAPH = {
    "logic": "",
    "note": "",
    "depth": 5,
-   "topo": 44,
+   "topo": 45,
    "A": {
     "desc": [
      "IFC-103",
@@ -2933,7 +2979,7 @@ window.IFC_GRAPH = {
    "logic": "",
    "note": "",
    "depth": 5,
-   "topo": 45,
+   "topo": 46,
    "A": {
     "desc": [],
     "parents": [
@@ -2979,7 +3025,7 @@ window.IFC_GRAPH = {
    "logic": "",
    "note": "",
    "depth": 5,
-   "topo": 46,
+   "topo": 47,
    "A": {
     "desc": [],
     "parents": [
@@ -3028,7 +3074,7 @@ window.IFC_GRAPH = {
    "logic": "Возможная логика: из расчётных IfcSpace (IFC-65-66) выбрать зоны с названиями и назначениями неэксплуатируемых помещений; исключение — зоны, входящие в подсчёт градостроительных показателей. Применяется: результат IFC-65-66.",
    "note": "",
    "depth": 6,
-   "topo": 52,
+   "topo": 56,
    "A": {
     "desc": [],
     "parents": [
@@ -3073,8 +3119,8 @@ window.IFC_GRAPH = {
    "amb": "Не всегда удаётся определить категорию ТЭП.",
    "logic": "",
    "note": "",
-   "depth": 6,
-   "topo": 55,
+   "depth": 7,
+   "topo": 59,
    "A": {
     "desc": [
      "IFC-103",
@@ -3084,17 +3130,23 @@ window.IFC_GRAPH = {
     "parents": [
      "IFC-01",
      "IFC-101",
+     "IFC-105",
+     "IFC-106",
+     "IFC-107",
      "IFC-59",
      "IFC-64",
      "IFC-65-66",
      "IFC-70",
      "IFC-99"
     ],
-    "depth": 6,
+    "depth": 7,
     "anc": [
      "IFC-01",
      "IFC-02",
      "IFC-101",
+     "IFC-105",
+     "IFC-106",
+     "IFC-107",
      "IFC-11-19",
      "IFC-45",
      "IFC-47",
@@ -3146,8 +3198,8 @@ window.IFC_GRAPH = {
    "amb": "Не всегда удаётся определить категорию ТЭП.",
    "logic": "",
    "note": "",
-   "depth": 7,
-   "topo": 56,
+   "depth": 8,
+   "topo": 60,
    "A": {
     "desc": [
      "IFC-103",
@@ -3158,12 +3210,15 @@ window.IFC_GRAPH = {
      "IFC-05",
      "IFC-90"
     ],
-    "depth": 7,
+    "depth": 8,
     "anc": [
      "IFC-01",
      "IFC-02",
      "IFC-05",
      "IFC-101",
+     "IFC-105",
+     "IFC-106",
+     "IFC-107",
      "IFC-11-19",
      "IFC-45",
      "IFC-47",
@@ -3217,22 +3272,26 @@ window.IFC_GRAPH = {
    "amb": "Не всегда удаётся определить категорию ТЭП.",
    "logic": "",
    "note": "",
-   "depth": 8,
-   "topo": 57,
+   "depth": 9,
+   "topo": 61,
    "A": {
     "desc": [],
     "parents": [
      "IFC-01",
      "IFC-05",
+     "IFC-105",
      "IFC-89",
      "IFC-95"
     ],
-    "depth": 8,
+    "depth": 9,
     "anc": [
      "IFC-01",
      "IFC-02",
      "IFC-05",
      "IFC-101",
+     "IFC-105",
+     "IFC-106",
+     "IFC-107",
      "IFC-11-19",
      "IFC-45",
      "IFC-47",
@@ -3285,20 +3344,24 @@ window.IFC_GRAPH = {
    "amb": "",
    "logic": "Возможная логика: разобрать XML ТЭП по схеме приложения 6, сравнить показатели с рассчитанными по модели (результат IFC-89): допуск на округление, «0» не вместо неприменимости. Применяется: XML из комплекта и расчёт ТЭП. Лист графа.",
    "note": "",
-   "depth": 8,
-   "topo": 58,
+   "depth": 9,
+   "topo": 62,
    "A": {
     "desc": [],
     "parents": [
      "IFC-05",
+     "IFC-105",
      "IFC-89"
     ],
-    "depth": 8,
+    "depth": 9,
     "anc": [
      "IFC-01",
      "IFC-02",
      "IFC-05",
      "IFC-101",
+     "IFC-105",
+     "IFC-106",
+     "IFC-107",
      "IFC-11-19",
      "IFC-45",
      "IFC-47",
@@ -3331,6 +3394,232 @@ window.IFC_GRAPH = {
      "IFC-01",
      "IFC-89",
      "IFC-90",
+     "IFC-96"
+    ]
+   }
+  },
+  {
+   "id": "IFC-104",
+   "label": "IFC-104",
+   "n": "Этап проектирования RUS_Stage",
+   "d": "Если объект делится на этапы, у элементов зонирования и функциональных зон участка (ЦИМ ПС) и у элементов зданий (ЦИМ АР) RUS_Stage заполнен порядковым номером этапа; если этапов нет — значение 1.",
+   "p": "п. 5.2.23–5.2.25, 5.3.20–5.3.22, прил. 2, 3",
+   "fam": "attr",
+   "sec": "both",
+   "sc": "file",
+   "st": "idea",
+   "rel": "16.10",
+   "model": true,
+   "amb": "",
+   "logic": "Возможная логика: у каждого элемента ПС (зонирование, функциональные зоны) и АР (здания) прочитать RUS_Stage из набора RusSet_Location; значение — число не меньше 1 (в таблицах приложений тип «Вещественный», пример 2); если у объекта нет деления на этапы — 1. Применяется: разобранная модель, карта «элемент → строка приложения» и правила чтения RusSet_/RUS_. Пересекается с IFC-59 и IFC-70: они проверяют состав атрибутов приложений 2 и 3, где RUS_Stage уже есть. Возможная граница: эта проверка отвечает за смысл значения (порядковый номер этапа, согласованность внутри объекта), те две — за наличие.",
+   "note": "Новая норма: в прежней редакции требований не было.",
+   "depth": 4,
+   "topo": 32,
+   "A": {
+    "desc": [],
+    "parents": [
+     "IFC-01",
+     "IFC-02",
+     "IFC-45",
+     "IFC-72",
+     "IFC-73",
+     "IFC-95"
+    ],
+    "depth": 4,
+    "anc": [
+     "IFC-01",
+     "IFC-02",
+     "IFC-11-19",
+     "IFC-45",
+     "IFC-72",
+     "IFC-73",
+     "IFC-95",
+     "IFC-96"
+    ]
+   },
+   "B": {
+    "desc": [],
+    "parents": [
+     "IFC-01"
+    ],
+    "depth": 2,
+    "anc": [
+     "IFC-01",
+     "IFC-96"
+    ]
+   }
+  },
+  {
+   "id": "IFC-105",
+   "label": "IFC-105",
+   "n": "Информационные конструкции (вывески)",
+   "d": "Вывеска — отдельный элемент IfcBuildingElementProxy; RUS_Zone заполнен по правилам приложения 1 (код B1); их количество входит в ТЭП (показатель 13, «при наличии»).",
+   "p": "п. 5.3.18, 5.3.19, прил. 1, табл. 7.1 (показатель 13)",
+   "fam": "ar",
+   "sec": "ar",
+   "sc": "file",
+   "st": "idea",
+   "rel": "16.10",
+   "model": true,
+   "amb": "Место на фасаде, габариты, облик и содержание автоматически не проверяются — только наличие, класс, атрибуты и положение.",
+   "logic": "Возможная логика: из выборки IFC-60 (в таблице 5.3 появилась группа «Информационные конструкции») выбрать элементы IfcBuildingElementProxy с RUS_Zone = код B1; проверить класс, обязательные атрибуты и размещение в модели; подсчитать количество для показателя 13 ТЭП. Применяется: выборка IFC-60, правила чтения. Результат — количество вывесок для IFC-90.",
+   "note": "Новая норма: в прежней редакции требований не было.",
+   "depth": 5,
+   "topo": 50,
+   "A": {
+    "desc": [
+     "IFC-103",
+     "IFC-89",
+     "IFC-90",
+     "IFC-91"
+    ],
+    "parents": [
+     "IFC-01",
+     "IFC-60",
+     "IFC-72",
+     "IFC-73",
+     "IFC-95"
+    ],
+    "depth": 5,
+    "anc": [
+     "IFC-01",
+     "IFC-02",
+     "IFC-11-19",
+     "IFC-45",
+     "IFC-60",
+     "IFC-72",
+     "IFC-73",
+     "IFC-95",
+     "IFC-96"
+    ]
+   },
+   "B": {
+    "desc": [],
+    "parents": [
+     "IFC-01"
+    ],
+    "depth": 2,
+    "anc": [
+     "IFC-01",
+     "IFC-96"
+    ]
+   }
+  },
+  {
+   "id": "IFC-106",
+   "label": "IFC-106",
+   "n": "Помещения квартир: RUS_Group_*",
+   "d": "Для помещений (IfcSpace) квартир жилых объектов: RUS_Group_Type = «Квартира», RUS_Group_Number — номер квартиры, RUS_Number — номер помещения в квартире; пары не повторяются в пределах объекта; только для жилых объектов.",
+   "p": "п. 5.3.12, прил. 3",
+   "fam": "attr",
+   "sec": "ar",
+   "sc": "batch",
+   "st": "idea",
+   "rel": "16.10",
+   "model": true,
+   "amb": "Открытый вопрос: «объект» для уникальности пар — корпус (один файл) или весь объект комплекта; от этого зависит, искать повторы внутри файла или по всему комплекту.",
+   "logic": "Возможная логика: для жилых зданий (RUS_FNO = «Жилое здание», по IFC-64) выбрать IfcSpace квартир; проверить RUS_Group_Type, номер квартиры и порядковый номер помещения; убедиться, что пары (RUS_Group_Number, RUS_Number) уникальны в пределах объекта. Применяется: выборка IFC-60, признак жилого здания из IFC-64, правила чтения. Результат — привязка помещений к квартирам, из которой считается разбивка квартир по комнатности и площади (новые показатели ТЭП).",
+   "note": "Новая норма: в прежней редакции требований не было.",
+   "depth": 6,
+   "topo": 55,
+   "A": {
+    "desc": [
+     "IFC-103",
+     "IFC-89",
+     "IFC-90",
+     "IFC-91"
+    ],
+    "parents": [
+     "IFC-01",
+     "IFC-45",
+     "IFC-60",
+     "IFC-64",
+     "IFC-72",
+     "IFC-73",
+     "IFC-95"
+    ],
+    "depth": 6,
+    "anc": [
+     "IFC-01",
+     "IFC-02",
+     "IFC-11-19",
+     "IFC-45",
+     "IFC-60",
+     "IFC-64",
+     "IFC-72",
+     "IFC-73",
+     "IFC-95",
+     "IFC-96"
+    ]
+   },
+   "B": {
+    "desc": [],
+    "parents": [
+     "IFC-01"
+    ],
+    "depth": 2,
+    "anc": [
+     "IFC-01",
+     "IFC-96"
+    ]
+   }
+  },
+  {
+   "id": "IFC-107",
+   "label": "IFC-107",
+   "n": "Функциональные зоны по ГПЗУ",
+   "d": "У помещений и зон ЦИМ АР заполнены RUS_GPZU_Zone (функция по ГПЗУ) и RUS_GPZU_CodeZone (код функционального назначения по классификатору из ППМ 306-ПП); значения сверяются с данными ГПЗУ.",
+   "p": "п. 5.3.9–5.3.11, прил. 3",
+   "fam": "attr",
+   "sec": "ar",
+   "sc": "file",
+   "st": "idea",
+   "rel": "16.10",
+   "model": true,
+   "amb": "Граница с IFC-65/66 не определена: норма про зонирование СПП по видам функциональных зон ГПЗУ уже частично покрыта ими; значения сверяются с внешним источником — данными ГПЗУ.",
+   "logic": "Возможная логика: у IfcSpace и зон ЦИМ АР прочитать RUS_GPZU_Zone и RUS_GPZU_CodeZone; сверить с функциями и кодами, полученными из данных ГПЗУ (внешний источник — модуль разбора ГПЗУ); код — по классификатору из ППМ 306-ПП, формат «010 001 001». Применяется: выборка IFC-60, реквизиты ГПЗУ из IFC-99, правила чтения.",
+   "note": "Новая норма: в прежней редакции требований не было.",
+   "depth": 5,
+   "topo": 51,
+   "A": {
+    "desc": [
+     "IFC-103",
+     "IFC-89",
+     "IFC-90",
+     "IFC-91"
+    ],
+    "parents": [
+     "IFC-01",
+     "IFC-45",
+     "IFC-60",
+     "IFC-72",
+     "IFC-73",
+     "IFC-95",
+     "IFC-99"
+    ],
+    "depth": 5,
+    "anc": [
+     "IFC-01",
+     "IFC-02",
+     "IFC-11-19",
+     "IFC-45",
+     "IFC-47",
+     "IFC-60",
+     "IFC-72",
+     "IFC-73",
+     "IFC-95",
+     "IFC-96",
+     "IFC-99"
+    ]
+   },
+   "B": {
+    "desc": [],
+    "parents": [
+     "IFC-01"
+    ],
+    "depth": 2,
+    "anc": [
+     "IFC-01",
      "IFC-96"
     ]
    }
@@ -4578,7 +4867,7 @@ window.IFC_GRAPH = {
    "b": "doc",
    "why": "",
    "implicit": false,
-   "implied": false
+   "implied": true
   },
   {
    "from": "IFC-65-66",
@@ -4622,7 +4911,7 @@ window.IFC_GRAPH = {
    "b": "doc",
    "why": "",
    "implicit": false,
-   "implied": false
+   "implied": true
   },
   {
    "from": "IFC-101",
@@ -4807,6 +5096,336 @@ window.IFC_GRAPH = {
    "need": "agg",
    "via": "сводный статус",
    "b": "doc",
+   "why": "",
+   "implicit": false,
+   "implied": false
+  },
+  {
+   "from": "IFC-45",
+   "to": "IFC-104",
+   "k": "scope",
+   "need": "data",
+   "via": "файлы ЦИМ ПС и АР / файлы ЦИМ АР",
+   "b": "infer",
+   "why": "",
+   "implicit": false,
+   "implied": true
+  },
+  {
+   "from": "IFC-45",
+   "to": "IFC-106",
+   "k": "scope",
+   "need": "data",
+   "via": "файлы ЦИМ ПС и АР / файлы ЦИМ АР",
+   "b": "infer",
+   "why": "",
+   "implicit": false,
+   "implied": true
+  },
+  {
+   "from": "IFC-45",
+   "to": "IFC-107",
+   "k": "scope",
+   "need": "data",
+   "via": "файлы ЦИМ ПС и АР / файлы ЦИМ АР",
+   "b": "infer",
+   "why": "",
+   "implicit": false,
+   "implied": true
+  },
+  {
+   "from": "IFC-02",
+   "to": "IFC-104",
+   "k": "data",
+   "need": "data",
+   "via": "карта «элемент → строка приложения»: зонирование, зоны участка, здания",
+   "b": "infer",
+   "why": "",
+   "implicit": false,
+   "implied": false
+  },
+  {
+   "from": "IFC-60",
+   "to": "IFC-106",
+   "k": "data",
+   "need": "data",
+   "via": "выборка помещений и зон ЦИМ АР",
+   "b": "infer",
+   "why": "",
+   "implicit": false,
+   "implied": true
+  },
+  {
+   "from": "IFC-60",
+   "to": "IFC-107",
+   "k": "data",
+   "need": "data",
+   "via": "выборка помещений и зон ЦИМ АР",
+   "b": "infer",
+   "why": "",
+   "implicit": false,
+   "implied": false
+  },
+  {
+   "from": "IFC-60",
+   "to": "IFC-105",
+   "k": "data",
+   "need": "data",
+   "via": "новая группа «Информационные конструкции» (табл. 5.3)",
+   "b": "infer",
+   "why": "",
+   "implicit": false,
+   "implied": false
+  },
+  {
+   "from": "IFC-72",
+   "to": "IFC-104",
+   "k": "rule",
+   "need": "data",
+   "via": "правило чтения: наборы RusSet_, атрибуты RUS_",
+   "b": "infer",
+   "why": "",
+   "implicit": false,
+   "implied": false
+  },
+  {
+   "from": "IFC-72",
+   "to": "IFC-105",
+   "k": "rule",
+   "need": "data",
+   "via": "правило чтения: наборы RusSet_, атрибуты RUS_",
+   "b": "infer",
+   "why": "",
+   "implicit": false,
+   "implied": false
+  },
+  {
+   "from": "IFC-72",
+   "to": "IFC-106",
+   "k": "rule",
+   "need": "data",
+   "via": "правило чтения: наборы RusSet_, атрибуты RUS_",
+   "b": "infer",
+   "why": "",
+   "implicit": false,
+   "implied": false
+  },
+  {
+   "from": "IFC-72",
+   "to": "IFC-107",
+   "k": "rule",
+   "need": "data",
+   "via": "правило чтения: наборы RusSet_, атрибуты RUS_",
+   "b": "infer",
+   "why": "",
+   "implicit": false,
+   "implied": false
+  },
+  {
+   "from": "IFC-73",
+   "to": "IFC-104",
+   "k": "rule",
+   "need": "data",
+   "via": "правило чтения: наборы RusSet_, атрибуты RUS_",
+   "b": "infer",
+   "why": "",
+   "implicit": false,
+   "implied": false
+  },
+  {
+   "from": "IFC-73",
+   "to": "IFC-105",
+   "k": "rule",
+   "need": "data",
+   "via": "правило чтения: наборы RusSet_, атрибуты RUS_",
+   "b": "infer",
+   "why": "",
+   "implicit": false,
+   "implied": false
+  },
+  {
+   "from": "IFC-73",
+   "to": "IFC-106",
+   "k": "rule",
+   "need": "data",
+   "via": "правило чтения: наборы RusSet_, атрибуты RUS_",
+   "b": "infer",
+   "why": "",
+   "implicit": false,
+   "implied": false
+  },
+  {
+   "from": "IFC-73",
+   "to": "IFC-107",
+   "k": "rule",
+   "need": "data",
+   "via": "правило чтения: наборы RusSet_, атрибуты RUS_",
+   "b": "infer",
+   "why": "",
+   "implicit": false,
+   "implied": false
+  },
+  {
+   "from": "IFC-95",
+   "to": "IFC-104",
+   "k": "rule",
+   "need": "data",
+   "via": "правило заполнения пустых значений",
+   "b": "infer",
+   "why": "",
+   "implicit": false,
+   "implied": false
+  },
+  {
+   "from": "IFC-95",
+   "to": "IFC-105",
+   "k": "rule",
+   "need": "data",
+   "via": "правило заполнения пустых значений",
+   "b": "infer",
+   "why": "",
+   "implicit": false,
+   "implied": false
+  },
+  {
+   "from": "IFC-95",
+   "to": "IFC-106",
+   "k": "rule",
+   "need": "data",
+   "via": "правило заполнения пустых значений",
+   "b": "infer",
+   "why": "",
+   "implicit": false,
+   "implied": false
+  },
+  {
+   "from": "IFC-95",
+   "to": "IFC-107",
+   "k": "rule",
+   "need": "data",
+   "via": "правило заполнения пустых значений",
+   "b": "infer",
+   "why": "",
+   "implicit": false,
+   "implied": true
+  },
+  {
+   "from": "IFC-64",
+   "to": "IFC-106",
+   "k": "data",
+   "need": "data",
+   "via": "жилое / нежилое здание (RUS_FNO) — применимость проверки",
+   "b": "doc",
+   "why": "",
+   "implicit": false,
+   "implied": false
+  },
+  {
+   "from": "IFC-99",
+   "to": "IFC-107",
+   "k": "data",
+   "need": "data",
+   "via": "номер и дата ГПЗУ — какие данные ГПЗУ брать для сверки",
+   "b": "infer",
+   "why": "",
+   "implicit": false,
+   "implied": false
+  },
+  {
+   "from": "IFC-105",
+   "to": "IFC-90",
+   "k": "data",
+   "need": "data",
+   "via": "количество вывесок — показатель 13 ТЭП («при наличии»)",
+   "b": "doc",
+   "why": "",
+   "implicit": false,
+   "implied": false
+  },
+  {
+   "from": "IFC-105",
+   "to": "IFC-91",
+   "k": "data",
+   "need": "data",
+   "via": "количество вывесок — показатель 13 ТЭП («при наличии»)",
+   "b": "doc",
+   "why": "",
+   "implicit": false,
+   "implied": true
+  },
+  {
+   "from": "IFC-105",
+   "to": "IFC-103",
+   "k": "data",
+   "need": "data",
+   "via": "количество вывесок — показатель 13 ТЭП («при наличии»)",
+   "b": "doc",
+   "why": "",
+   "implicit": false,
+   "implied": true
+  },
+  {
+   "from": "IFC-106",
+   "to": "IFC-90",
+   "k": "data",
+   "need": "data",
+   "via": "привязка помещений к квартирам — разбивка квартир по комнатности и площади",
+   "b": "infer",
+   "why": "",
+   "implicit": false,
+   "implied": false
+  },
+  {
+   "from": "IFC-107",
+   "to": "IFC-90",
+   "k": "data",
+   "need": "data",
+   "via": "функциональные зоны ГПЗУ — показатели ТЭП по зонам",
+   "b": "infer",
+   "why": "",
+   "implicit": false,
+   "implied": false
+  },
+  {
+   "from": "IFC-104",
+   "to": "IFC-44",
+   "k": "agg",
+   "need": "agg",
+   "via": "сводный статус",
+   "b": "infer",
+   "why": "",
+   "implicit": false,
+   "implied": false
+  },
+  {
+   "from": "IFC-105",
+   "to": "IFC-44",
+   "k": "agg",
+   "need": "agg",
+   "via": "сводный статус",
+   "b": "infer",
+   "why": "",
+   "implicit": false,
+   "implied": false
+  },
+  {
+   "from": "IFC-106",
+   "to": "IFC-44",
+   "k": "agg",
+   "need": "agg",
+   "via": "сводный статус",
+   "b": "infer",
+   "why": "",
+   "implicit": false,
+   "implied": false
+  },
+  {
+   "from": "IFC-107",
+   "to": "IFC-44",
+   "k": "agg",
+   "need": "agg",
+   "via": "сводный статус",
+   "b": "infer",
    "why": "",
    "implicit": false,
    "implied": false
@@ -5364,6 +5983,50 @@ window.IFC_GRAPH = {
   {
    "from": "IFC-01",
    "to": "IFC-91",
+   "k": "gate",
+   "need": "verdict",
+   "via": "разобранная модель (допуск)",
+   "b": "code",
+   "why": "Файл, который не удалось прочитать, остальные файловые проверки пропускают.",
+   "implicit": true,
+   "implied": true
+  },
+  {
+   "from": "IFC-01",
+   "to": "IFC-104",
+   "k": "gate",
+   "need": "verdict",
+   "via": "разобранная модель (допуск)",
+   "b": "code",
+   "why": "Файл, который не удалось прочитать, остальные файловые проверки пропускают.",
+   "implicit": true,
+   "implied": true
+  },
+  {
+   "from": "IFC-01",
+   "to": "IFC-105",
+   "k": "gate",
+   "need": "verdict",
+   "via": "разобранная модель (допуск)",
+   "b": "code",
+   "why": "Файл, который не удалось прочитать, остальные файловые проверки пропускают.",
+   "implicit": true,
+   "implied": true
+  },
+  {
+   "from": "IFC-01",
+   "to": "IFC-106",
+   "k": "gate",
+   "need": "verdict",
+   "via": "разобранная модель (допуск)",
+   "b": "code",
+   "why": "Файл, который не удалось прочитать, остальные файловые проверки пропускают.",
+   "implicit": true,
+   "implied": true
+  },
+  {
+   "from": "IFC-01",
+   "to": "IFC-107",
    "k": "gate",
    "need": "verdict",
    "via": "разобранная модель (допуск)",
