@@ -157,8 +157,6 @@
   .mlabel{font-size:10.5px;fill:var(--muted);cursor:pointer}
   .mlabel.hl{fill:var(--ink);font-weight:700}
   .mlabel:hover{fill:var(--accent)}
-  .ncirc{cursor:pointer;stroke:var(--panel);stroke-width:1.5}
-  .nlbl{font:600 10px ui-monospace,Menlo,Consolas,monospace;fill:var(--ink);paint-order:stroke;stroke:var(--bg);stroke-width:3px;pointer-events:none}
 
   /* ───── Рейтинг ───── */
   #rank h2{font-size:15px;margin:0 0 4px}
@@ -269,7 +267,6 @@
       <button data-v="cascade" class="on">Каскад</button>
       <button data-v="lanes">Дорожки</button>
       <button data-v="matrix">Матрица</button>
-      <button data-v="net">Сеть</button>
       <button data-v="rank">Рейтинг</button>
     </div>
     <div class="seg rule" id="ruleSeg">
@@ -288,7 +285,7 @@
 <div id="modal"><div class="win"><header><div><h2>Выводы анализа</h2><small id="insSub"></small></div><span class="x" id="closeModal">×</span></header><div class="body" id="insBody"></div></div></div>
 
 <script src="vendor/d3.v7.min.js"></script>
-<script src="data.js?v=1"></script>
+<script src="data.js?v=2"></script>
 <script>
 (() => {
 'use strict';
@@ -368,7 +365,7 @@ function edgeDash(e) {
 // ───────── SVG-каркас ─────────
 const svg = d3.select('#svg');
 let gRoot = null, zoomB = null, curTransform = d3.zoomIdentity;
-let nodeSel = null, edgeSel = null, cellSel = null, mlabSel = null, netSim = null, netPos = {};
+let nodeSel = null, edgeSel = null, cellSel = null, mlabSel = null;
 const NW = 186, NH = 46;
 
 function setupSvg() {
@@ -560,49 +557,6 @@ function drawMatrix() {
   nodeSel = null; edgeSel = null;
 }
 
-// ───────── сеть ─────────
-function drawNet(restart) {
-  const nodes = visNodes(), ids = new Set(nodes.map(n => n.id));
-  const edges = E.filter(e => edgeShown(e, ids));
-  const W = $('#stage').clientWidth, H = $('#stage').clientHeight;
-  const dn = nodes.map(n => { const p = netPos[n.id] || { x: n.depth * 130, y: secIdx[n.sec] * 150 + (Math.random() - .5) * 60 }; return { id: n.id, x: p.x, y: p.y }; });
-  const byId = Object.fromEntries(dn.map(d => [d.id, d]));
-  const links = edges.map(e => ({ source: byId[e.from], target: byId[e.to], e }));
-  const rad = d => 7 + 2.6 * Math.sqrt(M(N[d.id]).desc.length);
-  const ge = gRoot.append('g'), gn = gRoot.append('g');
-  // datum ребра в сети — link {source,target,e}; в остальных видах — само ребро e
-  edgeSel = ge.selectAll('path').data(links).join('path').attr('class', 'edge').attr('stroke', d => edgeColor(d.e)).attr('stroke-dasharray', d => edgeDash(d.e))
-    .attr('marker-end', d => 'url(#ar-' + d.e.k + ')');
-  const eS = edgeSel;
-  nodeSel = gn.selectAll('g').data(dn).join('g').attr('class', d => 'node ' + N[d.id].st).attr('data-id', d => d.id);
-  nodeSel.append('title').text(d => N[d.id].label + ' — ' + N[d.id].n);
-  nodeSel.append('circle').attr('class', 'ncirc').attr('r', rad).attr('fill', d => colorOf(N[d.id]));
-  nodeSel.append('text').attr('class', 'nlbl').attr('y', d => rad(d) + 11).attr('text-anchor', 'middle').text(d => N[d.id].label);
-  nodeSel.on('click', (ev, d) => { ev.stopPropagation(); select(d.id); });
-  nodeSel.call(d3.drag().on('start', (ev, d) => { if (!ev.active) netSim.alphaTarget(.25).restart(); d.fx = d.x; d.fy = d.y; })
-    .on('drag', (ev, d) => { d.fx = ev.x; d.fy = ev.y; })
-    .on('end', (ev, d) => { if (!ev.active) netSim.alphaTarget(0); d.fx = null; d.fy = null; }));
-  if (netSim) netSim.stop();
-  netSim = d3.forceSimulation(dn)
-    .force('link', d3.forceLink(links).distance(64).strength(.35))
-    .force('charge', d3.forceManyBody().strength(-300))
-    .force('collide', d3.forceCollide().radius(d => rad(d) + 10))
-    .force('x', d3.forceX(d => N[d.id].depth * 132).strength(.34))
-    .force('y', d3.forceY(d => secIdx[N[d.id].sec] * 130).strength(.09))
-    .alphaDecay(.045);
-  const paint = () => {
-    eS.attr('d', d => `M${d.source.x},${d.source.y}L${d.target.x},${d.target.y}`);
-    nodeSel.attr('transform', d => `translate(${d.x},${d.y})`);
-    dn.forEach(d => netPos[d.id] = { x: d.x, y: d.y });
-  };
-  // фиксируем стрелки на границе кружка
-  eS.attr('d', d => `M${d.source.x},${d.source.y}L${d.target.x},${d.target.y}`);
-  netSim.on('tick', paint);
-  if (restart) { for (let i = 0; i < 260; i++) netSim.tick(); paint(); netSim.alpha(.02).restart(); }
-  else netSim.alpha(.06).restart();
-  cellSel = null;
-}
-
 // ───────── общий рендер ─────────
 let epoch = 0;
 function render(opts) {
@@ -613,13 +567,11 @@ function render(opts) {
   $('#rank').style.display = isSvg ? 'none' : 'block';
   $('#fit').style.display = isSvg ? '' : 'none';
   $('#exportSvg').disabled = !isSvg;
-  if (netSim && S.view !== 'net') { netSim.stop(); }
   if (isSvg) {
     setupSvg();
     if (S.view === 'cascade') drawLayered(false);
     else if (S.view === 'lanes') drawLayered(true);
     else if (S.view === 'matrix') drawMatrix();
-    else if (S.view === 'net') drawNet(!!opts.relayout);
     restyle();
     if (opts.fit) requestAnimationFrame(() => fit(false));
   } else {
@@ -645,11 +597,10 @@ function restyle() {
       .classed('skipped', d => sk.has(d.id))
       .classed('match', d => !!q && matches(N[d.id], q));
     nodeSel.select('.stripe').attr('fill', d => colorOf(N[d.id]));
-    nodeSel.select('.ncirc').attr('fill', d => colorOf(N[d.id]));
     nodeSel.select('.cross').text(d => S.failed.has(d.id) ? '×' : '⊘');
   }
   if (edgeSel) {
-    const ee = d => d.e || d; // в сети datum — link {e}, в остальных видах — ребро
+    const ee = d => d;
     const inAnc = e => !!chain && e.k !== 'agg' && (chain.anc.has(e.from) || e.from === S.sel) && (chain.anc.has(e.to) || e.to === S.sel);
     const inDesc = e => !!chain && e.k !== 'agg' && (chain.desc.has(e.to) || e.to === S.sel) && (chain.desc.has(e.from) || e.from === S.sel);
     edgeSel.attr('stroke-dasharray', d => edgeDash(ee(d)))
@@ -840,7 +791,7 @@ function centerOn(id) {
   const W = $('#stage').clientWidth, H = $('#stage').clientHeight;
   const dw = $('#detail').classList.contains('on') ? 0 : 350; // панель уже подвинула область
   const k = curTransform.k;
-  const cx = d.x + (S.view === 'net' ? 0 : NW / 2), cy = d.y + (S.view === 'net' ? 0 : NH / 2);
+  const cx = d.x + NW / 2, cy = d.y + NH / 2;
   const sx = cx * k + curTransform.x, sy = cy * k + curTransform.y;
   if (sx > 60 && sx < W - 60 && sy > 90 && sy < H - 60) return; // уже в поле зрения
   svg.transition().duration(350).call(zoomB.transform, d3.zoomIdentity.translate(W / 2 - cx * k, H / 2 - cy * k).scale(k));
@@ -946,7 +897,7 @@ function writeHash() {
 }
 function readHash() {
   const p = new URLSearchParams(location.hash.replace(/^#/, ''));
-  if (['cascade', 'lanes', 'matrix', 'net', 'rank'].includes(p.get('view'))) S.view = p.get('view');
+  if (['cascade', 'lanes', 'matrix', 'rank'].includes(p.get('view'))) S.view = p.get('view');
   if (['A', 'B'].includes(p.get('rule'))) S.variant = p.get('rule');
   if (p.get('sel') && N[p.get('sel')]) S.sel = p.get('sel');
   if (p.get('fail')) p.get('fail').split(',').forEach(id => { if (N[id]) S.failed.add(id); });
