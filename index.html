@@ -275,12 +275,17 @@
   <div id="rank"></div>
   <div id="factsView"></div>
   <div class="topbar">
-    <div class="seg" id="views">
+    <div id="views" style="display:flex;gap:12px;flex-wrap:wrap">
+    <div class="seg" role="group" aria-label="Зависимости проверок">
       <button data-v="cascade" class="on">Каскад</button>
       <button data-v="lanes">Дорожки</button>
       <button data-v="matrix">Матрица</button>
       <button data-v="rank">Рейтинг</button>
+    </div>
+    <div class="seg" role="group" aria-label="Данные и нормы">
       <button data-v="facts">Данные → нормы</button>
+      <button data-v="factsGraph">Данные → нормы · граф</button>
+    </div>
     </div>
     <div class="seg rule" id="ruleSeg">
       <button data-v="A" class="on">Жёстко</button>
@@ -298,8 +303,9 @@
 <div id="modal"><div class="win"><header><div><h2 id="modalTitle">Выводы анализа</h2><small id="insSub"></small></div><span class="x" id="closeModal">×</span></header><div class="body" id="insBody"></div></div></div>
 
 <script src="vendor/d3.v7.min.js"></script>
-<script src="data.js?v=6"></script>
-<script src="facts.js?v=6"></script>
+<script src="data.js?v=7"></script>
+<script src="facts.js?v=7"></script>
+<script src="facts-graph.js?v=7"></script>
 <script>
 (() => {
 'use strict';
@@ -581,16 +587,17 @@ function drawMatrix() {
 let epoch = 0;
 function render(opts) {
   opts = opts || {};
-  ['#ruleSeg', '#stepsBox', '#copyTable', '#copyHint'].forEach(s => { if ($(s)) $(s).style.display = S.view === 'facts' ? 'none' : ''; });
-  ['#vA', '#showGate', '#colorBy', '#clearFail'].forEach(s => { const box = $(s).closest('fieldset'); if (box) box.style.display = S.view === 'facts' ? 'none' : ''; });
-  $('#factsView').style.display = S.view === 'facts' ? 'block' : 'none';
-  if (S.view === 'facts') {
+  const isFacts = S.view === 'facts' || S.view === 'factsGraph';
+  ['#ruleSeg', '#stepsBox', '#copyTable', '#copyHint'].forEach(s => { if ($(s)) $(s).style.display = isFacts ? 'none' : ''; });
+  ['#vA', '#showGate', '#colorBy', '#clearFail'].forEach(s => { const box = $(s).closest('fieldset'); if (box) box.style.display = isFacts ? 'none' : ''; });
+  $('#factsView').style.display = isFacts ? 'block' : 'none';
+  if (isFacts) {
     $('#svg').style.display = 'none'; $('#rank').style.display = 'none';
     $('#fit').style.display = 'none'; $('#exportSvg').disabled = true;
     renderSidebarState();
     $('#legend').style.display = 'none'; $('#scen').style.display = 'none';
     $('#detail').classList.remove('on');
-    window.renderFacts($('#factsView'), visNodes(), S.q, S.sel);
+    (S.view === 'factsGraph' ? window.renderFactsGraph : window.renderFacts)($('#factsView'), visNodes(), S.q, S.sel);
     writeHash(); return;
   }
   refreshMarkerCss();
@@ -816,7 +823,7 @@ const GATE_ID = 'IFC-01';
 
 function select(id) {
   S.sel = id;
-  if (S.view === 'facts') { render(); return; }
+  if (S.view === 'facts' || S.view === 'factsGraph') { render(); return; }
   if (S.view === 'rank') { drawRank(); } else restyle();
   renderDetail(); renderLegend(); writeHash();
   if (S.sel && S.view !== 'rank' && S.view !== 'matrix') centerOn(S.sel);
@@ -994,7 +1001,7 @@ function writeHash() {
 }
 function readHash() {
   const p = new URLSearchParams(location.hash.replace(/^#/, ''));
-  if (['cascade', 'lanes', 'matrix', 'rank', 'facts'].includes(p.get('view'))) S.view = p.get('view');
+  if (['cascade', 'lanes', 'matrix', 'rank', 'facts', 'factsGraph'].includes(p.get('view'))) S.view = p.get('view');
   if (['A', 'B'].includes(p.get('rule'))) S.variant = p.get('rule');
   const stepsN = +p.get('steps');
   if (stepsN >= 2 && stepsN <= STEPS_MAX) S.steps = stepsN;
@@ -1028,9 +1035,9 @@ function bind() {
     const res = q ? G.nodes.filter(n => matches(n, q)).slice(0, 9) : [];
     $('#results').innerHTML = res.map(n => `<a data-id="${n.id}"><span class="cd">${esc(n.label)}</span><span class="nm">${esc(n.n)}</span></a>`).join('');
     $('#results').querySelectorAll('a').forEach(a => a.addEventListener('click', () => select(a.dataset.id)));
-    if (S.view === 'facts') render(); else if (S.view === 'rank') drawRank(); else restyle();
+    if (S.view === 'facts' || S.view === 'factsGraph') render(); else if (S.view === 'rank') drawRank(); else restyle();
   });
-  window.addEventListener('resize', () => { if (S.view !== 'rank' && S.view !== 'facts') fit(false); });
+  window.addEventListener('resize', () => { if (!['rank', 'facts', 'factsGraph'].includes(S.view)) fit(false); });
   window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', () => render({ relayout: false }));
 }
 
