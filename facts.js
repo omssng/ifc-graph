@@ -1,0 +1,39 @@
+(() => {
+ 'use strict';
+ const groups = [
+ ['Комплект и документы','Состав TRM, имена и разделы, подписи, аннотации, ссылки. Независимо от чтения геометрии IFC.','96 05 06-10 75-84 11-19 45 92 86 99 103'],
+ ['Структура IFC','Результат чтения, версия схемы, представление, сущности, GlobalId.','01 04 94 02 45 46 60'],
+ ['Атрибуты и классификация','Классы, типы, наборы, исходные и нормализованные значения, пустота, назначение, этап.','02 72 73 95 59 102 70 71 64 104 105 106 107 90 91 99 97 100 60 44'],
+ ['Единицы и точность','Объявленные единицы, преобразования, точность записи. Не скрывать ошибку единиц нормализацией.','25 26 27 101 89 103'],
+ ['Координаты','Локальные и мировые матрицы, базовые точки, ориентация, геопривязка.','22 23 24 21 42 88-1 86'],
+ ['Оси и уровни','Сетка осей, отметки, названия, чистый пол, принадлежность элементов этажам.','40-41 28 29 30 35-39 43 23 42 46'],
+ ['Геометрия','Формы, габариты, длины, площади, объёмы, проекции, геометрические отпечатки. Один расчёт на версию объекта и метод.','93 03 26 42 47 50 51 52 97 98 101 54 58 65-66 68 100 67 105 107 86'],
+ ['Пространственные отношения','Пересечения, касания, расстояния, вложенность, связность, отклонения от поверхности. Измерения — факты; допуски — правила.','03 88-1 88-2 88-3 54 58 43 98 97 100 68 107'],
+ ['Участок и благоустройство','Контуры участка и зон, рельеф, покрытия, категории площадок.','47 50 51 52 54 58 98 107'],
+ ['Машиноместа','Количество, класс, атрибуты, контуры, размеры, расположение, надземное/подземное размещение.','97 100'],
+ ['Помещения и группы','IfcSpace, площади, назначение, эксплуатационный признак, квартирные группы, ограждения.','65-66 67 68 106 89 90 91'],
+ ['Количества и ТЭП','Записанные и вычисленные количества, агрегаты, происхождение слагаемых, версии методов расчёта.','26 27 89 90 91 101 103'],
+ ['Внешние исходные данные','Поля XML, реквизиты и геометрия ГПЗУ/планов, ТЗ, 2D. Источник, версия, единицы и достоверность распознавания.','05 86 99 103 107 24 28 29 30 42 97 98 100'],
+ ['Результаты частных правил','Отдельно: агрегация после второго слоя, не натуральный показатель. Статусы частных правил и покрытие.','21 44']
+ ].map(([title,description,ids],i)=>({id:String(i),title,description,checks:ids.split(' ').map(x=>'IFC-'+x)}));
+ const esc=s=>String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+ const inputs=n=>groups.filter(g=>g.checks.includes(n.id));
+ let chosen=null;
+ const style=document.createElement('style');
+ style.textContent=`#factsView{display:none;position:absolute;inset:0;overflow:auto;padding:86px 24px 36px;background:var(--bg)}.fact-intro{line-height:1.55;max-width:1100px}.fact-note{font-size:12px;color:var(--muted)}.fact-columns{display:grid;grid-template-columns:minmax(220px,1fr) 30px minmax(280px,1.5fr);gap:12px;margin-top:20px;align-items:start}.fact-card{border:1px solid var(--line);border-radius:10px;padding:13px;margin-bottom:10px;background:var(--panel);line-height:1.5;overflow-wrap:anywhere}button.fact-card{display:block;width:100%;text-align:left;color:var(--ink);font:inherit;cursor:pointer}.fact-card.active{border:2px solid var(--accent)}.fact-card p{margin:8px 0;font-size:12px}.fact-card small{color:var(--muted)}.fact-card summary{cursor:pointer}.fact-chip{border:1px solid var(--line);border-radius:5px;padding:4px;margin:3px;background:var(--bg);color:var(--ink);cursor:pointer}.fact-tools{display:flex;gap:8px;flex-wrap:wrap;margin:12px 0}.fact-arrow{position:sticky;top:20px;font-size:28px;color:var(--accent)}@media(max-width:850px){.fact-columns{grid-template-columns:1fr}.fact-arrow{display:none}#factsView{padding:110px 14px 20px}}`;
+ document.head.appendChild(style);
+ window.IFC_FACT_GROUPS=groups;
+ window.renderFacts=(root,nodes,query,selected)=>{
+  const q=query.trim().toLowerCase();
+  const available=nodes.filter(n=>!q||[n.id,n.n,n.d,...inputs(n).map(g=>g.title)].join(' ').toLowerCase().includes(q));
+  const relevant=groups.filter(g=>available.some(n=>g.checks.includes(n.id)));
+  if(!relevant.some(g=>g.id===chosen))chosen=null;
+  const shown=available.filter(n=>!chosen||inputs(n).some(g=>g.id===chosen));
+  root.innerHTML=`<div class="fact-intro"><h2>Один раз извлечь → многократно проверить</h2><p>Первый слой готовит общие факты. Второй применяет требования. Выберите блок данных, чтобы увидеть потребителей; раскройте проверку, чтобы увидеть её части.</p><p class="fact-note">Проект архитектуры текущего каталога, включая не реализованные правила. Не подтверждает готовность алгоритмов и не меняет нормативы. Полнота — покрытие потребностей каталога, а не всех возможных данных IFC.</p><p class="fact-note">Контракт факта: значение, единица, объект/файл, источник и версия, метод, качество. Состояния: получен / отсутствует / ошибка извлечения / неприменим. Нет данных ≠ нарушение нормы. Пропускается только зависимое правило. Геометрия используется для расчёта пространственных отношений: два слоя — разделение ответственности, не ровно два вызова.</p><p class="fact-note">Фильтры каталога и поиск действуют. Каскад отказов, глубина, цвет и типы связей относятся к прежним видам и не меняют эту архитектуру.</p></div><div class="fact-tools"><button class="btn" data-reset>Все связи</button><button class="btn" data-copy>Копировать разложение</button><button class="btn" data-save>Скачать TSV</button><span aria-live="polite" data-status>${shown.length} проверок</span></div><div class="fact-columns"><section><h3>1 · Общие данные</h3>${relevant.map(g=>`<button class="fact-card ${chosen===g.id?'active':''}" data-group="${g.id}" aria-pressed="${chosen===g.id}"><strong>${esc(g.title)}</strong><p>${esc(g.description)}</p><small>${available.filter(n=>g.checks.includes(n.id)).length} потребителей →</small></button>`).join('')}</section><div class="fact-arrow" aria-hidden="true">→</div><section><h3>2 · Правила и соответствие</h3>${shown.map(n=>`<details class="fact-card" ${n.id===selected?'open':''}><summary><strong>${esc(n.label)} · ${esc(n.n)}</strong></summary><p><b>${esc(n.label)} / Д — данные</b><br>${inputs(n).map(g=>`<button class="fact-chip" data-group="${g.id}">${esc(g.title)}</button>`).join('')}</p><p><b>${esc(n.label)} / Н — требование</b><br>${esc(n.d||n.n)}</p><p class="fact-note">Предложенная граница разделения. Для реализации требуется подтвердить область применимости, условие и допуск по действующей спецификации. Исходный статус: ${esc(n.st)}. Для сводов используются результаты частных правил.</p><p class="fact-note">Выход: соответствует / не соответствует / недостаточно данных / неприменимо.</p></details>`).join('')||'<p>Нет проверок по выбранным фильтрам.</p>'}</section></div>`;
+  root.querySelectorAll('[data-group]').forEach(b=>b.onclick=()=>{chosen=chosen===b.dataset.group?null:b.dataset.group;window.renderFacts(root,nodes,query,selected);});
+  root.querySelector('[data-reset]').onclick=()=>{chosen=null;window.renderFacts(root,nodes,query,selected);};
+  const tsv=()=>['Номер проверки\tБлоки данных\tИзвлечение\tНормативная часть\tСтатус',...shown.map(n=>[n.label,inputs(n).map(g=>g.title).join('; '),n.id+'/Д',n.d||n.n,'Проект декомпозиции'].map(s=>String(s).replace(/[\t\r\n]+/g,' ')).join('\t'))].join('\n');
+  root.querySelector('[data-copy]').onclick=async()=>{try{await navigator.clipboard.writeText(tsv());root.querySelector('[data-status]').textContent='Скопировано: '+shown.length+' строк';}catch{root.querySelector('[data-status]').textContent='Буфер недоступен — скачайте TSV.';}};
+  root.querySelector('[data-save]').onclick=()=>{const url=URL.createObjectURL(new Blob(['\ufeff'+tsv()],{type:'text/tab-separated-values;charset=utf-8'}));const a=document.createElement('a');a.href=url;a.download='IFC-данные-нормы.tsv';a.click();setTimeout(()=>URL.revokeObjectURL(url),1000);};
+ };
+})();
