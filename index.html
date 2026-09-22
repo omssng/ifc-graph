@@ -207,6 +207,12 @@
       <div class="vcard" id="vB" data-v="B"><b>Смягчённо — рекомендация</b><span>Блокируют только связи, где по смыслу нужен вердикт родителя (допуск, смысловая предпосылка). Связи «передача данных» — пунктиром: не блокируют, дочерняя сама сообщает о нехватке входных данных.</span></div>
     </fieldset>
 
+    <fieldset id="stepsBox">
+      <legend>Число слоёв <span id="stepsVal" style="text-transform:none;letter-spacing:0;color:var(--ink);font-weight:600"></span></legend>
+      <input type="range" id="stepsSlider" min="2" max="2" value="2" style="width:100%">
+      <div class="hint" style="margin-top:4px">Действует в «Каскаде» и «Дорожках»: объединяет несколько соседних слоёв в один, крупнее, чтобы сразу было видно основные родительские проверки, а не тонкое деление на десяток слоёв. Полная детализация — вправо до конца.</div>
+    </fieldset>
+
     <fieldset>
       <legend>Раздел ЦИМ <a id="allsec">все</a></legend>
       <div id="fSec"></div>
@@ -255,6 +261,10 @@
         <button class="btn flat" id="openGlossary">Словарь терминов</button>
         <button class="btn flat" id="exportSvg">Скачать SVG</button>
       </div>
+      <div class="btns">
+        <button class="btn flat" id="copyTable">Скопировать в буфер: номер + слой</button>
+      </div>
+      <div class="hint" id="copyHint">Копирует 2 колонки (номер проверки, слой — с учётом ползунка и текущих фильтров) — вставить как есть в свободный столбец общей таблицы и фильтровать по нему.</div>
       <div class="hint">Слева направо — от родительских проверок к дочерним: чем правее, тем больше проверок должно быть выполнено раньше. Пунктирная рамка и штрих — логика проверки ещё не написана, связи предположены.</div>
     </fieldset>
   </div>
@@ -286,7 +296,7 @@
 <div id="modal"><div class="win"><header><div><h2 id="modalTitle">Выводы анализа</h2><small id="insSub"></small></div><span class="x" id="closeModal">×</span></header><div class="body" id="insBody"></div></div></div>
 
 <script src="vendor/d3.v7.min.js"></script>
-<script src="data.js?v=4"></script>
+<script src="data.js?v=5"></script>
 <script>
 (() => {
 'use strict';
@@ -304,6 +314,12 @@ const RELS = { '16.10': 'Ближайший релиз', later: 'Позже / о
 const KIND_ORDER = ['gate', 'logic', 'scope', 'data', 'rule', 'agg'];
 const KIND_SHORT = { gate: 'допуск', logic: 'смысл', scope: 'раздел', data: 'данные', rule: 'правило', agg: 'свод' };
 const BASIS = { doc: 'в аналитике', code: 'по коду', infer: 'предположение' };
+// Ползунок «Число слоёв»: при полной детализации показываемый слой совпадает с исходным
+// (S.steps === STEPS_MAX); при уменьшении несколько соседних исходных слоёв объединяются
+// в один укрупнённый — stepOf(n) даёт номер этого показываемого слоя.
+const MAX_DEPTH = Math.max(0, ...G.nodes.map(n => n.depth));
+const STEPS_MAX = MAX_DEPTH + 1;
+const stepOf = n => Math.min(S.steps - 1, Math.floor(n.depth * S.steps / STEPS_MAX));
 
 const $ = s => document.querySelector(s);
 const esc = s => String(s == null ? '' : s).replace(/[&<>"]/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]));
@@ -311,7 +327,7 @@ const cssv = n => getComputedStyle(document.documentElement).getPropertyValue(n)
 
 // ───────── состояние ─────────
 const S = {
-  view: 'cascade', variant: 'A', colorBy: 'sec',
+  view: 'cascade', variant: 'A', colorBy: 'sec', steps: STEPS_MAX,
   sec: new Set(secKeys), fam: new Set(famKeys), st: new Set(stKeys), rel: new Set(Object.keys(RELS)),
   onlyAmb: false, showGate: false, showImplied: false, showAgg: true,
   q: '', sel: null, failed: new Set(), rankSort: 'desc', rankDir: -1,
@@ -417,13 +433,13 @@ function fit(animate) {
 // ───────── компоновка «слои слева направо» ─────────
 function layered(nodes, edges, lanes) {
   const ids = new Set(nodes.map(n => n.id));
-  const depths = [...new Set(nodes.map(n => n.depth))].sort((a, b) => a - b);
+  const depths = [...new Set(nodes.map(n => stepOf(n)))].sort((a, b) => a - b);
   const rank = Object.fromEntries(depths.map((d, i) => [d, i]));
   const cols = depths.map(() => []);
   const laneOrder = lanes ? secKeys.filter(k => nodes.some(n => n.sec === k)) : [];
   const laneOf = id => lanes ? laneOrder.indexOf(N[id].sec) : 0;
   nodes.slice().sort((a, b) => (laneOf(a.id) - laneOf(b.id)) || (famIdx[a.fam] - famIdx[b.fam]) || (a.topo - b.topo))
-    .forEach(n => cols[rank[n.depth]].push(n.id));
+    .forEach(n => cols[rank[stepOf(n)]].push(n.id));
   const nb = { in: {}, out: {} };
   ids.forEach(i => { nb.in[i] = []; nb.out[i] = []; });
   edges.forEach(e => { if (!e.implicit) { nb.out[e.from].push(e.to); nb.in[e.to].push(e.from); } });
@@ -513,7 +529,7 @@ function drawLayered(lanes) {
   }
   // заголовки колонок
   const counts = {};
-  nodes.forEach(n => counts[n.depth] = (counts[n.depth] || 0) + 1);
+  nodes.forEach(n => counts[stepOf(n)] = (counts[stepOf(n)] || 0) + 1);
   L.depths.forEach((d, r) => {
     gRoot.append('text').attr('class', 'colhead').attr('x', L.LM + r * (NW + L.GX)).attr('y', 24)
       .text((r === 0 ? 'родительские · ' : '') + 'слой ' + d + ' · ' + counts[d]);
@@ -634,7 +650,7 @@ function drawRank() {
   const roots = G.nodes.filter(n => M(n).parents.length === 0);
   const maxD = Math.max(1, ...nodes.map(n => Math.max(n.A.desc.length, n.B.desc.length)));
   const maxA = Math.max(1, ...nodes.map(n => Math.max(n.A.anc.length, n.B.anc.length)));
-  const key = { desc: n => M(n).desc.length, ancs: n => M(n).anc.length, depth: n => n.depth, id: n => n.topo, st: n => stKeys.indexOf(n.st) };
+  const key = { desc: n => M(n).desc.length, ancs: n => M(n).anc.length, depth: n => stepOf(n), id: n => n.topo, st: n => stKeys.indexOf(n.st) };
   const kf = key[S.rankSort] || key.desc;
   const rows = nodes.slice().sort((a, b) => (kf(a) - kf(b)) * S.rankDir || a.topo - b.topo);
   const bar = (v, mx, col) => `<div class="bar"><i style="width:${Math.max(v ? 3 : 0, 100 * v / mx)}%;background:${col}"></i><em>${v}</em></div>`;
@@ -652,7 +668,7 @@ function drawRank() {
     <tbody>${rows.map(n => `<tr class="r${n.id === S.sel ? ' sel' : ''}" data-id="${n.id}">
       <td><span class="cd">${esc(n.label)}</span><br><span style="color:var(--muted);font-size:11px">${esc(trunc(n.n, 38))}</span></td>
       <td>${stDot(n)}<span style="font-size:11px;color:var(--muted)">${esc(G.statuses[n.st].split(' — ')[0].split(' /')[0])}</span></td>
-      <td>${n.depth}</td>
+      <td>${stepOf(n)}</td>
       <td>${bar(n.A.desc.length, maxD, S.variant === 'A' ? cssv('--fail') : cssv('--dim'))}<div style="height:3px"></div>${bar(n.B.desc.length, maxD, S.variant === 'B' ? cssv('--ok') : cssv('--dim'))}</td>
       <td>${bar(n.A.anc.length, maxA, S.variant === 'A' ? cssv('--fail') : cssv('--dim'))}<div style="height:3px"></div>${bar(n.B.anc.length, maxA, S.variant === 'B' ? cssv('--ok') : cssv('--dim'))}</td>
       <td style="font-size:11px;color:${n.amb ? 'var(--warn)' : 'var(--dim)'}">${n.amb ? '⚠ ' + esc(trunc(n.amb, 60)) : '—'}</td></tr>`).join('')}</tbody></table>`;
@@ -677,6 +693,10 @@ function renderSidebarState() {
   document.querySelectorAll('#views button').forEach(b => b.classList.toggle('on', b.dataset.v === S.view));
   const vis = visNodes();
   $('#counter').textContent = vis.length + ' из ' + G.nodes.length + ' проверок';
+  const slider = $('#stepsSlider');
+  slider.max = STEPS_MAX; slider.value = S.steps;
+  $('#stepsVal').textContent = S.steps + ' из ' + STEPS_MAX + (S.steps === STEPS_MAX ? ' (полная детализация)' : '');
+  $('#stepsBox').style.opacity = (S.view === 'cascade' || S.view === 'lanes') ? '1' : '.45';
   const fc = $('#failedChips');
   fc.innerHTML = S.failed.size ? [...S.failed].map(id => `<a class="chip f" data-id="${id}" title="убрать из сценария">${esc(N[id].label)} ×</a>`).join('') : '<span class="hint" style="margin:0">сценарий пуст</span>';
   fc.querySelectorAll('a').forEach(a => a.addEventListener('click', () => { S.failed.delete(a.dataset.id); render(); }));
@@ -756,7 +776,7 @@ function renderDetail() {
     <div style="color:var(--muted);font-size:12px">Пункт требований: ${esc(n.p)}</div>`;
   if (sk.has(n.id)) h += `<div class="box danger">В текущем сценарии эта проверка <b>не выполнится</b>: один из её предков не прошёл.</div>`;
   h += `<div class="sub">Каскад</div><div class="kv">
-    <span>Слой (порядок выполнения)</span><b>${n.depth}</b>
+    <span>Слой (порядок выполнения)</span><b>${stepOf(n)}${S.steps < STEPS_MAX ? ` <span style="color:var(--muted);font-weight:400">(при полной детализации — ${n.depth})</span>` : ''}</b>
     <span>Должны пройти раньше (предков)${S.variant === 'A' ? ' ◀' : ''}: жёстко</span><b>${n.A.anc.length}</b>
     <span>Должны пройти раньше (предков)${S.variant === 'B' ? ' ◀' : ''}: смягчённо</span><b>${n.B.anc.length}</b>
     <span>Не выполнится при провале: жёстко</span><b style="color:${dA ? 'var(--fail)' : 'inherit'}">${dA}</b>
@@ -875,6 +895,7 @@ function glossary() {
   }[k])}</div>`).join('');
   return [
     { t: 'Слой', p: 'Столбец на схеме «Каскад» и «Дорожки». Слой проверки — это длина самой длинной цепочки её родителей: чем правее проверка, тем больше проверок в принципе должно быть выполнено до неё. Слой 0 — проверки совсем без родителей.' },
+    { t: 'Ползунок «Число слоёв»', p: 'Регулирует, сколько слоёв показано на схеме. При максимуме — полная детализация, каждый исходный слой виден отдельно. Если уменьшить, несколько соседних слоёв объединяются в один, более крупный — так сразу видно, какие проверки самые основные, без мелкого деления на десяток шагов. Номер слоя в карточке проверки и в «Рейтинге» тоже считается с учётом ползунка; если он сдвинут, рядом в скобках показан исходный слой при полной детализации.' },
     { t: 'Правило каскада: «жёстко» и «смягчённо»', p: 'Переключатель наверху страницы. Он не меняет граф, а меняет только то, что считается блокирующей связью для сценария отказа и для колонок «потомков / предков» в карточке и рейтинге.<br><br><b>Жёстко</b> — как сейчас принято для первого выпуска сервиса: любая родительская проверка, которая не прошла, блокирует все дочерние, какая бы ни была связь между ними.<br><br><b>Смягчённо</b> — блокируют только связи «допуск» и «смысловая предпосылка», то есть там, где дочерней проверке правда нужен вердикт родителя. Связи «данные», «выбор файлов по разделу» и «правило» не блокируют: считается, что дочерняя сама вернёт отрицательный результат с понятной причиной, если нужных ей данных не нашлось.' },
     { t: 'Виды связей между проверками', p: 'Стрелка на схеме — не просто «после», а конкретная зависимость одного из шести видов:', h: `<div style="margin-top:4px">${kindLi}</div>` },
     { t: 'Неоднозначный исход', p: 'Помечен значком ⚠ у проверки и жёлтой рамкой в карточке. Значит: у этой проверки есть ситуации, где по имеющимся данным нельзя однозначно сказать «пройдено» или «не пройдено» — например, что-то в модели можно понять двумя способами, нормативный порог не задан явно, или нужного признака в модели просто нет. Пример — открытый вопрос в самой карточке. Если такая проверка ещё и родительская, при жёстком правиле неоднозначность каскадом гасит все её дочерние проверки — сколько именно, видно в самой карточке.' },
@@ -920,11 +941,36 @@ function exportSvg() {
   setTimeout(() => URL.revokeObjectURL(a.href), 4000);
 }
 
+// ───────── копирование мини-таблицы «номер + слой» в буфер ─────────
+async function copyTable() {
+  const rows = visNodes().slice().sort((a, b) => stepOf(a) - stepOf(b) || a.topo - b.topo);
+  const tsv = 'Номер проверки\tСлой\n' + rows.map(n => `${n.label}\t${stepOf(n)}`).join('\n');
+  const btn = $('#copyTable');
+  const done = ok => {
+    btn.textContent = ok ? `Скопировано: ${rows.length} строк ✓` : 'Не удалось скопировать — выделите и Ctrl+C вручную';
+    setTimeout(() => { btn.textContent = 'Скопировать в буфер: номер + слой'; }, 2200);
+  };
+  try {
+    await navigator.clipboard.writeText(tsv);
+    done(true);
+  } catch (e) {
+    try {
+      const ta = document.createElement('textarea');
+      ta.value = tsv; ta.style.position = 'fixed'; ta.style.opacity = '0';
+      document.body.appendChild(ta); ta.select();
+      const ok = document.execCommand('copy');
+      document.body.removeChild(ta);
+      done(ok);
+    } catch (e2) { done(false); }
+  }
+}
+
 // ───────── состояние в адресе ─────────
 function writeHash() {
   try {
     const p = new URLSearchParams();
     p.set('view', S.view); p.set('rule', S.variant);
+    if (S.steps !== STEPS_MAX) p.set('steps', S.steps);
     if (S.sel) p.set('sel', S.sel);
     if (S.failed.size) p.set('fail', [...S.failed].join(','));
     history.replaceState(null, '', '#' + p.toString());
@@ -934,6 +980,8 @@ function readHash() {
   const p = new URLSearchParams(location.hash.replace(/^#/, ''));
   if (['cascade', 'lanes', 'matrix', 'rank'].includes(p.get('view'))) S.view = p.get('view');
   if (['A', 'B'].includes(p.get('rule'))) S.variant = p.get('rule');
+  const stepsN = +p.get('steps');
+  if (stepsN >= 2 && stepsN <= STEPS_MAX) S.steps = stepsN;
   if (p.get('sel') && N[p.get('sel')]) S.sel = p.get('sel');
   if (p.get('fail')) p.get('fail').split(',').forEach(id => { if (N[id]) S.failed.add(id); });
 }
@@ -946,6 +994,7 @@ function bind() {
   $('#fit').addEventListener('click', () => fit(true));
   $('#colorBy').addEventListener('change', e => { S.colorBy = e.target.value; render({ relayout: false }); });
   $('#onlyAmb').addEventListener('change', e => { S.onlyAmb = e.target.checked; render({ fit: true, relayout: true }); });
+  $('#stepsSlider').addEventListener('input', e => { S.steps = +e.target.value; render({ fit: true, relayout: true }); });
   $('#showGate').addEventListener('change', e => { S.showGate = e.target.checked; render({ fit: false, relayout: true }); });
   $('#showImplied').addEventListener('change', e => { S.showImplied = e.target.checked; render({ fit: false, relayout: true }); });
   $('#showAgg').addEventListener('change', e => { S.showAgg = e.target.checked; render({ fit: false, relayout: true }); });
@@ -953,6 +1002,7 @@ function bind() {
   $('#openInsights').addEventListener('click', openInsights);
   $('#openGlossary').addEventListener('click', openGlossary);
   $('#exportSvg').addEventListener('click', exportSvg);
+  $('#copyTable').addEventListener('click', copyTable);
   $('#closeModal').addEventListener('click', () => $('#modal').classList.remove('on'));
   $('#modal').addEventListener('click', e => { if (e.target.id === 'modal') $('#modal').classList.remove('on'); });
   document.addEventListener('keydown', e => { if (e.key === 'Escape') { if ($('#modal').classList.contains('on')) $('#modal').classList.remove('on'); else select(null); } });
