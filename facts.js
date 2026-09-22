@@ -34,6 +34,8 @@
   root.querySelector('[data-reset]').onclick=()=>{chosen=null;window.renderFacts(root,nodes,query,selected);};
   const tsv=()=>['Номер проверки\tБлоки данных\tИзвлечение\tНормативная часть\tСтатус',...shown.map(n=>[n.label,inputs(n).map(g=>g.title).join('; '),n.id+'/Д',n.d||n.n,'Проект декомпозиции'].map(s=>String(s).replace(/[\t\r\n]+/g,' ')).join('\t'))].join('\n');
   root.querySelector('[data-copy]').onclick=async()=>{try{await navigator.clipboard.writeText(tsv());root.querySelector('[data-status]').textContent='Скопировано: '+shown.length+' строк';}catch{root.querySelector('[data-status]').textContent='Буфер недоступен — нажмите «Скачать таблицу».';}};
-  root.querySelector('[data-save]').onclick=()=>{const url=URL.createObjectURL(new Blob(['\ufeff'+tsv()],{type:'text/tab-separated-values;charset=utf-8'}));const a=document.createElement('a');a.href=url;a.download='IFC-данные-нормы.tsv';a.click();setTimeout(()=>URL.revokeObjectURL(url),1000);};
+  // CSV для Excel: UTF-8 BOM, разделитель «;», CRLF и экранирование кавычек.
+  const csv=()=>tsv().split('\n').map(row=>row.split('\t').map(value=>'"'+value.replace(/"/g,'""')+'"').join(';')).join('\r\n');
+  root.querySelector('[data-save]').onclick=()=>{const url=URL.createObjectURL(new Blob(['\ufeff'+csv()],{type:'text/csv;charset=utf-8'}));const a=document.createElement('a');a.href=url;a.download='IFC-данные-нормы.csv';a.click();setTimeout(()=>URL.revokeObjectURL(url),1000);};
  };
 })();
