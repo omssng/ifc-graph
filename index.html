@@ -284,7 +284,6 @@
     </div>
     <div class="seg" role="group" aria-label="Данные и нормы">
       <button data-v="facts">Данные → нормы</button>
-      <button data-v="factsGraph">Данные → нормы · граф</button>
     </div>
     </div>
     <div class="seg rule" id="ruleSeg">
@@ -303,9 +302,8 @@
 <div id="modal"><div class="win"><header><div><h2 id="modalTitle">Выводы анализа</h2><small id="insSub"></small></div><span class="x" id="closeModal">×</span></header><div class="body" id="insBody"></div></div></div>
 
 <script src="vendor/d3.v7.min.js"></script>
-<script src="data.js?v=7"></script>
-<script src="facts.js?v=7"></script>
-<script src="facts-graph.js?v=7"></script>
+<script src="data.js?v=8"></script>
+<script src="facts.js?v=8"></script>
 <script>
 (() => {
 'use strict';
@@ -587,7 +585,7 @@ function drawMatrix() {
 let epoch = 0;
 function render(opts) {
   opts = opts || {};
-  const isFacts = S.view === 'facts' || S.view === 'factsGraph';
+  const isFacts = S.view === 'facts';
   ['#ruleSeg', '#stepsBox', '#copyTable', '#copyHint'].forEach(s => { if ($(s)) $(s).style.display = isFacts ? 'none' : ''; });
   ['#vA', '#showGate', '#colorBy', '#clearFail'].forEach(s => { const box = $(s).closest('fieldset'); if (box) box.style.display = isFacts ? 'none' : ''; });
   $('#factsView').style.display = isFacts ? 'block' : 'none';
@@ -597,7 +595,7 @@ function render(opts) {
     renderSidebarState();
     $('#legend').style.display = 'none'; $('#scen').style.display = 'none';
     $('#detail').classList.remove('on');
-    (S.view === 'factsGraph' ? window.renderFactsGraph : window.renderFacts)($('#factsView'), visNodes(), S.q, S.sel);
+    window.renderFacts($('#factsView'), visNodes(), S.q, S.sel);
     writeHash(); return;
   }
   refreshMarkerCss();
@@ -823,7 +821,7 @@ const GATE_ID = 'IFC-01';
 
 function select(id) {
   S.sel = id;
-  if (S.view === 'facts' || S.view === 'factsGraph') { render(); return; }
+  if (S.view === 'facts') { render(); return; }
   if (S.view === 'rank') { drawRank(); } else restyle();
   renderDetail(); renderLegend(); writeHash();
   if (S.sel && S.view !== 'rank' && S.view !== 'matrix') centerOn(S.sel);
@@ -1001,7 +999,9 @@ function writeHash() {
 }
 function readHash() {
   const p = new URLSearchParams(location.hash.replace(/^#/, ''));
-  if (['cascade', 'lanes', 'matrix', 'rank', 'facts', 'factsGraph'].includes(p.get('view'))) S.view = p.get('view');
+  if (['cascade', 'lanes', 'matrix', 'rank', 'facts'].includes(p.get('view'))) S.view = p.get('view');
+  // Архивный граф недоступен: старые ссылки открывают карточный вид.
+  if (p.get('view') === 'factsGraph') S.view = 'facts';
   if (['A', 'B'].includes(p.get('rule'))) S.variant = p.get('rule');
   const stepsN = +p.get('steps');
   if (stepsN >= 2 && stepsN <= STEPS_MAX) S.steps = stepsN;
@@ -1035,9 +1035,9 @@ function bind() {
     const res = q ? G.nodes.filter(n => matches(n, q)).slice(0, 9) : [];
     $('#results').innerHTML = res.map(n => `<a data-id="${n.id}"><span class="cd">${esc(n.label)}</span><span class="nm">${esc(n.n)}</span></a>`).join('');
     $('#results').querySelectorAll('a').forEach(a => a.addEventListener('click', () => select(a.dataset.id)));
-    if (S.view === 'facts' || S.view === 'factsGraph') render(); else if (S.view === 'rank') drawRank(); else restyle();
+    if (S.view === 'facts') render(); else if (S.view === 'rank') drawRank(); else restyle();
   });
-  window.addEventListener('resize', () => { if (!['rank', 'facts', 'factsGraph'].includes(S.view)) fit(false); });
+  window.addEventListener('resize', () => { if (!['rank', 'facts'].includes(S.view)) fit(false); });
   window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', () => render({ relayout: false }));
 }
 
