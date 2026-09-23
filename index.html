@@ -136,8 +136,6 @@
   .node .amb{font-size:11px;fill:var(--warn)}
   .node .cnt rect{fill:var(--chipbg);stroke:var(--chipbd);stroke-width:1}
   .node .cnt text{font:700 10.5px ui-monospace,"SF Mono",Menlo,Consolas,monospace;fill:var(--chipink);font-variant-numeric:tabular-nums}
-  .node .cnt.all rect{fill:rgba(224,121,26,.14);stroke:var(--desc)}
-  .node .cnt.all text{fill:var(--desc)}
   .node:hover .card{stroke:var(--accent)}
   .node.sel .card{stroke:var(--accent);stroke-width:2.6}
   .node.anc .card{stroke:var(--anc);stroke-width:2}
@@ -313,8 +311,8 @@
 <div id="modal"><div class="win"><header><div><h2 id="modalTitle">Выводы анализа</h2><small id="insSub"></small></div><span class="x" id="closeModal">×</span></header><div class="body" id="insBody"></div></div></div>
 
 <script src="vendor/d3.v7.min.js"></script>
-<script src="data.js?v=12"></script>
-<script src="facts.js?v=12"></script>
+<script src="data.js?v=13"></script>
+<script src="facts.js?v=13"></script>
 <script>
 (() => {
 'use strict';
@@ -655,14 +653,21 @@ function restyle() {
     nodeSel.select('.stripe').attr('fill', d => colorOf(N[d.id]));
     nodeSel.select('.cross').text(d => S.failed.has(d.id) ? '×' : '⊘');
     const rule = S.variant === 'A' ? 'жёстко' : 'смягчённо';
+    const cntMax = Math.max(1, ...nodeSel.data().map(d => cntOf(N[d.id])));
+    const strong = cssv(S.cnt === 'next' ? '--accent' : '--desc');
+    const fillOf = d3.interpolateRgb(cssv('--chipbg'), strong), strokeOf = d3.interpolateRgb(cssv('--chipbd'), strong);
     nodeSel.select('.cnt').each(function (d) {
       const n = N[d.id], v = cntOf(n), el = d3.select(this);
       if (!S.cnt || !v) { el.style('display', 'none'); return; }
       const label = (S.cnt === 'next' ? '→ ' : 'Σ ') + v;
       const w = 12 + label.length * 6.4, right = n.amb ? NW - 47 : NW - 24;
-      el.style('display', null).classed('all', S.cnt === 'all');
-      el.select('rect').attr('x', right - w).attr('width', w);
-      el.select('text').attr('x', right - w / 2).text(label);
+      // корень сглаживает разрыв: иначе при максимуме ~60 все значения до 10 выглядят одинаково серыми
+      const t = Math.sqrt(v / cntMax);
+      el.style('display', null);
+      el.select('rect').attr('x', right - w).attr('width', w)
+        .style('fill', fillOf(0.08 + 0.92 * t)).style('stroke', strokeOf(Math.min(1, 0.25 + t)));
+      el.select('text').attr('x', right - w / 2).text(label)
+        .style('fill', t > 0.5 ? '#fff' : t > 0.2 ? strong : cssv('--chipink'));
       el.select('title').text(S.cnt === 'next'
         ? `${v} — проверок на следующем шаге сразу после ${n.label} (${rule})`
         : `${v} — проверок всего после ${n.label} до конца цепочки (${rule})`);
@@ -795,7 +800,8 @@ function renderLegend() {
   h += '<div class="hint" style="margin-top:4px">' + (S.variant === 'A' ? 'Все линии, кроме свода, блокируют.' : 'Сплошная — блокирует, пунктир — только данные.') + '</div>';
   if (S.cnt && S.view !== 'matrix') h += '<h4>Число на карточке</h4><div class="hint" style="margin-top:0">' + (S.cnt === 'next'
     ? '→ N — сколько проверок ждут эту напрямую, на следующем шаге цепочки (по стрелкам, видимым на схеме).'
-    : 'Σ N — сколько проверок всего стоят после этой до конца цепочки.') + ' По выбранному правилу каскада; 0 не показывается.</div>';
+    : 'Σ N — сколько проверок всего стоят после этой до конца цепочки.') + ' По выбранному правилу каскада; 0 не показывается.</div>'
+    + `<div class="li" style="margin-top:4px"><span class="sw" style="flex:0 0 70px;background:linear-gradient(90deg,var(--chipbg),var(${S.cnt === 'next' ? '--accent' : '--desc'}))"></span>меньше → больше</div>`;
   if (S.sel) h += '<h4>Выбор</h4><div class="li"><span class="sw" style="background:var(--anc)"></span>предки (слева)</div><div class="li"><span class="sw" style="background:var(--desc)"></span>потомки (справа)</div>';
   el.innerHTML = h;
 }
