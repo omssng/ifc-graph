@@ -298,6 +298,9 @@
       <button data-v="" class="on" title="Карточки без числа">Без счёта</button>
       <button data-v="next" title="Сколько проверок ждут эту напрямую — на следующем шаге цепочки (при выбранном правиле каскада)">→ Следующий слой</button>
       <button data-v="all" title="Сколько проверок всего стоят после этой до самого конца цепочки (при выбранном правиле каскада)">Σ Всего после</button>
+      <label id="cntMidBox" class="lab" title="Середина подсветки: при каком числе контур горит вполсилы. Вправо — ярко только самые большие числа, влево — ярче и средние">
+        середина <input type="range" id="cntMid" min="5" max="90" step="5" style="width:90px;vertical-align:middle"> <b id="cntMidVal" style="color:var(--ink);font-variant-numeric:tabular-nums"></b>
+      </label>
     </div>
     <button class="btn" id="fit">К центру</button>
     <div class="pill" id="counter"></div>
@@ -311,8 +314,8 @@
 <div id="modal"><div class="win"><header><div><h2 id="modalTitle">Выводы анализа</h2><small id="insSub"></small></div><span class="x" id="closeModal">×</span></header><div class="body" id="insBody"></div></div></div>
 
 <script src="vendor/d3.v7.min.js"></script>
-<script src="data.js?v=14"></script>
-<script src="facts.js?v=14"></script>
+<script src="data.js?v=15"></script>
+<script src="facts.js?v=15"></script>
 <script>
 (() => {
 'use strict';
@@ -346,7 +349,7 @@ const S = {
   view: 'cascade', variant: 'A', colorBy: 'sec', steps: STEPS_MAX,
   sec: new Set(secKeys), fam: new Set(famKeys), st: new Set(stKeys), rel: new Set(Object.keys(RELS)),
   onlyAmb: false, showGate: false, showImplied: false, showAgg: true,
-  q: '', sel: null, failed: new Set(), rankSort: 'desc', rankDir: -1, cnt: '',
+  q: '', sel: null, failed: new Set(), rankSort: 'desc', rankDir: -1, cnt: '', cntMid: 40,
 };
 
 // ───────── вычисления ─────────
@@ -656,13 +659,15 @@ function restyle() {
     const cntMax = Math.max(1, ...nodeSel.data().map(d => cntOf(N[d.id])));
     const strong = cssv(S.cnt === 'next' ? '--accent' : '--desc');
     const strokeOf = d3.interpolateRgb(cssv('--chipbd'), strong);
+    // показатель степени подобран так, чтобы доля S.cntMid% от максимума давала ровно половину яркости
+    const mid = S.cntMid / 100, gamma = Math.log(0.5) / Math.log(mid);
+    $('#cntMidVal').textContent = '≈ ' + Math.max(1, Math.round(mid * cntMax));
     nodeSel.select('.cnt').each(function (d) {
       const n = N[d.id], v = cntOf(n), el = d3.select(this);
       if (!S.cnt || !v) { el.style('display', 'none'); return; }
       const label = (S.cnt === 'next' ? '→ ' : 'Σ ') + v;
       const w = 12 + label.length * 6.4, right = n.amb ? NW - 47 : NW - 24;
-      // корень сглаживает разрыв: иначе при максимуме ~60 все значения до 10 выглядят одинаково серыми
-      const t = Math.sqrt(v / cntMax);
+      const t = Math.pow(v / cntMax, gamma);
       el.style('display', null);
       el.select('rect').attr('x', right - w).attr('width', w)
         .style('stroke', strokeOf(t)).style('stroke-width', 1 + 1.4 * t);
@@ -748,6 +753,8 @@ function renderSidebarState() {
   document.querySelectorAll('#ruleSeg button').forEach(b => b.classList.toggle('on', b.dataset.v === S.variant));
   document.querySelectorAll('#views button').forEach(b => b.classList.toggle('on', b.dataset.v === S.view));
   document.querySelectorAll('#cntSeg button').forEach(b => b.classList.toggle('on', b.dataset.v === S.cnt));
+  $('#cntMidBox').style.display = S.cnt ? '' : 'none';
+  $('#cntMid').value = S.cntMid;
   $('#cntSeg').style.display = (S.view === 'cascade' || S.view === 'lanes') ? '' : 'none';
   const vis = visNodes();
   $('#counter').textContent = vis.length + ' из ' + G.nodes.length + ' проверок';
@@ -1035,6 +1042,7 @@ function writeHash() {
     p.set('view', S.view); p.set('rule', S.variant);
     if (S.steps !== STEPS_MAX) p.set('steps', S.steps);
     if (S.cnt) p.set('cnt', S.cnt);
+    if (S.cnt && S.cntMid !== 40) p.set('mid', S.cntMid);
     if (S.sel) p.set('sel', S.sel);
     if (S.failed.size) p.set('fail', [...S.failed].join(','));
     history.replaceState(null, '', '#' + p.toString());
@@ -1047,6 +1055,8 @@ function readHash() {
   if (p.get('view') === 'factsGraph') S.view = 'facts';
   if (['A', 'B'].includes(p.get('rule'))) S.variant = p.get('rule');
   if (['next', 'all'].includes(p.get('cnt'))) S.cnt = p.get('cnt');
+  const midN = +p.get('mid');
+  if (midN >= 5 && midN <= 90) S.cntMid = midN;
   const stepsN = +p.get('steps');
   if (stepsN >= 2 && stepsN <= STEPS_MAX) S.steps = stepsN;
   if (p.get('sel') && N[p.get('sel')]) S.sel = p.get('sel');
@@ -1057,6 +1067,7 @@ function readHash() {
 function bind() {
   document.querySelectorAll('#views button').forEach(b => b.addEventListener('click', () => { S.view = b.dataset.v; render({ fit: true, relayout: true }); }));
   document.querySelectorAll('#ruleSeg button').forEach(b => b.addEventListener('click', () => { S.variant = b.dataset.v; render({ relayout: false }); }));
+  $('#cntMid').addEventListener('input', e => { S.cntMid = +e.target.value; restyle(); writeHash(); });
   document.querySelectorAll('#cntSeg button').forEach(b => b.addEventListener('click', () => {
     S.cnt = b.dataset.v; restyle(); renderSidebarState(); renderLegend(); writeHash();
   }));
