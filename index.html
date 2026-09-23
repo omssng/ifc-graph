@@ -79,6 +79,7 @@
   .seg button.on{background:var(--bg);color:var(--ink);font-weight:600}
   .seg.rule button.on[data-v=A]{color:var(--fail)}
   .seg.rule button.on[data-v=B]{color:var(--ok)}
+  .seg .lab{color:var(--muted);font-size:11px;padding:6px 4px 6px 7px;white-space:nowrap}
   .pill{background:var(--panel);border:1px solid var(--line);border-radius:9px;box-shadow:var(--shadow);padding:6px 10px;font-size:12px;color:var(--muted)}
 
   #legend{position:absolute;right:12px;bottom:12px;z-index:6;background:var(--panel);border:1px solid var(--line);border-radius:9px;
@@ -133,6 +134,10 @@
   .node .id{font:700 11.5px ui-monospace,"SF Mono",Menlo,Consolas,monospace;fill:var(--ink)}
   .node .nm{font-size:10px;fill:var(--muted)}
   .node .amb{font-size:11px;fill:var(--warn)}
+  .node .cnt rect{fill:var(--chipbg);stroke:var(--chipbd);stroke-width:1}
+  .node .cnt text{font:700 10.5px ui-monospace,"SF Mono",Menlo,Consolas,monospace;fill:var(--chipink);font-variant-numeric:tabular-nums}
+  .node .cnt.all rect{fill:rgba(224,121,26,.14);stroke:var(--desc)}
+  .node .cnt.all text{fill:var(--desc)}
   .node:hover .card{stroke:var(--accent)}
   .node.sel .card{stroke:var(--accent);stroke-width:2.6}
   .node.anc .card{stroke:var(--anc);stroke-width:2}
@@ -290,6 +295,12 @@
       <button data-v="A" class="on">Жёстко</button>
       <button data-v="B">Смягчённо</button>
     </div>
+    <div class="seg" id="cntSeg" role="group" aria-label="Число на карточках">
+      <span class="lab">На карточке:</span>
+      <button data-v="" class="on" title="Карточки без числа">Без счёта</button>
+      <button data-v="next" title="Сколько проверок ждут эту напрямую — на следующем шаге цепочки (при выбранном правиле каскада)">→ Следующий слой</button>
+      <button data-v="all" title="Сколько проверок всего стоят после этой до самого конца цепочки (при выбранном правиле каскада)">Σ Всего после</button>
+    </div>
     <button class="btn" id="fit">К центру</button>
     <div class="pill" id="counter"></div>
   </div>
@@ -302,8 +313,8 @@
 <div id="modal"><div class="win"><header><div><h2 id="modalTitle">Выводы анализа</h2><small id="insSub"></small></div><span class="x" id="closeModal">×</span></header><div class="body" id="insBody"></div></div></div>
 
 <script src="vendor/d3.v7.min.js"></script>
-<script src="data.js?v=10"></script>
-<script src="facts.js?v=10"></script>
+<script src="data.js?v=11"></script>
+<script src="facts.js?v=11"></script>
 <script>
 (() => {
 'use strict';
@@ -337,7 +348,7 @@ const S = {
   view: 'cascade', variant: 'A', colorBy: 'sec', steps: STEPS_MAX,
   sec: new Set(secKeys), fam: new Set(famKeys), st: new Set(stKeys), rel: new Set(Object.keys(RELS)),
   onlyAmb: false, showGate: false, showImplied: false, showAgg: true,
-  q: '', sel: null, failed: new Set(), rankSort: 'desc', rankDir: -1,
+  q: '', sel: null, failed: new Set(), rankSort: 'desc', rankDir: -1, cnt: '',
 };
 
 // ───────── вычисления ─────────
@@ -368,6 +379,10 @@ function chainOf(id) {
   return { anc, desc };
 }
 const M = n => n[S.variant];
+const nextCount = n => new Set(OUT[n.id]
+  .filter(e => blocks(e) && (!e.implicit || S.showGate) && (!e.implied || S.showImplied))
+  .map(e => e.to)).size;
+const cntOf = n => S.cnt === 'next' ? nextCount(n) : S.cnt === 'all' ? M(n).desc.length : 0;
 const maxDesc = () => Math.max(1, ...G.nodes.map(n => M(n).desc.length));
 const matches = (n, q) => (n.label + ' ' + n.n + ' ' + n.d + ' ' + n.id).toLowerCase().includes(q);
 
@@ -520,6 +535,10 @@ function nodeShape(g) {
   });
   g.filter(d => N[d.id].amb).append('text').attr('class', 'amb').attr('x', NW - 32).attr('y', 18).attr('text-anchor', 'end').text('⚠');
   g.append('text').attr('class', 'cross').attr('x', NW - 14).attr('y', NH - 8).attr('text-anchor', 'middle').text(d => S.failed.has(d.id) ? '×' : '⊘');
+  const cg = g.append('g').attr('class', 'cnt').style('display', 'none');
+  cg.append('title');
+  cg.append('rect').attr('y', 6).attr('height', 16).attr('rx', 8);
+  cg.append('text').attr('y', 18).attr('text-anchor', 'middle');
   g.on('click', (ev, d) => { ev.stopPropagation(); select(d.id); });
 }
 
@@ -635,6 +654,19 @@ function restyle() {
       .classed('match', d => !!q && matches(N[d.id], q));
     nodeSel.select('.stripe').attr('fill', d => colorOf(N[d.id]));
     nodeSel.select('.cross').text(d => S.failed.has(d.id) ? '×' : '⊘');
+    const rule = S.variant === 'A' ? 'жёстко' : 'смягчённо';
+    nodeSel.select('.cnt').each(function (d) {
+      const n = N[d.id], v = cntOf(n), el = d3.select(this);
+      if (!S.cnt || !v) { el.style('display', 'none'); return; }
+      const label = (S.cnt === 'next' ? '→ ' : 'Σ ') + v;
+      const w = 12 + label.length * 6.4, right = n.amb ? NW - 47 : NW - 24;
+      el.style('display', null).classed('all', S.cnt === 'all');
+      el.select('rect').attr('x', right - w).attr('width', w);
+      el.select('text').attr('x', right - w / 2).text(label);
+      el.select('title').text(S.cnt === 'next'
+        ? `${v} — проверок на следующем шаге сразу после ${n.label} (${rule})`
+        : `${v} — проверок всего после ${n.label} до конца цепочки (${rule})`);
+    });
   }
   if (edgeSel) {
     const ee = d => d;
@@ -711,6 +743,8 @@ function renderSidebarState() {
   $('#vB').classList.toggle('on', S.variant === 'B');
   document.querySelectorAll('#ruleSeg button').forEach(b => b.classList.toggle('on', b.dataset.v === S.variant));
   document.querySelectorAll('#views button').forEach(b => b.classList.toggle('on', b.dataset.v === S.view));
+  document.querySelectorAll('#cntSeg button').forEach(b => b.classList.toggle('on', b.dataset.v === S.cnt));
+  $('#cntSeg').style.display = (S.view === 'cascade' || S.view === 'lanes') ? '' : 'none';
   const vis = visNodes();
   $('#counter').textContent = vis.length + ' из ' + G.nodes.length + ' проверок';
   const slider = $('#stepsSlider');
@@ -759,6 +793,9 @@ function renderLegend() {
   }
   h += '<h4>Связи</h4>' + KIND_ORDER.map(k => `<div class="li"><svg width="26" height="8"><line x1="0" y1="4" x2="24" y2="4" stroke="var(--k-${k})" stroke-width="2.2" ${k === 'agg' ? 'stroke-dasharray="2 4"' : ''}/></svg>${esc(G.meta.kindName[k])}</div>`).join('');
   h += '<div class="hint" style="margin-top:4px">' + (S.variant === 'A' ? 'Все линии, кроме свода, блокируют.' : 'Сплошная — блокирует, пунктир — только данные.') + '</div>';
+  if (S.cnt && S.view !== 'matrix') h += '<h4>Число на карточке</h4><div class="hint" style="margin-top:0">' + (S.cnt === 'next'
+    ? '→ N — сколько проверок ждут эту напрямую, на следующем шаге цепочки (по стрелкам, видимым на схеме).'
+    : 'Σ N — сколько проверок всего стоят после этой до конца цепочки.') + ' По выбранному правилу каскада; 0 не показывается.</div>';
   if (S.sel) h += '<h4>Выбор</h4><div class="li"><span class="sw" style="background:var(--anc)"></span>предки (слева)</div><div class="li"><span class="sw" style="background:var(--desc)"></span>потомки (справа)</div>';
   el.innerHTML = h;
 }
@@ -992,6 +1029,7 @@ function writeHash() {
     const p = new URLSearchParams();
     p.set('view', S.view); p.set('rule', S.variant);
     if (S.steps !== STEPS_MAX) p.set('steps', S.steps);
+    if (S.cnt) p.set('cnt', S.cnt);
     if (S.sel) p.set('sel', S.sel);
     if (S.failed.size) p.set('fail', [...S.failed].join(','));
     history.replaceState(null, '', '#' + p.toString());
@@ -1003,6 +1041,7 @@ function readHash() {
   // Архивный граф недоступен: старые ссылки открывают карточный вид.
   if (p.get('view') === 'factsGraph') S.view = 'facts';
   if (['A', 'B'].includes(p.get('rule'))) S.variant = p.get('rule');
+  if (['next', 'all'].includes(p.get('cnt'))) S.cnt = p.get('cnt');
   const stepsN = +p.get('steps');
   if (stepsN >= 2 && stepsN <= STEPS_MAX) S.steps = stepsN;
   if (p.get('sel') && N[p.get('sel')]) S.sel = p.get('sel');
@@ -1013,6 +1052,9 @@ function readHash() {
 function bind() {
   document.querySelectorAll('#views button').forEach(b => b.addEventListener('click', () => { S.view = b.dataset.v; render({ fit: true, relayout: true }); }));
   document.querySelectorAll('#ruleSeg button').forEach(b => b.addEventListener('click', () => { S.variant = b.dataset.v; render({ relayout: false }); }));
+  document.querySelectorAll('#cntSeg button').forEach(b => b.addEventListener('click', () => {
+    S.cnt = b.dataset.v; restyle(); renderSidebarState(); renderLegend(); writeHash();
+  }));
   [$('#vA'), $('#vB')].forEach(c => c.addEventListener('click', () => { S.variant = c.dataset.v; render(); }));
   $('#fit').addEventListener('click', () => fit(true));
   $('#colorBy').addEventListener('change', e => { S.colorBy = e.target.value; render({ relayout: false }); });
