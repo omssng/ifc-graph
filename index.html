@@ -298,7 +298,7 @@
       <button data-v="" class="on" title="Карточки без числа">Без счёта</button>
       <button data-v="next" title="Сколько проверок ждут эту напрямую — на следующем шаге цепочки (при выбранном правиле каскада)">→ Следующий слой</button>
       <button data-v="all" title="Сколько проверок всего стоят после этой до самого конца цепочки (при выбранном правиле каскада)">Σ Всего после</button>
-      <label id="cntMidBox" class="lab" title="Середина подсветки: при каком числе контур горит вполсилы. Вправо — ярко только самые большие числа, влево — ярче и средние">
+      <label id="cntMidBox" class="lab" title="Середина шкалы: при каком числе контур жёлтый. Вправо — красным горят только самые большие числа, влево — теплее становятся и средние">
         середина <input type="range" id="cntMid" min="5" max="90" step="5" style="width:90px;vertical-align:middle"> <b id="cntMidVal" style="color:var(--ink);font-variant-numeric:tabular-nums"></b>
       </label>
     </div>
@@ -314,8 +314,8 @@
 <div id="modal"><div class="win"><header><div><h2 id="modalTitle">Выводы анализа</h2><small id="insSub"></small></div><span class="x" id="closeModal">×</span></header><div class="body" id="insBody"></div></div></div>
 
 <script src="vendor/d3.v7.min.js"></script>
-<script src="data.js?v=15"></script>
-<script src="facts.js?v=15"></script>
+<script src="data.js?v=16"></script>
+<script src="facts.js?v=16"></script>
 <script>
 (() => {
 'use strict';
@@ -383,6 +383,8 @@ const M = n => n[S.variant];
 const nextCount = n => new Set(OUT[n.id]
   .filter(e => blocks(e) && (!e.implicit || S.showGate) && (!e.implied || S.showImplied))
   .map(e => e.to)).size;
+// Turbo без бледной середины (в отличие от RdYlBu); тёмные края срезаны — на тёмной теме они сливаются с фоном
+const heat = t => d3.interpolateTurbo(0.12 + 0.8 * t);
 const cntOf = n => S.cnt === 'next' ? nextCount(n) : S.cnt === 'all' ? M(n).desc.length : 0;
 const maxDesc = () => Math.max(1, ...G.nodes.map(n => M(n).desc.length));
 const matches = (n, q) => (n.label + ' ' + n.n + ' ' + n.d + ' ' + n.id).toLowerCase().includes(q);
@@ -657,9 +659,7 @@ function restyle() {
     nodeSel.select('.cross').text(d => S.failed.has(d.id) ? '×' : '⊘');
     const rule = S.variant === 'A' ? 'жёстко' : 'смягчённо';
     const cntMax = Math.max(1, ...nodeSel.data().map(d => cntOf(N[d.id])));
-    const strong = cssv(S.cnt === 'next' ? '--accent' : '--desc');
-    const strokeOf = d3.interpolateRgb(cssv('--chipbd'), strong);
-    // показатель степени подобран так, чтобы доля S.cntMid% от максимума давала ровно половину яркости
+    // показатель степени подобран так, чтобы доля S.cntMid% от максимума попадала ровно в середину шкалы
     const mid = S.cntMid / 100, gamma = Math.log(0.5) / Math.log(mid);
     $('#cntMidVal').textContent = '≈ ' + Math.max(1, Math.round(mid * cntMax));
     nodeSel.select('.cnt').each(function (d) {
@@ -670,7 +670,7 @@ function restyle() {
       const t = Math.pow(v / cntMax, gamma);
       el.style('display', null);
       el.select('rect').attr('x', right - w).attr('width', w)
-        .style('stroke', strokeOf(t)).style('stroke-width', 1 + 1.4 * t);
+        .style('stroke', heat(t)).style('stroke-width', 1.6 + 1.2 * t);
       el.select('text').attr('x', right - w / 2).text(label);
       el.select('title').text(S.cnt === 'next'
         ? `${v} — проверок на следующем шаге сразу после ${n.label} (${rule})`
@@ -807,7 +807,7 @@ function renderLegend() {
   if (S.cnt && S.view !== 'matrix') h += '<h4>Число на карточке</h4><div class="hint" style="margin-top:0">' + (S.cnt === 'next'
     ? '→ N — сколько проверок ждут эту напрямую, на следующем шаге цепочки (по стрелкам, видимым на схеме).'
     : 'Σ N — сколько проверок всего стоят после этой до конца цепочки.') + ' По выбранному правилу каскада; 0 не показывается.</div>'
-    + `<div class="li" style="margin-top:4px"><span class="sw" style="flex:0 0 70px;height:6px;background:linear-gradient(90deg,var(--chipbd),var(${S.cnt === 'next' ? '--accent' : '--desc'}))"></span>контур: меньше → больше</div>`;
+    + `<div class="li" style="margin-top:4px"><span class="sw" style="flex:0 0 70px;height:6px;background:linear-gradient(90deg,${d3.range(0, 1.01, 0.25).map(heat).join(',')})"></span>контур: меньше → больше</div>`;
   if (S.sel) h += '<h4>Выбор</h4><div class="li"><span class="sw" style="background:var(--anc)"></span>предки (слева)</div><div class="li"><span class="sw" style="background:var(--desc)"></span>потомки (справа)</div>';
   el.innerHTML = h;
 }
