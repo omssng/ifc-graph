@@ -65,6 +65,13 @@
   .vcard span{color:var(--muted);font-size:11px;line-height:1.35;display:block;margin-top:2px}
   .vcard.on{border-color:var(--accent);background:var(--chipbg)}
   .hint{color:var(--muted);font-size:11px;margin-top:6px;line-height:1.4}
+  #filePick{position:absolute;z-index:5;display:none;align-items:center;gap:2px;background:var(--panel);border:1px solid var(--accent);border-radius:9px;
+    box-shadow:var(--shadow);padding:2px 3px 2px 7px;font-size:11px;white-space:nowrap}
+  #filePick.on{display:flex}
+  #filePick .lab{color:var(--muted);margin-right:3px}
+  #filePick button{border:0;background:transparent;color:var(--muted);padding:3px 6px;border-radius:6px;cursor:pointer;font-size:11px}
+  #filePick button:hover{color:var(--ink);background:var(--bg)}
+  #filePick button.on{background:var(--accent);color:#fff;font-weight:600}
   .fork{display:flex;align-items:center;gap:6px;padding:2px 4px;border-radius:6px;user-select:none}
   .fork:hover{background:var(--bg)}
   .fork label{flex:1;display:flex;align-items:center;gap:6px;cursor:pointer}
@@ -181,6 +188,9 @@
   .lanelabel.sub{font-weight:400;font-size:10px}
   .stripe.copy{fill:none!important;stroke-width:1.6}
   .node.ctx{opacity:.55}
+  .node.off{filter:grayscale(1);opacity:.25}
+  .node.off.sel{opacity:.6}
+  .edge.off{opacity:.04!important}
   .node.ctx .card{stroke-dasharray:4 3}
   .node.ctx.sel,.node.ctx.anc,.node.ctx.desc{opacity:1}
   .stub{cursor:help}
@@ -341,7 +351,7 @@
 </aside>
 
 <main>
-  <div id="stage"><svg id="svg"></svg></div>
+  <div id="stage"><svg id="svg"></svg><div id="filePick" title="Какой IFC-файл сейчас проходит проверки: граф не меняется, у узлов, которые этот файл не проходит, уходит насыщенность"><span class="lab">IFC-01 · файл:</span><button data-v="">все</button><button data-v="ps">ПС</button><button data-v="ar">АР</button><button data-v="psar">ПС+АР</button><button data-v="bf">БФ</button></div></div>
   <div id="rank"></div>
   <div id="factsView"></div>
   <div class="topbar">
@@ -385,9 +395,9 @@
 <div id="modal"><div class="win"><header><div><h2 id="modalTitle">Выводы анализа</h2><small id="insSub"></small></div><span class="x" id="closeModal">×</span></header><div class="body" id="insBody"></div></div></div>
 
 <script src="vendor/d3.v7.min.js"></script>
-<script src="data.js?v=22"></script>
-<script src="facts.js?v=22"></script>
-<script src="npa.js?v=22"></script>
+<script src="data.js?v=23"></script>
+<script src="facts.js?v=23"></script>
+<script src="npa.js?v=23"></script>
 <script>
 (() => {
 'use strict';
@@ -421,6 +431,7 @@ const S = {
   view: 'cascade', variant: 'A', colorBy: 'sec', steps: STEPS_MAX,
   npaPsAr: false, npaVed: false, npaEmpty: true, npaLinks: false, npaSel: null,
   brDisc: true, brSub: true, brDup: false, brSel: null, brOn: null, brAnc: true, brDesc: true,
+  fileDisc: '',
   sec: new Set(secKeys), fam: new Set(famKeys), st: new Set(stKeys), rel: new Set(Object.keys(RELS)), ft: new Set(Object.keys(window.IFC_GRAPH.branches.types)),
   onlyAmb: false, showGate: false, showImplied: false, showAgg: true,
   q: '', sel: null, failed: new Set(), rankSort: 'desc', rankDir: -1, cnt: '', cntMid: 40,
@@ -509,7 +520,7 @@ function setupSvg() {
   pat.append('rect').attr('width', 6).attr('height', 6).attr('class', 'hatchbg');
   pat.append('line').attr('x1', 0).attr('y1', 0).attr('x2', 0).attr('y2', 6).attr('class', 'hatchln');
   gRoot = svg.append('g');
-  zoomB = d3.zoom().scaleExtent([0.12, 3.2]).on('zoom', ev => { curTransform = ev.transform; gRoot.attr('transform', ev.transform); });
+  zoomB = d3.zoom().scaleExtent([0.12, 3.2]).on('zoom', ev => { curTransform = ev.transform; gRoot.attr('transform', ev.transform); placeFilePick(); });
   svg.call(zoomB).on('dblclick.zoom', null);
   svg.on('click', ev => { if (ev.target === svg.node()) select(null); });
   svg.call(zoomB.transform, curTransform);
@@ -685,6 +696,42 @@ function drawMatrix() {
   nodeSel = null; edgeSel = null;
 }
 
+
+// ───────── выбор файла на узле IFC-01 ─────────
+// Какой IFC-файл (раздел ЦИМ) сейчас проходит проверки. Граф не меняется: у узлов, которые этот файл
+// не проходит, уходит насыщенность. Проходит: контейнер TRM, общие проверки любого IFC-файла,
+// проверки своего раздела и совместные ПС+АР (для ПС и АР). XML, аннотации и 2D — другие файлы.
+const FILE_DISCS = { ps: ['ps'], ar: ['ar'], psar: ['ps', 'ar'], bf: ['bf'] };
+const FILE_NAMES = { ps: 'ЦИМ ПС', ar: 'ЦИМ АР', psar: 'ЦИМ ПС и ЦИМ АР', bf: 'ЦИМ БФ' };
+const FILE_VIEWS = ['cascade', 'lanes', 'branches'];
+function fileInvolved(d) {
+  const base = d.base || d.id, p = G.branches.assign[base].split('.'), want = FILE_DISCS[S.fileDisc];
+  if (p[0] === 'trm') return true;
+  if (p[0] !== 'ifc') return false;
+  if (d.base && d.id !== d.base) return want.includes(d.id.split('@')[1]);   // копия общей проверки
+  if (p[1] === 'common') return true;
+  if (p[1] === 'both') return want.includes('ps') || want.includes('ar');
+  return want.includes(p[1]);
+}
+function applyFileDisc() {
+  if (!nodeSel || !FILE_VIEWS.includes(S.view)) return;
+  if (!S.fileDisc) { nodeSel.classed('off', false); if (edgeSel) edgeSel.classed('off', false); placeFilePick(); return; }
+  const inv = new Set();
+  nodeSel.each(d => { if (fileInvolved(d)) inv.add(d.id); });
+  nodeSel.classed('off', d => !inv.has(d.id));
+  if (edgeSel) edgeSel.classed('off', x => !inv.has(x.from) || !inv.has(x.to));
+  placeFilePick();
+}
+function placeFilePick() {
+  const el = $('#filePick');
+  const anchor = nodeSel && FILE_VIEWS.includes(S.view) ? nodeSel.filter(d => (d.base || d.id) === 'IFC-01') : null;
+  if (!anchor || anchor.empty()) { el.classList.remove('on'); return; }
+  const d = anchor.datum(), t = curTransform;
+  el.querySelectorAll('button').forEach(b => b.classList.toggle('on', b.dataset.v === S.fileDisc));
+  el.classList.add('on');
+  el.style.left = Math.round(d.x * t.k + t.x) + 'px';
+  el.style.top = Math.round((d.y + NH) * t.k + t.y + 3) + 'px';
+}
 
 // ───────── вид «Ветки по файлам» ─────────
 // Раскладка той же модели по дорожкам «тип файла → раздел ЦИМ → подветка». В режиме копий
@@ -1297,6 +1344,7 @@ function render(opts) {
   ['#fFt', '#fSec', '#fFam', '#fSt', '#fRel'].forEach(s => { const box = $(s).closest('fieldset'); if (box) box.style.display = isNpa ? 'none' : ''; });
   $('#npaBox').style.display = isNpa ? '' : 'none';
   $('#brBox').style.display = S.view === 'branches' ? '' : 'none';
+  if (!FILE_VIEWS.includes(S.view)) $('#filePick').classList.remove('on');
   $('#factsView').style.display = isFacts ? 'block' : 'none';
   if (isFacts) {
     $('#svg').style.display = 'none'; $('#rank').style.display = 'none';
@@ -1335,7 +1383,7 @@ function render(opts) {
 
 function restyle() {
   if (S.view === 'npa') { npaRestyle(); return; }
-  if (S.view === 'branches') { brRestyle(); return; }
+  if (S.view === 'branches') { brRestyle(); applyFileDisc(); return; }
   const sk = skippedSet();
   const chain = S.sel ? chainOf(S.sel) : null;
   const q = S.q.trim().toLowerCase();
@@ -1395,6 +1443,7 @@ function restyle() {
   if (mlabSel) {
     d3.selectAll('.mlabel').classed('hl', d => d && d.id === S.sel);
   }
+  applyFileDisc();
 }
 
 // ───────── рейтинг ─────────
@@ -1533,6 +1582,7 @@ function renderLegend() {
   if (S.view === 'branches') h += '<h4>Ветки по файлам</h4><div class="hint" style="margin-top:0">Дорожка — тип файла → раздел ЦИМ → подветка; цветная полоса слева — тип файла или раздел.'
     + (S.brDisc && S.brDup ? ' Общие проверки скопированы в каждый раздел: у копии полоса на карточке — контуром, связи копии не выходят за свой раздел.' : '') + '</div>'
     + (S.brOn ? '<div class="hint">Показаны выбранные ветки; бледные карточки с пунктирной рамкой — из других веток, но лежат на пути. <b style="color:var(--fail)">↤N / N↦</b> — связь обрывается: столько проверок из скрытых веток ещё нужны этой (слева) или ждут её (справа); наведите — список.</div>' : '');
+  if (S.fileDisc && FILE_VIEWS.includes(S.view)) h += `<h4>Файл: ${esc(FILE_NAMES[S.fileDisc])}</h4><div class="hint" style="margin-top:0">Выбрано на узле IFC-01. Насыщенные карточки — проверки, которые проходит IFC-файл этого раздела: контейнер TRM, общие проверки любого IFC-файла, проверки раздела${S.fileDisc === 'bf' ? '' : ' и совместные ПС+АР'}. Серые — не задействованы (другие разделы и другие типы файлов: XML, аннотации, 2D).</div>`;
   if (S.cnt && S.view !== 'matrix') h += '<h4>Число на карточке</h4><div class="hint" style="margin-top:0">' + (S.cnt === 'next'
     ? '→ N — сколько проверок ждут эту напрямую, на следующем шаге цепочки (по стрелкам, видимым на схеме).'
     : 'Σ N — сколько проверок всего стоят после этой до конца цепочки.') + ' По выбранному правилу каскада; 0 не показывается.</div>'
@@ -1707,6 +1757,7 @@ function glossary() {
     { t: 'Потомков / предков (в карточке и в «Рейтинге»)', p: '«Потомков» — сколько проверок перестанет выполняться, если эта не пройдёт (при выбранном правиле). «Предков» — сколько проверок должно пройти раньше, чтобы эта вообще запустилась. В «Рейтинге» оба правила показаны рядом, чтобы было видно разницу.' },
     { t: 'Своды', p: 'Проверки вроде «все параметры заполнены», которые не проверяют что-то своё, а просто собирают статусы других проверок в один общий результат. На схеме связи к ним идут пунктиром и подписаны «свод» — такие связи никогда не блокируют, при любом правиле каскада.' },
     { t: 'Допуск IFC-01', p: 'Скрытая по умолчанию связь: почти всем проверкам, которым нужна разобранная модель, добавлена связь-допуск от IFC-01 (файл вообще должен читаться). Таких связей больше полусотни, поэтому они спрятаны, чтобы не загромождать схему — включаются галочкой «Допуск IFC-01 к каждой проверке».' },
+    { t: 'Выбор файла на узле IFC-01', p: 'У карточки IFC-01 (проверка формата — с неё начинается путь любого IFC-файла) есть плавающий переключатель «файл: все / ПС / АР / ПС+АР / БФ» — какой IFC-файл сейчас проходит проверки. Граф при этом не перестраивается: насыщенными остаются проверки, которые этот файл проходит (контейнер TRM, общие проверки любого IFC-файла, проверки своего раздела и совместные проверки ПС и АР), остальные становятся серыми. Работает в «Каскаде», «Дорожках» и «Ветках по файлам»; в режиме копий общих проверок насыщенными остаются только копии выбранного раздела.' },
     { t: 'Вид «Ветки по файлам»', p: 'Те же проверки и связи, что в «Каскаде», но разложенные по дорожкам: сначала контейнер TRM, затем параллельные треки по типам файлов — IFC-файлы, XML (ведомость и ТЭП), аннотации BCF, 2D-документация. Трек IFC делится по разделам ЦИМ (любой IFC-файл, ПС, АР, ПС и АР вместе, необязательный БФ), разделы — на подветки (например, в ПС: участок, парковки, пожарные проезды, зонирование). Деление по разделам и подветки включаются галочками.<br><br>Общие проверки, применимые ко всем разделам, показываются двумя способами. <b>Одной веткой</b> — дорожка «Любой IFC-файл», от которой зависят все разделы. <b>Копией в каждом разделе</b> — у ПС, АР и БФ своя копия общих проверок (полоса на карточке копии — контуром), связи копии не выходят за свой раздел, поэтому каждая ветка читается как самостоятельная цепочка, а число на карточке считает только свою ветку.<br><br>Блок «Какие ветки показать» включает и выключает ветки-форки: от контейнера TRM — XML, аннотации, 2D-документация и IFC; внутри IFC — общие проверки, ПС, АР, ПС и АР вместе, БФ. «Только» (или клик по названию дорожки на схеме) показывает одну ветку целиком: от TRM через всё, что должно пройти раньше, до последнего узла, к которому она ведёт. Карточки из других веток, попавшие на этот путь, — бледные с пунктирной рамкой. Метка ↤N слева на карточке — проверке нужны ещё N проверок из скрытых веток (например, ТЭП ждёт и ПС, и АР); N↦ справа — её результат уходит в скрытые ветки. Наведите на метку — будет список.' },
     { t: 'Вид «По пунктам в39»', p: 'Отдельная схема, не связанная со связями остальных видов (их собирали по смыслу проверок). Здесь проверки стоят строго в порядке требований в39: колонки — разделы документа (4.1 форматы, 4.3 имена файлов, 4.6 координация … 7 ТЭП), внутри колонки — проверки по возрастанию номеров пунктов. Источник — лист «IFC к 16.10» рабочей таблицы; раздел проверки определяется по первому указанному в таблице пункту.<br><br>Правило цепочки: проверки следующего раздела запускаются, только если прошли все проверки предыдущих разделов; внутри одного раздела проверки независимы. Пустые колонки — разделы в39, по которым в таблице нет ни одной проверки.<br><br>Две галочки меняют цепочку: «ЦИМ ПС и ЦИМ АР — параллельно» (разделы 5.2 и 5.3 не ждут друг друга) и «Ведомость и аннотации — отдельная ветка» (не зависят от IFC-файлов). Число на карточке: → — сколько проверок в следующем разделе ждут эту; Σ — сколько всего стоят после неё.<br><br>Флажок «Связи между карточками» дорисовывает поверх разделов связи из модели связей (как в «Каскаде»): какая проверка что берёт у какой, цвет — вид связи, при наведении — что передаётся. Красный пунктир — связь против порядка пунктов (проверка по в39 идёт раньше той, от которой зависит по смыслу), точечная дуга — связь внутри одного раздела, который по правилу цепочки считается независимым. Это места, где логика проверок и порядок требований расходятся — их стоит обсудить.' },
     { t: 'Выводимая (транзитивная) связь', p: 'Связь, которая и так следует из цепочки других связей на схеме (A→B→C делает связь A→C избыточной для чтения графа). По умолчанию скрыта, как и допуск — включается отдельной галочкой.' },
@@ -1778,6 +1829,7 @@ function writeHash() {
     if (S.cnt && S.cntMid !== 40) p.set('mid', S.cntMid);
     if (S.sel) p.set('sel', S.sel);
     if (S.failed.size) p.set('fail', [...S.failed].join(','));
+    if (S.fileDisc) p.set('file', S.fileDisc);
     if (S.view === 'branches') {
       if (!S.brDisc) p.set('bdisc', 0);
       if (!S.brSub) p.set('bsub', 0);
@@ -1810,6 +1862,7 @@ function readHash() {
   if (p.get('view') === 'factsGraph') S.view = 'facts';
   if (['A', 'B'].includes(p.get('rule'))) S.variant = p.get('rule');
   if (['next', 'all'].includes(p.get('cnt'))) S.cnt = p.get('cnt');
+  if (FILE_DISCS[p.get('file')]) S.fileDisc = p.get('file');
   const midN = +p.get('mid');
   if (midN >= 5 && midN <= 90) S.cntMid = midN;
   const stepsN = +p.get('steps');
@@ -1836,6 +1889,10 @@ function bind() {
   $('#npaEmpty').addEventListener('change', e => { S.npaEmpty = e.target.checked; render({ fit: true }); });
   $('#npaLinks').addEventListener('change', e => { S.npaLinks = e.target.checked; render({ fit: false }); });
   $('#copyNpa').addEventListener('click', copyNpa);
+  document.querySelectorAll('#filePick button').forEach(b => b.addEventListener('click', ev => {
+    ev.stopPropagation();
+    S.fileDisc = b.dataset.v; applyFileDisc(); renderLegend(); writeHash();
+  }));
   document.querySelectorAll('#ruleSeg button').forEach(b => b.addEventListener('click', () => { S.variant = b.dataset.v; render({ relayout: false }); }));
   $('#cntMid').addEventListener('input', e => { S.cntMid = +e.target.value; restyle(); writeHash(); });
   document.querySelectorAll('#cntSeg button').forEach(b => b.addEventListener('click', () => {
@@ -1867,7 +1924,7 @@ function bind() {
     $('#results').querySelectorAll('a').forEach(a => a.addEventListener('click', () => select(a.dataset.id)));
     if (S.view === 'facts') render(); else if (S.view === 'rank') drawRank(); else restyle();
   });
-  window.addEventListener('resize', () => { if (!['rank', 'facts'].includes(S.view)) fit(false); });
+  window.addEventListener('resize', () => { if (!['rank', 'facts'].includes(S.view)) fit(false); placeFilePick(); });
   window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', () => render({ relayout: false }));
 }
 
