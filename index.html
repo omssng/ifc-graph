@@ -209,6 +209,8 @@
   .stub rect{fill:var(--panel);stroke:var(--fail);stroke-width:1.2;stroke-dasharray:3 2}
   .stub text{font:700 9.5px ui-monospace,"SF Mono",Menlo,Consolas,monospace;fill:var(--fail)}
   .lanelabel.pick{cursor:pointer}
+  .pahead{font-size:12.5px;font-weight:700;fill:var(--ink)}
+  .pasub{font-size:10.5px;fill:var(--muted)}
   .lanelabel.pick:hover{fill:var(--accent)}
   .npalink{fill:none;stroke-width:1.3;opacity:.45;pointer-events:visibleStroke;cursor:help}
   .npalink.same{stroke-dasharray:2 3}
@@ -268,6 +270,13 @@
       <legend>Правило каскада</legend>
       <div class="vcard" id="vA" data-v="A"><b>Жёстко — как принято для MVP</b><span>Любая родительская проверка, не прошедшая, блокирует все дочерние. Любую объявленную связь считаем родительской.</span></div>
       <div class="vcard" id="vB" data-v="B"><b>Смягчённо — рекомендация</b><span>Блокируют только связи, где по смыслу нужен вердикт родителя (допуск, смысловая предпосылка). Связи «передача данных» — пунктиром: не блокируют, дочерняя сама сообщает о нехватке входных данных.</span></div>
+    </fieldset>
+
+    <fieldset id="paBox" style="display:none">
+      <legend>Все пути</legend>
+      <div class="hint" style="margin:0 0 8px">Все пути сразу: от одного контейнера TRM веером расходятся полосы — по одной на каждый файл. В полосе — полная копия всех проверок, которые этот файл проходит, от первой до последней; общие проверки повторяются в каждой полосе.</div>
+      <div id="paList"></div>
+      <div class="hint"><b style="color:var(--fail)">↤N</b> — проверке нужны ещё N проверок из других путей (например, ТЭП в пути ПС ждёт и АР); <b style="color:var(--fail)">N↦</b> — её результат нужен в других путях. Наведите — список.</div>
     </fieldset>
 
     <fieldset id="brBox" style="display:none">
@@ -372,6 +381,7 @@
       <button data-v="cascade" class="on">Каскад</button>
       <button data-v="lanes">Дорожки</button>
       <button data-v="branches" title="Дорожки по типу файла → разделу ЦИМ → подветке">Ветки по файлам</button>
+      <button data-v="paths" title="Все пути сразу: отдельная полоса на каждый файл — ПС, АР, ПС+АР, БФ, XML, аннотации, 2D — с полной копией его проверок">Все пути</button>
       <button data-v="matrix">Матрица</button>
       <button data-v="rank">Рейтинг</button>
     </div>
@@ -407,9 +417,9 @@
 <div id="modal"><div class="win"><header><div><h2 id="modalTitle">Выводы анализа</h2><small id="insSub"></small></div><span class="x" id="closeModal">×</span></header><div class="body" id="insBody"></div></div></div>
 
 <script src="vendor/d3.v7.min.js"></script>
-<script src="data.js?v=24"></script>
-<script src="facts.js?v=24"></script>
-<script src="npa.js?v=24"></script>
+<script src="data.js?v=25"></script>
+<script src="facts.js?v=25"></script>
+<script src="npa.js?v=25"></script>
 <script>
 (() => {
 'use strict';
@@ -444,6 +454,7 @@ const S = {
   npaPsAr: false, npaVed: false, npaEmpty: true, npaLinks: false, npaSel: null,
   brDisc: true, brSub: true, brDup: false, brSel: null, brOn: null, brAnc: true, brDesc: true,
   fileDisc: '',
+  paOff: new Set(), paSel: null,
   sec: new Set(secKeys), fam: new Set(famKeys), st: new Set(stKeys), rel: new Set(Object.keys(RELS)), ft: new Set(Object.keys(window.IFC_GRAPH.branches.types)),
   onlyAmb: false, showGate: false, showImplied: false, showAgg: true,
   q: '', sel: null, failed: new Set(), rankSort: 'desc', rankDir: -1, cnt: '', cntMid: 40,
@@ -627,9 +638,9 @@ const trunc = (s, n) => s.length > n ? s.slice(0, n - 1) + '…' : s;
 
 function nodeShape(g) {
   g.attr('class', d => 'node ' + N[d.base || d.id].st).attr('data-id', d => d.id);
-  g.append('title').text(d => { const n = N[d.base || d.id]; return n.label + ' — ' + n.n + (d.copyOf ? '\nкопия общей проверки в разделе «' + d.copyOf + '»' : '') + (n.amb ? '\n⚠ ' + n.amb : ''); });
+  g.append('title').text(d => { const n = N[d.base || d.id]; return n.label + ' — ' + n.n + (d.copyOf ? '\nкопия общей проверки в разделе «' + d.copyOf + '»' : '') + (d.inPath ? '\n' + d.inPath : '') + (n.amb ? '\n⚠ ' + n.amb : ''); });
   g.append('rect').attr('class', 'card').attr('width', NW).attr('height', NH).attr('rx', 8);
-  g.append('rect').attr('class', d => 'stripe' + (d.base && d.base !== d.id ? ' copy' : '')).attr('width', 5).attr('height', NH - 10).attr('x', 0).attr('y', 5).attr('rx', 2.5);
+  g.append('rect').attr('class', d => 'stripe' + (d.copyOf ? ' copy' : '')).attr('width', 5).attr('height', NH - 10).attr('x', 0).attr('y', 5).attr('rx', 2.5);
   g.append('text').attr('class', 'id').attr('x', 14).attr('y', 18).text(d => N[d.base || d.id].label);
   g.append('text').attr('class', 'nm').attr('x', 14).attr('y', 34).text(d => trunc(N[d.base || d.id].n, 27));
   // статус
@@ -1070,6 +1081,221 @@ function brSelect(id) {
   }
 }
 
+
+// ───────── вид «Все пути» ─────────
+// Каждый сценарий (какой файл проходит проверки) — своя полоса с полной копией проверок этого файла.
+// Один общий корень — контейнер TRM; id копии — «IFC-04#ps». Связи копий не выходят за полосу,
+// зависимости из других полос показываются метками обрыва ↤N / N↦.
+const PA_ROOT = 'IFC-96';
+const PA_SCEN = [
+  { key: 'ps', name: 'Путь файла ЦИМ ПС', sub: 'общие проверки + ЦИМ ПС + совместные ПС и АР', col: '--s-ps', take: p => p[0] === 'ifc' && ['common', 'ps', 'both'].includes(p[1]) },
+  { key: 'ar', name: 'Путь файла ЦИМ АР', sub: 'общие проверки + ЦИМ АР + совместные ПС и АР', col: '--s-ar', take: p => p[0] === 'ifc' && ['common', 'ar', 'both'].includes(p[1]) },
+  { key: 'psar', name: 'Путь ЦИМ ПС + АР вместе', sub: 'всё сразу: общие, ПС, АР и совместные', col: '--s-both', take: p => p[0] === 'ifc' && ['common', 'ps', 'ar', 'both'].includes(p[1]) },
+  { key: 'bf', name: 'Путь файла ЦИМ БФ', sub: 'необязательный файл с осями', col: '--t-bf', take: p => p[0] === 'ifc' && (p[1] === 'bf' || (p[1] === 'common' && (BR.copy.bf === 'all' || BR.copy.bf.includes(p[2])))) },
+  { key: 'xml', name: 'Путь XML', sub: 'ведомость и ТЭП', col: '--t-xml', take: p => p[0] === 'xml' },
+  { key: 'bcf', name: 'Путь аннотаций BCF', sub: '', col: '--t-bcf', take: p => p[0] === 'bcf' },
+  { key: 'dwg', name: 'Путь 2D-документации', sub: '', col: '--t-dwg', take: p => p[0] === 'dwg' },
+];
+const PA_NAME = Object.fromEntries(PA_SCEN.map(sc => [sc.key, sc.name]));
+const PA_ORDER = (() => {
+  const out = [];
+  BR_TYPES_ORDER.forEach(t => { if (t !== 'ifc') out.push(t); else Object.keys(BR.discs).forEach(d => Object.keys(BR.subs[d] || {}).forEach(k => out.push('ifc.' + d + '.' + k))); });
+  return out;
+})();
+const paWhere = base => { const p = brPath(base); return p[0] !== 'ifc' ? BR.types[p[0]] : BR.discs[p[1]] + (p[2] && BR.subs[p[1]] ? ' · ' + BR.subs[p[1]][p[2]] : ''); };
+let paG = null;
+
+function paBuild() {
+  const vis = visNodes(), visIds = new Set(vis.map(n => n.id));
+  const on = PA_SCEN.filter(sc => !S.paOff.has(sc.key));
+  const VN = [], V = {}, byBase = {}, members = {};
+  const add = v => { VN.push(v); V[v.id] = v; (byBase[v.base] = byBase[v.base] || []).push(v); };
+  if (visIds.has(PA_ROOT)) add({ id: PA_ROOT, base: PA_ROOT, scen: null });
+  on.forEach(sc => {
+    const m = new Set(vis.filter(n => n.id !== PA_ROOT && sc.take(brPath(n.id))).map(n => n.id));
+    members[sc.key] = m;
+    m.forEach(b => add({ id: b + '#' + sc.key, base: b, scen: sc.key }));
+  });
+  const mk = (from, to, e) => ({ from, to, e, k: e.k, need: e.need, implicit: e.implicit, implied: e.implied, via: e.via });
+  const VE = [];
+  E.forEach(e => {
+    if (!visIds.has(e.from) || !visIds.has(e.to)) return;
+    if (e.from === PA_ROOT) { on.forEach(sc => { if (members[sc.key].has(e.to)) VE.push(mk(PA_ROOT, e.to + '#' + sc.key, e)); }); return; }
+    on.forEach(sc => { const m = members[sc.key]; if (m.has(e.from) && m.has(e.to)) VE.push(mk(e.from + '#' + sc.key, e.to + '#' + sc.key, e)); });
+  });
+  const vin = {}, vout = {};
+  VN.forEach(v => { vin[v.id] = []; vout[v.id] = []; });
+  VE.forEach(x => { vout[x.from].push(x); vin[x.to].push(x); });
+  const indeg = Object.fromEntries(VN.map(v => [v.id, vin[v.id].length]));
+  const q = VN.filter(v => !indeg[v.id]).map(v => v.id);
+  VN.forEach(v => { v.depth = 0; v.topo = N[v.base].topo; v.ord = PA_ORDER.indexOf(BR.assign[v.base]); });
+  while (q.length) {
+    const u = q.shift();
+    vout[u].forEach(x => { V[x.to].depth = Math.max(V[x.to].depth, V[u].depth + 1); if (--indeg[x.to] === 0) q.push(x.to); });
+  }
+  // метки обрыва: зависимости из других полос
+  VN.forEach(v => {
+    v.hin = []; v.hout = [];
+    if (!v.scen) return;
+    const m = members[v.scen];
+    v.hin = [...new Set(IN[v.base].filter(e => !e.implicit && e.from !== PA_ROOT && visIds.has(e.from) && !m.has(e.from)).map(e => e.from))];
+    v.hout = [...new Set(OUT[v.base].filter(e => !e.implicit && e.to !== PA_ROOT && visIds.has(e.to) && !m.has(e.to)).map(e => e.to))];
+  });
+  return { VN, VE, V, vin, vout, byBase, members, visIds, on };
+}
+const paCnt = v => S.cnt === 'next'
+  ? new Set(paG.vout[v.id].filter(x => blocks(x) && (!x.implicit || S.showGate) && (!x.implied || S.showImplied)).map(x => x.to)).size
+  : S.cnt === 'all' ? paReach(v.id, 'out', blocks).size : 0;
+function paReach(id, dir, pred) {
+  const seen = new Set(), q = [id];
+  while (q.length) {
+    const u = q.shift();
+    (dir === 'out' ? paG.vout[u] : paG.vin[u]).forEach(x => { const w = dir === 'out' ? x.to : x.from; if (pred(x) && !seen.has(w)) { seen.add(w); q.push(w); } });
+  }
+  return seen;
+}
+
+function drawPaths() {
+  paG = paBuild();
+  const GX = 84, GY = 12, LM = 232, TOP = 40, HEAD = 34, BGAP = 30;
+  const colX = d => LM + d * (NW + GX);
+  const maxD = Math.max(1, ...paG.VN.map(v => v.depth));
+  const W = colX(maxD) + NW + 30;
+  const bands = paG.on.filter(sc => paG.members[sc.key].size);
+  const P = {}, boxes = [];
+  let y = TOP;
+  bands.forEach(sc => {
+    const vs = paG.VN.filter(v => v.scen === sc.key);
+    const cols = {};
+    vs.forEach(v => (cols[v.depth] = cols[v.depth] || []).push(v.id));
+    // порядок в колонке: ветка → соседи по связям (несколько проходов) → номер
+    const pos = {};
+    Object.values(cols).forEach(c => { c.sort((a, b) => paG.V[a].ord - paG.V[b].ord || paG.V[a].topo - paG.V[b].topo); c.forEach((id, i) => pos[id] = c.length > 1 ? i / (c.length - 1) : 0.5); });
+    const ds = Object.keys(cols).map(Number).sort((a, b) => a - b);
+    for (let it = 0; it < 8; it++) {
+      (it % 2 ? [...ds].reverse() : ds).forEach(d => {
+        const c = cols[d], key = {};
+        c.forEach(id => {
+          const ns = (it % 2 ? paG.vout[id].map(x => x.to) : paG.vin[id].map(x => x.from)).filter(x => pos[x] !== undefined);
+          key[id] = ns.length ? ns.reduce((s2, x) => s2 + pos[x], 0) / ns.length : pos[id];
+        });
+        c.sort((a, b) => key[a] - key[b] || paG.V[a].ord - paG.V[b].ord);
+        c.forEach((id, i) => pos[id] = c.length > 1 ? i / (c.length - 1) : 0.5);
+      });
+    }
+    const mx = Math.max(1, ...Object.values(cols).map(c => c.length));
+    const h = HEAD + mx * (NH + GY) + 6;
+    Object.entries(cols).forEach(([d, c]) => c.forEach((id, i) => { P[id] = { x: colX(+d), y: y + HEAD + i * (NH + GY) }; }));
+    boxes.push({ sc, y, h, n: vs.length });
+    y += h + BGAP;
+  });
+  const H = y - BGAP;
+  if (paG.V[PA_ROOT]) P[PA_ROOT] = { x: colX(0), y: TOP + (H - TOP) / 2 - NH / 2 };
+  boxes.forEach((b, i) => {
+    gRoot.append('rect').attr('x', 0).attr('y', b.y).attr('width', W).attr('height', b.h).attr('rx', 12).attr('fill', i % 2 ? cssv('--lane2') : cssv('--lane1')).attr('stroke', cssv('--line'));
+    gRoot.append('rect').attr('x', 0).attr('y', b.y).attr('width', 6).attr('height', b.h).attr('rx', 3).attr('fill', cssv(b.sc.col));
+    gRoot.append('text').attr('class', 'pahead').attr('x', 16).attr('y', b.y + 22).text(b.sc.name);
+    gRoot.append('text').attr('class', 'pasub').attr('x', 16).attr('y', b.y + 38).text(b.n + ' проверок');
+    if (b.sc.sub) gRoot.append('text').attr('class', 'pasub').attr('x', 16).attr('y', b.y + 53).text(trunc(b.sc.sub, 36));
+  });
+  for (let d = 0; d <= maxD; d++) gRoot.append('text').attr('class', 'colhead').attr('x', colX(d)).attr('y', 24).text(d === 0 ? 'начало · TRM' : 'слой ' + d);
+  const shown = paG.VE.filter(x => edgeShown(x.e, paG.visIds) && P[x.from] && P[x.to]);
+  const ge = gRoot.append('g'), gn = gRoot.append('g');
+  edgeSel = ge.selectAll('path').data(shown).join('path')
+    .attr('class', 'edge').attr('d', x => edgePath(P[x.from], P[x.to]))
+    .attr('stroke', x => edgeColor(x.e)).attr('stroke-dasharray', x => edgeDash(x.e))
+    .attr('marker-end', x => 'url(#ar-' + x.k + ')');
+  edgeSel.append('title').text(x => N[x.e.from].label + ' → ' + N[x.e.to].label + ': ' + x.via);
+  nodeSel = gn.selectAll('g').data(paG.VN.filter(v => P[v.id]).map(v => ({ id: v.id, base: v.base, inPath: v.scen ? 'в полосе «' + PA_NAME[v.scen] + '»' : 'общее начало всех путей', x: P[v.id].x, y: P[v.id].y }))).join('g')
+    .attr('transform', d => `translate(${d.x},${d.y})`).call(nodeShape);
+  // метки обрыва
+  nodeSel.each(function (d) {
+    const v = paG.V[d.id], g = d3.select(this);
+    [[v.hin, 'in'], [v.hout, 'out']].forEach(([list, dir]) => {
+      if (!list.length) return;
+      const lab = (dir === 'in' ? '↤' : '') + list.length + (dir === 'out' ? '↦' : ''), w = 10 + lab.length * 6.2;
+      const st = g.append('g').attr('class', 'stub').attr('transform', `translate(${dir === 'in' ? -w - 3 : NW + 3},${NH / 2 - 8})`);
+      st.append('rect').attr('width', w).attr('height', 16).attr('rx', 8);
+      st.append('text').attr('x', w / 2).attr('y', 12).attr('text-anchor', 'middle').text(lab);
+      st.append('title').text((dir === 'in' ? 'Нужны ещё проверки из других путей:\n' : 'Результат нужен в других путях:\n') + list.map(b => '· ' + N[b].label + ' — ' + paWhere(b)).join('\n'));
+    });
+  });
+  cellSel = null;
+  renderPaList();
+}
+function renderPaList() {
+  const box = $('#paList');
+  if (!box) return;
+  const vis = visNodes();
+  box.innerHTML = PA_SCEN.map(sc => {
+    const n = vis.filter(x => x.id !== PA_ROOT && sc.take(brPath(x.id))).length;
+    return `<div class="fork"><label><input type="checkbox" data-k="${sc.key}" ${S.paOff.has(sc.key) ? '' : 'checked'} ${n ? '' : 'disabled'}><span class="sw" style="background:var(${sc.col})"></span>${esc(sc.name)}</label><span class="c">${n}</span><a data-solo="${sc.key}">только</a></div>`;
+  }).join('');
+  box.querySelectorAll('input[data-k]').forEach(i => i.addEventListener('change', () => { i.checked ? S.paOff.delete(i.dataset.k) : S.paOff.add(i.dataset.k); render({ fit: true }); }));
+  box.querySelectorAll('a[data-solo]').forEach(a => a.addEventListener('click', () => { S.paOff = new Set(PA_SCEN.map(x => x.key).filter(k => k !== a.dataset.solo)); render({ fit: true }); }));
+}
+function paRestyle() {
+  if (!paG || !nodeSel) return;
+  const q = S.q.trim().toLowerCase();
+  const sel = S.paSel && paG.V[S.paSel] ? S.paSel : null;
+  const A = sel ? paReach(sel, 'in', x => x.k !== 'agg') : null, D = sel ? paReach(sel, 'out', x => x.k !== 'agg') : null;
+  const failedV = paG.VN.filter(v => S.failed.has(v.base)).map(v => v.id);
+  const sk = new Set();
+  failedV.forEach(f => paReach(f, 'out', blocks).forEach(x => sk.add(x)));
+  failedV.forEach(f => sk.delete(f));
+  nodeSel.classed('sel', d => d.id === sel)
+    .classed('anc', d => !!A && A.has(d.id))
+    .classed('desc', d => !!D && D.has(d.id))
+    .classed('dim', d => !!sel && d.id !== sel && !A.has(d.id) && !D.has(d.id))
+    .classed('failed', d => S.failed.has(d.base))
+    .classed('skipped', d => sk.has(d.id))
+    .classed('match', d => !!q && matches(N[d.base], q));
+  nodeSel.select('.stripe').attr('fill', d => colorOf(N[d.base]));
+  nodeSel.select('.cross').text(d => S.failed.has(d.base) ? '×' : '⊘');
+  const rule = S.variant === 'A' ? 'жёстко' : 'смягчённо';
+  const cntMax = Math.max(1, ...paG.VN.map(paCnt));
+  const mid = S.cntMid / 100, gamma = Math.log(0.5) / Math.log(mid);
+  $('#cntMidVal').textContent = '≈ ' + Math.max(1, Math.round(mid * cntMax));
+  nodeSel.select('.cnt').each(function (d) {
+    const v = paG.V[d.id], n = N[d.base], val = paCnt(v), el = d3.select(this);
+    if (!S.cnt || !val) { el.style('display', 'none'); return; }
+    const label = (S.cnt === 'next' ? '→ ' : 'Σ ') + val;
+    const w = 12 + label.length * 6.4, right = n.amb ? NW - 47 : NW - 24, t = Math.pow(val / cntMax, gamma);
+    el.style('display', null);
+    el.select('rect').attr('x', right - w).attr('width', w).style('stroke', heat(t)).style('stroke-width', 1.6 + 1.2 * t);
+    el.select('text').attr('x', right - w / 2).text(label);
+    el.select('title').text((S.cnt === 'next' ? `${val} — проверок на следующем шаге после ${n.label}` : `${val} — проверок после ${n.label} до конца пути`)
+      + (v.scen ? ` (${PA_NAME[v.scen]})` : ' (все пути)') + ` (${rule})`);
+  });
+  if (edgeSel) {
+    const on = x => !!sel && x.k !== 'agg';
+    const inA = x => on(x) && (A.has(x.from) || x.from === sel) && (A.has(x.to) || x.to === sel);
+    const inD = x => on(x) && (D.has(x.to) || x.to === sel) && (D.has(x.from) || x.from === sel);
+    edgeSel.attr('stroke-dasharray', x => edgeDash(x.e))
+      .classed('on-anc', inA).classed('on-desc', inD)
+      .classed('dim', x => !!sel && !inA(x) && !inD(x))
+      .attr('marker-end', x => inA(x) ? 'url(#ar-anc)' : inD(x) ? 'url(#ar-desc)' : 'url(#ar-' + x.k + ')');
+  }
+}
+function paResolve(id) {
+  if (!id || !paG) return null;
+  if (paG.V[id]) return id;
+  const list = paG.byBase[id] || [];
+  const cur = S.paSel && paG.V[S.paSel];
+  return ((cur && list.find(v => v.scen === cur.scen)) || list[0] || {}).id || null;
+}
+function paSelect(id) {
+  S.paSel = paResolve(id);
+  S.sel = S.paSel ? paG.V[S.paSel].base : null;
+  paRestyle(); renderDetail(); renderLegend(); writeHash();
+  if (S.paSel) {
+    const v = paG.V[S.paSel];
+    const other = (paG.byBase[v.base] || []).filter(x => x.scen && x.id !== v.id).map(x => PA_NAME[x.scen]);
+    $('#detail .title').insertAdjacentHTML('afterend', `<div class="box note" style="margin-top:0">${v.scen ? `Копия в полосе <b>${esc(PA_NAME[v.scen])}</b>.` : 'Общее начало всех путей.'}${other.length ? ' Эта же проверка есть ещё в полосах: ' + other.map(esc).join(', ') + '.' : ''} Подсветка на схеме — внутри полосы; в панели ниже — связи проверки целиком.</div>`);
+    centerOn(S.paSel);
+  }
+}
+
 // ───────── вид «По пунктам в39» ─────────
 // Своя модель, не связанная со связями остальных видов: проверки стоят в порядке пунктов
 // требований; «коробка» = раздел в39 (× ветка, если включены галочки). Коробка ждёт все
@@ -1361,6 +1587,7 @@ function render(opts) {
   ['#fFt', '#fSec', '#fFam', '#fSt', '#fRel'].forEach(s => { const box = $(s).closest('fieldset'); if (box) box.style.display = isNpa ? 'none' : ''; });
   $('#npaBox').style.display = isNpa ? '' : 'none';
   $('#brBox').style.display = S.view === 'branches' ? '' : 'none';
+  $('#paBox').style.display = S.view === 'paths' ? '' : 'none';
   if (!FILE_VIEWS.includes(S.view)) $('#filePick').classList.remove('on');
   $('#factsView').style.display = isFacts ? 'block' : 'none';
   if (isFacts) {
@@ -1385,6 +1612,7 @@ function render(opts) {
     else if (S.view === 'matrix') drawMatrix();
     else if (S.view === 'npa') drawNpa();
     else if (S.view === 'branches') drawBranches();
+    else if (S.view === 'paths') drawPaths();
     restyle();
     if (opts.fit) requestAnimationFrame(() => fit(false));
   } else {
@@ -1394,6 +1622,7 @@ function render(opts) {
   renderLegend();
   if (isNpa) { renderNpaDetail(); $('#scen').classList.remove('on'); }
   else if (S.view === 'branches') { S.brSel = brResolve(S.brSel || S.sel); brSelect(S.brSel); renderScenario(); }
+  else if (S.view === 'paths') { S.paSel = paResolve(S.paSel || S.sel); paSelect(S.paSel); renderScenario(); }
   else { renderDetail(); renderScenario(); }
   writeHash();
 }
@@ -1401,6 +1630,7 @@ function render(opts) {
 function restyle() {
   if (S.view === 'npa') { npaRestyle(); return; }
   if (S.view === 'branches') { brRestyle(); applyFileDisc(); return; }
+  if (S.view === 'paths') { paRestyle(); return; }
   const sk = skippedSet();
   const chain = S.sel ? chainOf(S.sel) : null;
   const q = S.q.trim().toLowerCase();
@@ -1513,7 +1743,7 @@ function renderSidebarState() {
   document.querySelectorAll('#cntSeg button').forEach(b => b.classList.toggle('on', b.dataset.v === S.cnt));
   $('#cntMidBox').style.display = S.cnt ? '' : 'none';
   $('#cntMid').value = S.cntMid;
-  $('#cntSeg').style.display = ['cascade', 'lanes', 'branches', 'npa'].includes(S.view) ? '' : 'none';
+  $('#cntSeg').style.display = ['cascade', 'lanes', 'branches', 'paths', 'npa'].includes(S.view) ? '' : 'none';
   const vis = visNodes();
   $('#counter').textContent = S.view === 'npa'
     ? NPA.checks.length + ' проверок из таблицы · ' + (npaM ? npaM.steps : '') + ' ступеней'
@@ -1529,6 +1759,7 @@ function renderSidebarState() {
     ? 'ветки: ' + [...S.brOn].map(brForkName).join(', ') + ' · ' + brG.core.size + ' карточек + ' + (brG.vis.size - brG.core.size) + ' на пути'
     : vis.length + ' из ' + G.nodes.length + ' проверок' + (brG.dup ? ' · карточек с копиями: ' + brG.VN.length : '');
   $('#brAnc').checked = S.brAnc; $('#brDesc').checked = S.brDesc;
+  if (S.view === 'paths' && paG) $('#counter').textContent = paG.on.filter(sc => paG.members[sc.key].size).length + ' путей · ' + paG.VN.length + ' карточек (из ' + visNodes().length + ' проверок)';
   const fc = $('#failedChips');
   fc.innerHTML = S.failed.size ? [...S.failed].map(id => `<a class="chip f" data-id="${id}" title="убрать из сценария">${esc(N[id].label)} ×</a>`).join('') : '<span class="hint" style="margin:0">сценарий пуст</span>';
   fc.querySelectorAll('a').forEach(a => a.addEventListener('click', () => { S.failed.delete(a.dataset.id); render(); }));
@@ -1596,6 +1827,7 @@ function renderLegend() {
   }
   h += '<h4>Связи</h4>' + KIND_ORDER.map(k => `<div class="li"><svg width="26" height="8"><line x1="0" y1="4" x2="24" y2="4" stroke="var(--k-${k})" stroke-width="2.2" ${k === 'agg' ? 'stroke-dasharray="2 4"' : ''}/></svg>${esc(G.meta.kindName[k])}</div>`).join('');
   h += '<div class="hint" style="margin-top:4px">' + (S.variant === 'A' ? 'Все линии, кроме свода, блокируют.' : 'Сплошная — блокирует, пунктир — только данные.') + '</div>';
+  if (S.view === 'paths') h += '<h4>Все пути</h4><div class="hint" style="margin-top:0">Слева — общий контейнер TRM, от него веером полосы: каждая — полный путь одного файла от первой проверки до последней. Одна и та же проверка повторяется в каждой полосе, где её проходит файл. <b style="color:var(--fail)">↤N</b> — нужны ещё проверки из других путей, <b style="color:var(--fail)">N↦</b> — результат нужен в других путях.</div>';
   if (S.view === 'branches') h += '<h4>Ветки по файлам</h4><div class="hint" style="margin-top:0">Дорожка — тип файла → раздел ЦИМ → подветка; цветная полоса слева — тип файла или раздел.'
     + (S.brDisc && S.brDup ? ' Общие проверки скопированы в каждый раздел: у копии полоса на карточке — контуром, связи копии не выходят за свой раздел.' : '') + '</div>'
     + (S.brOn ? '<div class="hint">Показаны выбранные ветки; бледные карточки с пунктирной рамкой — из других веток, но лежат на пути. <b style="color:var(--fail)">↤N / N↦</b> — связь обрывается: столько проверок из скрытых веток ещё нужны этой (слева) или ждут её (справа); наведите — список.</div>' : '');
@@ -1667,6 +1899,7 @@ const GATE_ID = 'IFC-01';
 function select(id) {
   if (S.view === 'npa') { npaSelect(id); return; }
   if (S.view === 'branches') { brSelect(id); return; }
+  if (S.view === 'paths') { paSelect(id); return; }
   S.sel = id;
   if (S.view === 'facts') { render(); return; }
   if (S.view === 'rank') { drawRank(); } else restyle();
@@ -1774,6 +2007,7 @@ function glossary() {
     { t: 'Потомков / предков (в карточке и в «Рейтинге»)', p: '«Потомков» — сколько проверок перестанет выполняться, если эта не пройдёт (при выбранном правиле). «Предков» — сколько проверок должно пройти раньше, чтобы эта вообще запустилась. В «Рейтинге» оба правила показаны рядом, чтобы было видно разницу.' },
     { t: 'Своды', p: 'Проверки вроде «все параметры заполнены», которые не проверяют что-то своё, а просто собирают статусы других проверок в один общий результат. На схеме связи к ним идут пунктиром и подписаны «свод» — такие связи никогда не блокируют, при любом правиле каскада.' },
     { t: 'Допуск IFC-01', p: 'Скрытая по умолчанию связь: почти всем проверкам, которым нужна разобранная модель, добавлена связь-допуск от IFC-01 (файл вообще должен читаться). Таких связей больше полусотни, поэтому они спрятаны, чтобы не загромождать схему — включаются галочкой «Допуск IFC-01 к каждой проверке».' },
+    { t: 'Вид «Все пути»', p: 'Все возможные пути движения по графу сразу. Слева — один контейнер TRM (общее начало), от него веером расходятся полосы: путь файла ЦИМ ПС, путь ЦИМ АР, путь ЦИМ ПС + АР вместе, путь ЦИМ БФ, путь XML, путь аннотаций BCF, путь 2D-документации. В каждой полосе — полная копия всех проверок, которые этот файл проходит, от IFC-01 до последнего узла, со своими связями и своим счётчиком; общие проверки повторяются в каждой полосе. В полосах ПС и АР есть и совместные проверки (классы, реквизиты участка, ТЭП, своды) — у них метка ↤N: нужны ещё проверки из другого пути. Метка N↦ — результат проверки нужен в других путях. Полосы включаются и выключаются в левой панели, «только» — одна полоса.' },
     { t: 'Выбор файла на узле IFC-01', p: 'У карточки IFC-01 (проверка формата — с неё начинается путь любого IFC-файла) над карточкой есть плашка «файл: все ▼» — по клику раскрывается список (все, ЦИМ ПС, ЦИМ АР, ЦИМ ПС + АР, ЦИМ БФ) — какой IFC-файл сейчас проходит проверки. Граф при этом не перестраивается: насыщенными остаются проверки, которые этот файл проходит (контейнер TRM, общие проверки любого IFC-файла, проверки своего раздела и совместные проверки ПС и АР), остальные становятся серыми. Работает в «Каскаде», «Дорожках» и «Ветках по файлам»; в режиме копий общих проверок насыщенными остаются только копии выбранного раздела.' },
     { t: 'Вид «Ветки по файлам»', p: 'Те же проверки и связи, что в «Каскаде», но разложенные по дорожкам: сначала контейнер TRM, затем параллельные треки по типам файлов — IFC-файлы, XML (ведомость и ТЭП), аннотации BCF, 2D-документация. Трек IFC делится по разделам ЦИМ (любой IFC-файл, ПС, АР, ПС и АР вместе, необязательный БФ), разделы — на подветки (например, в ПС: участок, парковки, пожарные проезды, зонирование). Деление по разделам и подветки включаются галочками.<br><br>Общие проверки, применимые ко всем разделам, показываются двумя способами. <b>Одной веткой</b> — дорожка «Любой IFC-файл», от которой зависят все разделы. <b>Копией в каждом разделе</b> — у ПС, АР и БФ своя копия общих проверок (полоса на карточке копии — контуром), связи копии не выходят за свой раздел, поэтому каждая ветка читается как самостоятельная цепочка, а число на карточке считает только свою ветку.<br><br>Блок «Какие ветки показать» включает и выключает ветки-форки: от контейнера TRM — XML, аннотации, 2D-документация и IFC; внутри IFC — общие проверки, ПС, АР, ПС и АР вместе, БФ. «Только» (или клик по названию дорожки на схеме) показывает одну ветку целиком: от TRM через всё, что должно пройти раньше, до последнего узла, к которому она ведёт. Карточки из других веток, попавшие на этот путь, — бледные с пунктирной рамкой. Метка ↤N слева на карточке — проверке нужны ещё N проверок из скрытых веток (например, ТЭП ждёт и ПС, и АР); N↦ справа — её результат уходит в скрытые ветки. Наведите на метку — будет список.' },
     { t: 'Вид «По пунктам в39»', p: 'Отдельная схема, не связанная со связями остальных видов (их собирали по смыслу проверок). Здесь проверки стоят строго в порядке требований в39: колонки — разделы документа (4.1 форматы, 4.3 имена файлов, 4.6 координация … 7 ТЭП), внутри колонки — проверки по возрастанию номеров пунктов. Источник — лист «IFC к 16.10» рабочей таблицы; раздел проверки определяется по первому указанному в таблице пункту.<br><br>Правило цепочки: проверки следующего раздела запускаются, только если прошли все проверки предыдущих разделов; внутри одного раздела проверки независимы. Пустые колонки — разделы в39, по которым в таблице нет ни одной проверки.<br><br>Две галочки меняют цепочку: «ЦИМ ПС и ЦИМ АР — параллельно» (разделы 5.2 и 5.3 не ждут друг друга) и «Ведомость и аннотации — отдельная ветка» (не зависят от IFC-файлов). Число на карточке: → — сколько проверок в следующем разделе ждут эту; Σ — сколько всего стоят после неё.<br><br>Флажок «Связи между карточками» дорисовывает поверх разделов связи из модели связей (как в «Каскаде»): какая проверка что берёт у какой, цвет — вид связи, при наведении — что передаётся. Красный пунктир — связь против порядка пунктов (проверка по в39 идёт раньше той, от которой зависит по смыслу), точечная дуга — связь внутри одного раздела, который по правилу цепочки считается независимым. Это места, где логика проверок и порядок требований расходятся — их стоит обсудить.' },
@@ -1847,6 +2081,10 @@ function writeHash() {
     if (S.sel) p.set('sel', S.sel);
     if (S.failed.size) p.set('fail', [...S.failed].join(','));
     if (S.fileDisc) p.set('file', S.fileDisc);
+    if (S.view === 'paths') {
+      if (S.paOff.size) p.set('paoff', [...S.paOff].join(','));
+      if (S.paSel && S.paSel !== S.sel) p.set('psel', S.paSel);
+    }
     if (S.view === 'branches') {
       if (!S.brDisc) p.set('bdisc', 0);
       if (!S.brSub) p.set('bsub', 0);
@@ -1868,7 +2106,9 @@ function writeHash() {
 }
 function readHash() {
   const p = new URLSearchParams(location.hash.replace(/^#/, ''));
-  if (['cascade', 'lanes', 'branches', 'matrix', 'rank', 'facts', 'npa'].includes(p.get('view'))) S.view = p.get('view');
+  if (['cascade', 'lanes', 'branches', 'paths', 'matrix', 'rank', 'facts', 'npa'].includes(p.get('view'))) S.view = p.get('view');
+  if (p.get('paoff')) S.paOff = new Set(p.get('paoff').split(',').filter(Boolean));
+  if (p.get('psel')) S.paSel = p.get('psel');
   S.brDisc = p.get('bdisc') !== '0'; S.brSub = p.get('bsub') !== '0'; S.brDup = p.get('bdup') === '1';
   if (p.get('bsel')) S.brSel = p.get('bsel');
   if (p.get('bon')) S.brOn = new Set(p.get('bon').split(',').filter(Boolean));
