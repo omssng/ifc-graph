@@ -14,6 +14,7 @@
     --lane1:rgba(120,130,150,.06); --lane2:rgba(120,130,150,.0);
     --s-pkg:#8a94a6; --s-all:#3d7fd6; --s-ps:#1f9d8b; --s-ar:#8b5fd1; --s-both:#dd8a2e;
     --k-gate:#a33a3a; --k-logic:#e08a1e; --k-scope:#3d7fd6; --k-data:#7d8798; --k-rule:#8b5fd1; --k-agg:#9aa1ad;
+    --r-parent:#e25555; --r-dep:#e0a82a; --r-lonely:#3f9ad6; --chg:#8b4fc6;
   }
   @media (prefers-color-scheme:dark){
     :root{ --bg:#12151c; --panel:#1a1f29; --ink:#e6e9ef; --muted:#9aa3b2; --dim:#666f7e; --line:#2b323f;
@@ -22,7 +23,8 @@
       --anc:#5b8cff; --desc:#ff9d3d; --fail:#ff6b6b; --ok:#4cc27a; --warn:#f0b93a;
       --lane1:rgba(160,170,190,.06);
       --s-pkg:#7d8798; --s-all:#5b8cff; --s-ps:#3cc0ac; --s-ar:#a586e8; --s-both:#f0a04a;
-      --k-gate:#e06b6b; --k-logic:#f0a04a; --k-scope:#5b8cff; --k-data:#8d97a8; --k-rule:#a586e8; --k-agg:#6d7686; }
+      --k-gate:#e06b6b; --k-logic:#f0a04a; --k-scope:#5b8cff; --k-data:#8d97a8; --k-rule:#a586e8; --k-agg:#6d7686;
+      --r-parent:#ff7a7a; --r-dep:#f0c050; --r-lonely:#6ab8f0; --chg:#c49bff; }
   }
   *{box-sizing:border-box}
   html,body{margin:0;height:100%}
@@ -160,6 +162,17 @@
   .mlabel{font-size:10.5px;fill:var(--muted);cursor:pointer}
   .mlabel.hl{fill:var(--ink);font-weight:700}
   .mlabel:hover{fill:var(--accent)}
+  .npabox{fill:var(--lane1);stroke:var(--line);stroke-width:1}
+  .npabox.empty{fill:none;stroke-dasharray:4 4}
+  .npaedge{fill:none;stroke:var(--muted);stroke-width:1.6;opacity:.55}
+  .npaedge.on-anc{stroke:var(--anc);opacity:1;stroke-width:2.4}
+  .npaedge.on-desc{stroke:var(--desc);opacity:1;stroke-width:2.4}
+  .npaedge.dim{opacity:.12}
+  .node .cl{font-size:9.5px;fill:var(--dim);font-family:ui-monospace,"SF Mono",Menlo,Consolas,monospace}
+  .node .chg{font-size:9px;font-weight:700;fill:var(--chg)}
+  .colhead.big{font-size:11.5px;fill:var(--ink);font-weight:600}
+  .colhead.sub{font-size:10px;fill:var(--muted)}
+  .colhead.none{fill:var(--dim);font-style:italic}
 
   /* ───── Рейтинг ───── */
   #rank h2{font-size:15px;margin:0 0 4px}
@@ -208,6 +221,16 @@
       <legend>Правило каскада</legend>
       <div class="vcard" id="vA" data-v="A"><b>Жёстко — как принято для MVP</b><span>Любая родительская проверка, не прошедшая, блокирует все дочерние. Любую объявленную связь считаем родительской.</span></div>
       <div class="vcard" id="vB" data-v="B"><b>Смягчённо — рекомендация</b><span>Блокируют только связи, где по смыслу нужен вердикт родителя (допуск, смысловая предпосылка). Связи «передача данных» — пунктиром: не блокируют, дочерняя сама сообщает о нехватке входных данных.</span></div>
+    </fieldset>
+
+    <fieldset id="npaBox" style="display:none">
+      <legend>Порядок по пунктам в39</legend>
+      <div class="hint" style="margin:0 0 8px">Отдельная схема, не связанная со связями в остальных видах. Колонки — разделы требований в39 в порядке документа, внутри — проверки по номерам пунктов. Следующий раздел выполняется, только если прошли все проверки предыдущего; внутри раздела проверки независимы.</div>
+      <label class="chk"><input type="checkbox" id="npaPsAr"><span>ЦИМ ПС и ЦИМ АР — параллельно<small>разделы 5.2 и 5.3 не ждут друг друга; проверки сразу на ПС и АР остаются в общей цепочке</small></span></label>
+      <label class="chk"><input type="checkbox" id="npaVed"><span>Ведомость и аннотации — отдельная ветка<small>не зависят от IFC-файлов и не блокируют их</small></span></label>
+      <label class="chk"><input type="checkbox" id="npaEmpty" checked><span>Разделы без проверок<small>пустые колонки — разделы в39, по которым в таблице нет ни одной проверки</small></span></label>
+      <div class="btns"><button class="btn flat" id="copyNpa">Скопировать в буфер: номер + пункт + ступень</button></div>
+      <div class="hint" id="npaSrc"></div>
     </fieldset>
 
     <fieldset id="stepsBox">
@@ -288,6 +311,9 @@
     <div class="seg" role="group" aria-label="Данные и нормы">
       <button data-v="facts">Данные → нормы</button>
     </div>
+    <div class="seg" role="group" aria-label="Порядок по требованиям">
+      <button data-v="npa" title="Проверки строго в порядке пунктов требований в39: колонки — разделы документа">По пунктам в39</button>
+    </div>
     </div>
     <div class="seg rule" id="ruleSeg">
       <button data-v="A" class="on">Жёстко</button>
@@ -314,8 +340,9 @@
 <div id="modal"><div class="win"><header><div><h2 id="modalTitle">Выводы анализа</h2><small id="insSub"></small></div><span class="x" id="closeModal">×</span></header><div class="body" id="insBody"></div></div></div>
 
 <script src="vendor/d3.v7.min.js"></script>
-<script src="data.js?v=17"></script>
-<script src="facts.js?v=17"></script>
+<script src="data.js?v=18"></script>
+<script src="facts.js?v=18"></script>
+<script src="npa.js?v=18"></script>
 <script>
 (() => {
 'use strict';
@@ -347,6 +374,7 @@ const cssv = n => getComputedStyle(document.documentElement).getPropertyValue(n)
 // ───────── состояние ─────────
 const S = {
   view: 'cascade', variant: 'A', colorBy: 'sec', steps: STEPS_MAX,
+  npaPsAr: false, npaVed: false, npaEmpty: true, npaSel: null,
   sec: new Set(secKeys), fam: new Set(famKeys), st: new Set(stKeys), rel: new Set(Object.keys(RELS)),
   onlyAmb: false, showGate: false, showImplied: false, showAgg: true,
   q: '', sel: null, failed: new Set(), rankSort: 'desc', rankDir: -1, cnt: '', cntMid: 40,
@@ -418,6 +446,9 @@ function setupSvg() {
       .attr('markerWidth', 6.5).attr('markerHeight', 6.5).attr('orient', 'auto')
       .append('path').attr('d', 'M0,-3.5L8,0L0,3.5Z').attr('class', 'mk mk-' + k);
   });
+  defs.append('marker').attr('id', 'ar-npa').attr('viewBox', '0 -4 8 8').attr('refX', 7).attr('refY', 0)
+    .attr('markerWidth', 7).attr('markerHeight', 7).attr('orient', 'auto')
+    .append('path').attr('d', 'M0,-3.5L8,0L0,3.5Z').attr('class', 'mk mk-npa');
   ['anc', 'desc'].forEach(k => {
     defs.append('marker').attr('id', 'ar-' + k).attr('viewBox', '0 -4 8 8').attr('refX', 7).attr('refY', 0)
       .attr('markerWidth', 7).attr('markerHeight', 7).attr('orient', 'auto')
@@ -438,7 +469,7 @@ document.head.appendChild(svgCss);
 function refreshMarkerCss() {
   let css = '';
   KIND_ORDER.forEach(k => { css += `.mk-${k}{fill:${cssv('--k-' + k)}}`; });
-  css += `.mk-anc{fill:${cssv('--anc')}}.mk-desc{fill:${cssv('--desc')}}.hatchbg{fill:${cssv('--panel')}}.hatchln{stroke:${cssv('--dim')};stroke-width:1.2;opacity:.6}`;
+  css += `.mk-npa{fill:${cssv('--muted')}}.mk-anc{fill:${cssv('--anc')}}.mk-desc{fill:${cssv('--desc')}}.hatchbg{fill:${cssv('--panel')}}.hatchln{stroke:${cssv('--dim')};stroke-width:1.2;opacity:.6}`;
   svgCss.textContent = css;
 }
 
@@ -603,13 +634,235 @@ function drawMatrix() {
   nodeSel = null; edgeSel = null;
 }
 
+// ───────── вид «По пунктам в39» ─────────
+// Своя модель, не связанная со связями остальных видов: проверки стоят в порядке пунктов
+// требований; «коробка» = раздел в39 (× ветка, если включены галочки). Коробка ждёт все
+// коробки более ранних разделов своей ветки; внутри коробки проверки независимы.
+const NPA = window.NPA_GRAPH;
+const NPA_C = Object.fromEntries(NPA.checks.map(c => [c.id, c]));
+const NPA_SEC = Object.fromEntries(NPA.sections.map((s, i) => [s.key, { ...s, i }]));
+const NPA_ROWS = [['ved', 'Ведомость и аннотации'], ['main', 'Общая цепочка'], ['ps', 'ЦИМ ПС'], ['ar', 'ЦИМ АР']];
+const NPA_ROLE = { parent: 'родительская', dep: 'зависимая', lonely: 'одинокая (результат дальше никуда не идёт)' };
+const NH2 = 58;
+let npaM = null;
+
+function npaGroup(c) {
+  if (S.npaVed && c.side === 'ved') return 'ved';
+  if (S.npaPsAr && (c.sec === '5.2' || c.sec === '5.3') && (c.disc === 'ps' || c.disc === 'ar')) return c.disc;
+  return 'main';
+}
+function npaModel() {
+  const byKey = {};
+  NPA.checks.forEach(c => {
+    const g = npaGroup(c), key = c.sec + '|' + g;
+    (byKey[key] = byKey[key] || { key, sec: c.sec, g, si: NPA_SEC[c.sec].i, checks: [] }).checks.push(c);
+  });
+  const rowIdx = Object.fromEntries(NPA_ROWS.map(([k], i) => [k, i]));
+  const boxes = Object.values(byKey).sort((a, b) => a.si - b.si || rowIdx[a.g] - rowIdx[b.g]);
+  // кто кого ждёт: ведомость — только свою ветку; ПС и АР — не друг друга; общая цепочка — всех, кроме ведомости
+  const compat = (a, b) => a === 'ved' || b === 'ved' ? a === b : a === 'main' || b === 'main' || a === b;
+  const gates = new Map(boxes.map(y => [y, boxes.filter(x => y.si < x.si && compat(y.g, x.g))]));
+  const reach = y => { const seen = new Set(), q = [...gates.get(y)]; while (q.length) { const u = q.shift(); if (!seen.has(u)) { seen.add(u); q.push(...gates.get(u)); } } return seen; };
+  const desc = new Map(boxes.map(y => [y, reach(y)]));
+  const kids = new Map(boxes.map(y => [y, gates.get(y).filter(x => !gates.get(y).some(z => z !== x && desc.get(z).has(x)))]));
+  const par = new Map(boxes.map(x => [x, boxes.filter(y => kids.get(y).includes(x))]));
+  const anc = new Map(boxes.map(x => [x, new Set(boxes.filter(y => desc.get(y).has(x)))]));
+  const boxOf = {};
+  boxes.forEach(b => b.checks.forEach(c => { boxOf[c.id] = b; }));
+  const sum = set => [...set].reduce((s, b) => s + b.checks.length, 0);
+  const cnt = {};
+  const stepOfSec = {};
+  [...new Set(boxes.map(b => b.si))].sort((a, b) => a - b).forEach((si, i) => { stepOfSec[si] = i + 1; });
+  boxes.forEach(b => b.checks.forEach(c => {
+    cnt[c.id] = { next: sum(kids.get(b)), all: sum(desc.get(b)), before: sum(anc.get(b)), step: stepOfSec[b.si] };
+  }));
+  return { boxes, kids, par, desc, anc, boxOf, cnt, steps: Object.keys(stepOfSec).length };
+}
+const npaCnt = c => S.cnt === 'next' ? npaM.cnt[c.id].next : S.cnt === 'all' ? npaM.cnt[c.id].all : 0;
+const npaMatch = (c, q) => (c.label + ' ' + c.title + ' ' + c.parts.join(' ') + ' ' + c.clauses.join(' ')).toLowerCase().includes(q);
+const npaClauses = c => 'п. ' + (c.clauses.length > 2 ? c.clauses.slice(0, 2).join(', ') + ' +' + (c.clauses.length - 2) : c.clauses.join(', '));
+
+function drawNpa() {
+  npaM = npaModel();
+  const GX = 64, GY = 10, PAD = 10, TOP = 58, EW = 92;
+  const rows = NPA_ROWS.filter(([k]) => npaM.boxes.some(b => b.g === k));
+  const multi = rows.length > 1, LM = multi ? 150 : 24;
+  const secs = NPA.sections.filter(s => S.npaEmpty || npaM.boxes.some(b => b.sec === s.key));
+  const colX = {};
+  let x = LM;
+  secs.forEach(s => {
+    const has = npaM.boxes.some(b => b.sec === s.key);
+    colX[s.key] = x;
+    x += (has ? NW + 2 * PAD : EW) + GX;
+  });
+  const rowH = {}, rowY = {};
+  let y = TOP;
+  rows.forEach(([k]) => {
+    const mx = Math.max(1, ...npaM.boxes.filter(b => b.g === k).map(b => b.checks.length));
+    rowH[k] = mx * (NH2 + GY) - GY + 2 * PAD;
+    rowY[k] = y;
+    y += rowH[k] + 30;
+  });
+  const H = y - 30;
+  // заголовки колонок
+  secs.forEach(s => {
+    const has = npaM.boxes.some(b => b.sec === s.key);
+    const n = NPA.checks.filter(c => c.sec === s.key).length;
+    const cx = colX[s.key] + (has ? 0 : 4);
+    gRoot.append('text').attr('class', 'colhead big' + (has ? '' : ' none')).attr('x', cx).attr('y', 22).text(s.key + (has ? ' · ' + n : ''));
+    gRoot.append('text').attr('class', 'colhead sub' + (has ? '' : ' none')).attr('x', cx).attr('y', 38)
+      .text(has ? trunc(s.short, 30) : 'нет проверок').append('title').text(s.key + ' ' + s.title);
+    if (!has) gRoot.append('rect').attr('class', 'npabox empty').attr('x', colX[s.key]).attr('y', TOP).attr('width', EW).attr('height', H - TOP).attr('rx', 10)
+      .append('title').text(`${s.key} ${s.title}: в таблице нет ни одной проверки по этому разделу`);
+  });
+  if (multi) rows.forEach(([k, name]) => {
+    gRoot.append('text').attr('class', 'lanelabel').attr('x', 8).attr('y', rowY[k] + 18).text(name);
+  });
+  // коробки
+  const bx = b => colX[b.sec], by = b => rowY[b.g];
+  const bh = b => b.checks.length * (NH2 + GY) - GY + 2 * PAD;
+  gRoot.append('g').selectAll('rect').data(npaM.boxes).join('rect').attr('class', 'npabox')
+    .attr('x', bx).attr('y', by).attr('width', NW + 2 * PAD).attr('height', bh).attr('rx', 10)
+    .append('title').text(b => `${b.sec} ${NPA_SEC[b.sec].title}: ${b.checks.length} — проверки внутри выполняются независимо`);
+  // стрелки между коробками
+  const links = [];
+  npaM.boxes.forEach(b => npaM.kids.get(b).forEach(k => links.push({ from: b, to: k })));
+  const ge = gRoot.append('g');
+  npaEdgeSel = ge.selectAll('path').data(links).join('path').attr('class', 'npaedge').attr('marker-end', 'url(#ar-npa)')
+    .attr('d', l => {
+      const x1 = bx(l.from) + NW + 2 * PAD, y1 = by(l.from) + Math.min(bh(l.from), 90) / 2;
+      const x2 = bx(l.to), y2 = by(l.to) + Math.min(bh(l.to), 90) / 2;
+      const dx = Math.max(24, (x2 - x1) * 0.5);
+      return `M${x1},${y1}C${x1 + dx},${y1} ${x2 - dx},${y2} ${x2 - 2},${y2}`;
+    });
+  // карточки
+  const pos = [];
+  npaM.boxes.forEach(b => b.checks.forEach((c, i) => pos.push({ id: c.id, x: bx(b) + PAD, y: by(b) + PAD + i * (NH2 + GY) })));
+  nodeSel = gRoot.append('g').selectAll('g').data(pos).join('g')
+    .attr('transform', d => `translate(${d.x},${d.y})`).call(npaShape);
+  edgeSel = null; cellSel = null;
+}
+let npaEdgeSel = null;
+function npaShape(g) {
+  g.attr('class', 'node').attr('data-id', d => d.id);
+  g.append('title').text(d => { const c = NPA_C[d.id]; return c.label + ' — ' + c.title + '\n' + npaClauses(c); });
+  g.append('rect').attr('class', 'card').attr('width', NW).attr('height', NH2).attr('rx', 8);
+  g.append('rect').attr('class', 'stripe').attr('width', 5).attr('height', NH2 - 10).attr('x', 0).attr('y', 5).attr('rx', 2.5)
+    .attr('fill', d => { const r = NPA_C[d.id].role; return r ? cssv('--r-' + r) : cssv('--line'); });
+  g.append('text').attr('class', 'id').attr('x', 14).attr('y', 18).text(d => NPA_C[d.id].label);
+  g.append('text').attr('class', 'nm').attr('x', 14).attr('y', 34).text(d => trunc(NPA_C[d.id].title, 29));
+  g.append('text').attr('class', 'cl').attr('x', 14).attr('y', 49).text(d => trunc(npaClauses(NPA_C[d.id]), 26));
+  g.filter(d => NPA_C[d.id].changed).append('text').attr('class', 'chg').attr('x', NW - 10).attr('y', 49).attr('text-anchor', 'end').text('изм. в39')
+    .append('title').text('Норма изменилась или появилась в в39 (отметка из таблицы)');
+  const st = g.append('g').attr('transform', `translate(${NW - 13},13)`);
+  st.each(function (d) {
+    const c = NPA_C[d.id], el = d3.select(this);
+    if (c.dev) el.append('circle').attr('r', 5).attr('fill', cssv('--ok'));
+    else if (c.analysis) el.append('circle').attr('r', 4.6).attr('fill', 'none').attr('stroke', cssv('--ink')).attr('stroke-width', 1.6);
+    else el.append('circle').attr('r', 4.6).attr('fill', 'none').attr('stroke', cssv('--dim')).attr('stroke-width', 1.6).attr('stroke-dasharray', '2 2');
+    el.append('title').text(c.dev ? 'разработка: готово' : c.analysis ? 'аналитика: готово, разработка — нет' : 'в таблице аналитика ещё не отмечена как готовая');
+  });
+  const cg = g.append('g').attr('class', 'cnt').style('display', 'none');
+  cg.append('title');
+  cg.append('rect').attr('y', 6).attr('height', 16).attr('rx', 8);
+  cg.append('text').attr('y', 18).attr('text-anchor', 'middle');
+  g.on('click', (ev, d) => { ev.stopPropagation(); npaSelect(d.id); });
+}
+function npaRestyle() {
+  if (!npaM || !nodeSel) return;
+  const q = S.q.trim().toLowerCase();
+  const sb = S.npaSel && npaM.boxOf[S.npaSel];
+  const A = sb ? npaM.anc.get(sb) : null, D = sb ? npaM.desc.get(sb) : null;
+  nodeSel.classed('sel', d => d.id === S.npaSel)
+    .classed('anc', d => !!A && A.has(npaM.boxOf[d.id]))
+    .classed('desc', d => !!D && D.has(npaM.boxOf[d.id]))
+    .classed('dim', d => !!sb && d.id !== S.npaSel && npaM.boxOf[d.id] !== sb && !A.has(npaM.boxOf[d.id]) && !D.has(npaM.boxOf[d.id]))
+    .classed('match', d => !!q && npaMatch(NPA_C[d.id], q));
+  if (npaEdgeSel) npaEdgeSel
+    .classed('on-anc', l => !!sb && (A.has(l.from) && (A.has(l.to) || l.to === sb)))
+    .classed('on-desc', l => !!sb && ((l.from === sb || D.has(l.from)) && D.has(l.to)))
+    .classed('dim', l => !!sb && !((A.has(l.from) && (A.has(l.to) || l.to === sb)) || ((l.from === sb || D.has(l.from)) && D.has(l.to))));
+  const cntMax = Math.max(1, ...NPA.checks.map(npaCnt));
+  const mid = S.cntMid / 100, gamma = Math.log(0.5) / Math.log(mid);
+  $('#cntMidVal').textContent = '≈ ' + Math.max(1, Math.round(mid * cntMax));
+  nodeSel.select('.cnt').each(function (d) {
+    const c = NPA_C[d.id], v = npaCnt(c), el = d3.select(this);
+    if (!S.cnt || !v) { el.style('display', 'none'); return; }
+    const label = (S.cnt === 'next' ? '→ ' : 'Σ ') + v;
+    const w = 12 + label.length * 6.4, right = NW - 24, t = Math.pow(v / cntMax, gamma);
+    el.style('display', null);
+    el.select('rect').attr('x', right - w).attr('width', w).style('stroke', heat(t)).style('stroke-width', 1.6 + 1.2 * t);
+    el.select('text').attr('x', right - w / 2).text(label);
+    el.select('title').text(S.cnt === 'next'
+      ? `${v} — проверок в следующем разделе цепочки: они не запустятся, если ${c.label} не пройдёт`
+      : `${v} — проверок всего после ${c.label} по цепочке пунктов в39`);
+  });
+}
+function npaSelect(id) {
+  S.npaSel = id;
+  npaRestyle(); renderNpaDetail(); renderLegend(); writeHash();
+  if (id) centerOn(id);
+}
+function renderNpaDetail() {
+  const box = $('#detail');
+  if (!S.npaSel || !NPA_C[S.npaSel]) { box.classList.remove('on'); box.innerHTML = ''; return; }
+  const c = NPA_C[S.npaSel], b = npaM.boxOf[c.id], k = npaM.cnt[c.id], sec = NPA_SEC[c.sec];
+  const chips = list => '<div class="chips">' + list.map(x => `<a class="chip" data-id="${x.id}" title="${esc(x.title)}">${esc(x.label)}</a>`).join('') + '</div>';
+  const parents = npaM.par.get(b).flatMap(p => p.checks), kids = npaM.kids.get(b).flatMap(p => p.checks);
+  const sibs = b.checks.filter(x => x.id !== c.id);
+  const grp = NPA_ROWS.find(([key]) => key === b.g)[1];
+  let h = `<span class="x" id="dx">×</span>
+    <div class="code">${esc(c.label)}</div><div class="title">${esc(c.title)}</div>
+    <div class="tags"><span class="tag">${esc(sec.key + ' ' + sec.short)}</span>${S.npaPsAr || S.npaVed ? `<span class="tag">${esc(grp)}</span>` : ''}${c.changed ? '<span class="tag" style="color:var(--chg);border-color:var(--chg)">изменилась в в39</span>' : ''}<span class="tag">${c.dev ? 'разработка: готово' : c.analysis ? 'аналитика: готово' : 'аналитика не отмечена'}</span></div>`;
+  if (c.parts.length > 1) h += `<div class="desc">${c.parts.map(p => '— ' + esc(p)).join('<br>')}</div>`;
+  h += `<div style="color:var(--muted);font-size:12px;margin-top:6px">Пункты в39: ${esc(c.clauses.join(', '))}</div>
+    <div style="color:var(--muted);font-size:12px">Раздел: ${esc(sec.key + ' ' + sec.title)}</div>`;
+  if (c.role) h += `<div class="box note">Разметка в таблице: <b style="color:var(--r-${c.role})">${esc(NPA_ROLE[c.role])}</b></div>`;
+  h += `<div class="sub">Цепочка по пунктам</div><div class="kv">
+    <span>Ступень (раздел по порядку)</span><b>${k.step} из ${npaM.steps}</b>
+    <span>Должны пройти раньше</span><b>${k.before}</b>
+    <span>Ждут её в следующем разделе</span><b style="color:${k.next ? 'var(--fail)' : 'inherit'}">${k.next}</b>
+    <span>Не запустятся при провале, всего</span><b style="color:${k.all ? 'var(--fail)' : 'inherit'}">${k.all}</b></div>`;
+  h += `<div class="sub">Предыдущая ступень (${parents.length})</div>` + (parents.length ? chips(parents) : '<div class="hint" style="margin:0">нет — начало цепочки</div>');
+  h += `<div class="sub">Рядом в том же разделе, независимо (${sibs.length})</div>` + (sibs.length ? chips(sibs) : '<div class="hint" style="margin:0">одна в разделе</div>');
+  h += `<div class="sub">Следующая ступень (${kids.length})</div>` + (kids.length ? chips(kids) : '<div class="hint" style="margin:0">нет — конец цепочки</div>');
+  if (c.inModel.length) h += `<div class="sub">Та же проверка в модели связей</div><div class="chips">${c.inModel.map(id => `<a class="chip" data-model="${id}">${esc(N[id] ? N[id].label : id)}</a>`).join('')}</div><div class="hint">Откроет вид «Каскад» с этой проверкой.</div>`;
+  else h += `<div class="sub">В модели связей</div><div class="hint" style="margin:0">нет — проверка есть только в таблице</div>`;
+  box.innerHTML = h;
+  box.classList.add('on');
+  $('#dx').addEventListener('click', () => npaSelect(null));
+  box.querySelectorAll('a.chip[data-id]').forEach(x => x.addEventListener('click', () => npaSelect(x.dataset.id)));
+  box.querySelectorAll('a.chip[data-model]').forEach(x => x.addEventListener('click', () => {
+    S.view = 'cascade'; S.sel = x.dataset.model; render({ fit: true, relayout: true }); centerOn(S.sel);
+  }));
+}
+async function copyNpa() {
+  if (!npaM) npaM = npaModel();
+  const rows = NPA.checks.slice().sort((a, b) => npaM.cnt[a.id].step - npaM.cnt[b.id].step || a.ord - b.ord);
+  const tsv = 'Номер проверки\tПункт в39\tРаздел в39\tСтупень\tПроверок после\n'
+    + rows.map(c => [c.label, c.clauses[0], c.sec, npaM.cnt[c.id].step, npaM.cnt[c.id].all].join('\t')).join('\n');
+  const btn = $('#copyNpa'), txt = btn.textContent;
+  const done = ok => { btn.textContent = ok ? `Скопировано: ${rows.length} строк ✓` : 'Не удалось скопировать'; setTimeout(() => { btn.textContent = txt; }, 2200); };
+  try { await navigator.clipboard.writeText(tsv); done(true); }
+  catch (e) {
+    try {
+      const ta = document.createElement('textarea');
+      ta.value = tsv; ta.style.position = 'fixed'; ta.style.opacity = '0';
+      document.body.appendChild(ta); ta.select();
+      const ok = document.execCommand('copy'); document.body.removeChild(ta); done(ok);
+    } catch (e2) { done(false); }
+  }
+}
+
 // ───────── общий рендер ─────────
 let epoch = 0;
 function render(opts) {
   opts = opts || {};
-  const isFacts = S.view === 'facts';
-  ['#ruleSeg', '#stepsBox', '#copyTable', '#copyHint'].forEach(s => { if ($(s)) $(s).style.display = isFacts ? 'none' : ''; });
-  ['#vA', '#showGate', '#colorBy', '#clearFail'].forEach(s => { const box = $(s).closest('fieldset'); if (box) box.style.display = isFacts ? 'none' : ''; });
+  const isFacts = S.view === 'facts', isNpa = S.view === 'npa';
+  ['#ruleSeg', '#stepsBox', '#copyTable', '#copyHint'].forEach(s => { if ($(s)) $(s).style.display = isFacts || isNpa ? 'none' : ''; });
+  ['#vA', '#showGate', '#colorBy', '#clearFail'].forEach(s => { const box = $(s).closest('fieldset'); if (box) box.style.display = isFacts || isNpa ? 'none' : ''; });
+  ['#fSec', '#fFam', '#fSt', '#fRel'].forEach(s => { const box = $(s).closest('fieldset'); if (box) box.style.display = isNpa ? 'none' : ''; });
+  $('#npaBox').style.display = isNpa ? '' : 'none';
   $('#factsView').style.display = isFacts ? 'block' : 'none';
   if (isFacts) {
     $('#svg').style.display = 'none'; $('#rank').style.display = 'none';
@@ -631,6 +884,7 @@ function render(opts) {
     if (S.view === 'cascade') drawLayered(false);
     else if (S.view === 'lanes') drawLayered(true);
     else if (S.view === 'matrix') drawMatrix();
+    else if (S.view === 'npa') drawNpa();
     restyle();
     if (opts.fit) requestAnimationFrame(() => fit(false));
   } else {
@@ -638,12 +892,12 @@ function render(opts) {
   }
   renderSidebarState();
   renderLegend();
-  renderDetail();
-  renderScenario();
+  if (isNpa) { renderNpaDetail(); $('#scen').classList.remove('on'); } else { renderDetail(); renderScenario(); }
   writeHash();
 }
 
 function restyle() {
+  if (S.view === 'npa') { npaRestyle(); return; }
   const sk = skippedSet();
   const chain = S.sel ? chainOf(S.sel) : null;
   const q = S.q.trim().toLowerCase();
@@ -755,9 +1009,12 @@ function renderSidebarState() {
   document.querySelectorAll('#cntSeg button').forEach(b => b.classList.toggle('on', b.dataset.v === S.cnt));
   $('#cntMidBox').style.display = S.cnt ? '' : 'none';
   $('#cntMid').value = S.cntMid;
-  $('#cntSeg').style.display = (S.view === 'cascade' || S.view === 'lanes') ? '' : 'none';
+  $('#cntSeg').style.display = ['cascade', 'lanes', 'npa'].includes(S.view) ? '' : 'none';
   const vis = visNodes();
-  $('#counter').textContent = vis.length + ' из ' + G.nodes.length + ' проверок';
+  $('#counter').textContent = S.view === 'npa'
+    ? NPA.checks.length + ' проверок из таблицы · ' + (npaM ? npaM.steps : '') + ' ступеней'
+    : vis.length + ' из ' + G.nodes.length + ' проверок';
+  $('#npaPsAr').checked = S.npaPsAr; $('#npaVed').checked = S.npaVed; $('#npaEmpty').checked = S.npaEmpty;
   const slider = $('#stepsSlider');
   slider.max = STEPS_MAX; slider.value = S.steps;
   $('#stepsVal').textContent = S.steps + ' из ' + STEPS_MAX + (S.steps === STEPS_MAX ? ' (полная детализация)' : '');
@@ -791,6 +1048,23 @@ function renderLegend() {
   if (S.view === 'rank') { el.style.display = 'none'; return; }
   el.style.display = 'block';
   let h = '';
+  if (S.view === 'npa') {
+    const dot = (inner, t) => `<div class="li"><svg width="16" height="12" viewBox="0 0 16 12">${inner}</svg><span>${t}</span></div>`;
+    h += '<h4>Порядок по пунктам в39</h4><div class="hint" style="margin-top:0">Рамка — раздел требований; проверки внутри независимы. Стрелка — следующий раздел ждёт, пока пройдут все проверки предыдущего.</div>';
+    h += '<h4>Статус по таблице</h4>' + dot('<circle cx="6" cy="6" r="5" fill="var(--ok)"/>', 'разработка готова')
+      + dot('<circle cx="6" cy="6" r="4.4" fill="none" stroke="var(--ink)" stroke-width="1.6"/>', 'аналитика готова')
+      + dot('<circle cx="6" cy="6" r="4.4" fill="none" stroke="var(--dim)" stroke-width="1.6" stroke-dasharray="2 2"/>', 'аналитика не отмечена');
+    h += '<h4>Полоса слева — разметка в таблице</h4>' + Object.keys(NPA_ROLE).map(r => `<div class="li"><span class="sw" style="background:var(--r-${r})"></span>${esc(NPA_ROLE[r])}</div>`).join('')
+      + '<div class="li"><span class="sw" style="background:var(--line)"></span>не размечено</div>'
+      + '<div class="li"><b style="color:var(--chg);font-size:10px">изм. в39</b>&nbsp;норма изменилась или новая</div>';
+    if (S.cnt) h += '<h4>Число на карточке</h4><div class="hint" style="margin-top:0">' + (S.cnt === 'next'
+      ? '→ N — сколько проверок в следующем разделе не запустятся, если эта не пройдёт.'
+      : 'Σ N — сколько проверок всего стоят после неё по цепочке пунктов.') + '</div>'
+      + `<div class="li" style="margin-top:4px"><span class="sw" style="flex:0 0 70px;height:6px;background:linear-gradient(90deg,${d3.range(0, 1.01, 0.25).map(heat).join(',')})"></span>контур: меньше → больше</div>`;
+    if (S.npaSel) h += '<h4>Выбор</h4><div class="li"><span class="sw" style="background:var(--anc)"></span>раньше по цепочке</div><div class="li"><span class="sw" style="background:var(--desc)"></span>ждут её</div>';
+    el.innerHTML = h;
+    return;
+  }
   const dotRow = (svgInner, t) => `<div class="li"><svg width="16" height="12" viewBox="0 0 16 12">${svgInner}</svg><span>${t}</span></div>`;
   if (S.view !== 'matrix') {
     if (S.colorBy === 'sec') h += '<h4>Раздел ЦИМ</h4>' + secKeys.map(k => `<div class="li"><span class="sw" style="background:var(--s-${k})"></span>${esc(G.sections[k])}</div>`).join('');
@@ -869,6 +1143,7 @@ function renderDetail() {
 const GATE_ID = 'IFC-01';
 
 function select(id) {
+  if (S.view === 'npa') { npaSelect(id); return; }
   S.sel = id;
   if (S.view === 'facts') { render(); return; }
   if (S.view === 'rank') { drawRank(); } else restyle();
@@ -976,6 +1251,7 @@ function glossary() {
     { t: 'Потомков / предков (в карточке и в «Рейтинге»)', p: '«Потомков» — сколько проверок перестанет выполняться, если эта не пройдёт (при выбранном правиле). «Предков» — сколько проверок должно пройти раньше, чтобы эта вообще запустилась. В «Рейтинге» оба правила показаны рядом, чтобы было видно разницу.' },
     { t: 'Своды', p: 'Проверки вроде «все параметры заполнены», которые не проверяют что-то своё, а просто собирают статусы других проверок в один общий результат. На схеме связи к ним идут пунктиром и подписаны «свод» — такие связи никогда не блокируют, при любом правиле каскада.' },
     { t: 'Допуск IFC-01', p: 'Скрытая по умолчанию связь: почти всем проверкам, которым нужна разобранная модель, добавлена связь-допуск от IFC-01 (файл вообще должен читаться). Таких связей больше полусотни, поэтому они спрятаны, чтобы не загромождать схему — включаются галочкой «Допуск IFC-01 к каждой проверке».' },
+    { t: 'Вид «По пунктам в39»', p: 'Отдельная схема, не связанная со связями остальных видов (их собирали по смыслу проверок). Здесь проверки стоят строго в порядке требований в39: колонки — разделы документа (4.1 форматы, 4.3 имена файлов, 4.6 координация … 7 ТЭП), внутри колонки — проверки по возрастанию номеров пунктов. Источник — лист «IFC к 16.10» рабочей таблицы; раздел проверки определяется по первому указанному в таблице пункту.<br><br>Правило цепочки: проверки следующего раздела запускаются, только если прошли все проверки предыдущих разделов; внутри одного раздела проверки независимы. Пустые колонки — разделы в39, по которым в таблице нет ни одной проверки.<br><br>Две галочки меняют цепочку: «ЦИМ ПС и ЦИМ АР — параллельно» (разделы 5.2 и 5.3 не ждут друг друга) и «Ведомость и аннотации — отдельная ветка» (не зависят от IFC-файлов). Число на карточке: → — сколько проверок в следующем разделе ждут эту; Σ — сколько всего стоят после неё.' },
     { t: 'Выводимая (транзитивная) связь', p: 'Связь, которая и так следует из цепочки других связей на схеме (A→B→C делает связь A→C избыточной для чтения графа). По умолчанию скрыта, как и допуск — включается отдельной галочкой.' },
   ];
 }
@@ -1045,12 +1321,20 @@ function writeHash() {
     if (S.cnt && S.cntMid !== 40) p.set('mid', S.cntMid);
     if (S.sel) p.set('sel', S.sel);
     if (S.failed.size) p.set('fail', [...S.failed].join(','));
+    if (S.view === 'npa') {
+      if (S.npaPsAr) p.set('psar', 1);
+      if (S.npaVed) p.set('ved', 1);
+      if (!S.npaEmpty) p.set('empty', 0);
+      if (S.npaSel) p.set('nsel', S.npaSel);
+    }
     history.replaceState(null, '', '#' + p.toString());
   } catch (e) { /* file:// в некоторых браузерах не разрешает */ }
 }
 function readHash() {
   const p = new URLSearchParams(location.hash.replace(/^#/, ''));
-  if (['cascade', 'lanes', 'matrix', 'rank', 'facts'].includes(p.get('view'))) S.view = p.get('view');
+  if (['cascade', 'lanes', 'matrix', 'rank', 'facts', 'npa'].includes(p.get('view'))) S.view = p.get('view');
+  S.npaPsAr = p.get('psar') === '1'; S.npaVed = p.get('ved') === '1'; S.npaEmpty = p.get('empty') !== '0';
+  if (p.get('nsel') && NPA_C[p.get('nsel')]) S.npaSel = p.get('nsel');
   // Архивный граф недоступен: старые ссылки открывают карточный вид.
   if (p.get('view') === 'factsGraph') S.view = 'facts';
   if (['A', 'B'].includes(p.get('rule'))) S.variant = p.get('rule');
@@ -1065,7 +1349,15 @@ function readHash() {
 
 // ───────── события ─────────
 function bind() {
-  document.querySelectorAll('#views button').forEach(b => b.addEventListener('click', () => { S.view = b.dataset.v; render({ fit: true, relayout: true }); }));
+  document.querySelectorAll('#views button').forEach(b => b.addEventListener('click', () => {
+    S.view = b.dataset.v;
+    if (S.view === 'npa' && !S.cnt) S.cnt = 'all';
+    render({ fit: true, relayout: true });
+  }));
+  $('#npaPsAr').addEventListener('change', e => { S.npaPsAr = e.target.checked; render({ fit: true }); });
+  $('#npaVed').addEventListener('change', e => { S.npaVed = e.target.checked; render({ fit: true }); });
+  $('#npaEmpty').addEventListener('change', e => { S.npaEmpty = e.target.checked; render({ fit: true }); });
+  $('#copyNpa').addEventListener('click', copyNpa);
   document.querySelectorAll('#ruleSeg button').forEach(b => b.addEventListener('click', () => { S.variant = b.dataset.v; render({ relayout: false }); }));
   $('#cntMid').addEventListener('input', e => { S.cntMid = +e.target.value; restyle(); writeHash(); });
   document.querySelectorAll('#cntSeg button').forEach(b => b.addEventListener('click', () => {
@@ -1090,7 +1382,9 @@ function bind() {
   $('#q').addEventListener('input', e => {
     S.q = e.target.value;
     const q = S.q.trim().toLowerCase();
-    const res = q ? G.nodes.filter(n => matches(n, q)).slice(0, 9) : [];
+    const res = !q ? [] : S.view === 'npa'
+      ? NPA.checks.filter(c => npaMatch(c, q)).slice(0, 9).map(c => ({ id: c.id, label: c.label, n: c.title }))
+      : G.nodes.filter(n => matches(n, q)).slice(0, 9);
     $('#results').innerHTML = res.map(n => `<a data-id="${n.id}"><span class="cd">${esc(n.label)}</span><span class="nm">${esc(n.n)}</span></a>`).join('');
     $('#results').querySelectorAll('a').forEach(a => a.addEventListener('click', () => select(a.dataset.id)));
     if (S.view === 'facts') render(); else if (S.view === 'rank') drawRank(); else restyle();
@@ -1101,6 +1395,8 @@ function bind() {
 
 // ───────── старт ─────────
 $('#asof').textContent = 'порядок выполнения и каскад пропусков · срез на ' + G.meta.asof.split('-').reverse().join('.');
+$('#npaSrc').innerHTML = 'Источник: ' + esc(NPA.meta.source) + ', срез на ' + NPA.meta.asof.split('-').reverse().join('.') + '.'
+  + (NPA.notes.length ? '<br>По таблице: ' + NPA.notes.map(esc).join('; ') + '.' : '');
 readHash();
 buildFilters();
 bind();
