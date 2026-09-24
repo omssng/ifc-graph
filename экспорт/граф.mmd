@@ -67,9 +67,10 @@ flowchart LR
   IFC_111["IFC-111<br/>Парковочные места для инвалидов"]
   IFC_96 --> IFC_01
   IFC_96 -.-> IFC_05
-  IFC_96 -.-> IFC_11_19
   IFC_05 -.-> IFC_89
   IFC_01 --> IFC_04
+  IFC_01 --> IFC_11_19
+  IFC_11_19 -.-> IFC_94
   IFC_04 --> IFC_03
   IFC_04 --> IFC_93
   IFC_25 --> IFC_26
@@ -95,7 +96,6 @@ flowchart LR
   IFC_46 -.-> IFC_92
   IFC_11_19 -.-> IFC_46
   IFC_11_19 -.-> IFC_02
-  IFC_11_19 -.-> IFC_88_1
   IFC_11_19 -.-> IFC_88_2
   IFC_11_19 -.-> IFC_50
   IFC_11_19 -.-> IFC_51
