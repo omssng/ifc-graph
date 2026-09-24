@@ -101,7 +101,7 @@ window.NPA_GRAPH = {
    "sec": "4.1",
    "changed": false,
    "role": null,
-   "analysis": true,
+   "analysis": false,
    "dev": false,
    "inModel": [
     "IFC-01"
@@ -145,8 +145,8 @@ window.NPA_GRAPH = {
    "sec": "4.1",
    "changed": false,
    "role": null,
-   "analysis": true,
-   "dev": true,
+   "analysis": false,
+   "dev": false,
    "inModel": [
     "IFC-04"
    ],
@@ -187,7 +187,7 @@ window.NPA_GRAPH = {
     "4.1.3.2"
    ],
    "sec": "4.1",
-   "changed": false,
+   "changed": true,
    "role": null,
    "analysis": false,
    "dev": false,
@@ -281,7 +281,7 @@ window.NPA_GRAPH = {
    "sec": "4.1",
    "changed": false,
    "role": null,
-   "analysis": true,
+   "analysis": false,
    "dev": false,
    "inModel": [
     "IFC-05"
@@ -583,7 +583,7 @@ window.NPA_GRAPH = {
    "sec": "4.9",
    "changed": false,
    "role": null,
-   "analysis": true,
+   "analysis": false,
    "dev": false,
    "inModel": [
     "IFC-44"
@@ -627,7 +627,7 @@ window.NPA_GRAPH = {
    "sec": "5.1",
    "changed": true,
    "role": null,
-   "analysis": false,
+   "analysis": true,
    "dev": true,
    "inModel": [
     "IFC-46"
@@ -855,7 +855,7 @@ window.NPA_GRAPH = {
     "5.2.17"
    ],
    "sec": "5.2",
-   "changed": false,
+   "changed": true,
    "role": null,
    "analysis": false,
    "dev": false,
@@ -904,7 +904,9 @@ window.NPA_GRAPH = {
    "role": null,
    "analysis": false,
    "dev": false,
-   "inModel": [],
+   "inModel": [
+    "IFC-109-b"
+   ],
    "ord": 35,
    "side": "",
    "disc": "ps"
@@ -932,19 +934,15 @@ window.NPA_GRAPH = {
    "disc": "ps"
   },
   {
-   "id": "IFC-104",
-   "label": "IFC-104",
-   "title": "Этап проектирования: атрибут RUS_Stage (RusSet_Location) у элементов ЦИМ ПС и ЦИМ АР",
+   "id": "IFC-99",
+   "label": "IFC-99",
+   "title": "параметры ГЗК/ГПЗУ/ППТ для IfcSite",
    "parts": [
-    "Этап проектирования: атрибут RUS_Stage (RusSet_Location) у элементов ЦИМ ПС и ЦИМ АР"
+    "параметры ГЗК/ГПЗУ/ППТ для IfcSite"
    ],
    "clauses": [
-    "5.2.23",
-    "5.2.24",
-    "5.2.25",
-    "5.3.20",
-    "5.3.21",
-    "5.3.22"
+    "5.2.20",
+    "5.3.6"
    ],
    "sec": "5.2",
    "changed": true,
@@ -952,7 +950,7 @@ window.NPA_GRAPH = {
    "analysis": false,
    "dev": false,
    "inModel": [
-    "IFC-104"
+    "IFC-99"
    ],
    "ord": 37,
    "side": "",
@@ -971,8 +969,8 @@ window.NPA_GRAPH = {
    "sec": "5.2",
    "changed": false,
    "role": null,
-   "analysis": true,
-   "dev": true,
+   "analysis": false,
+   "dev": false,
    "inModel": [
     "IFC-102"
    ],
@@ -1016,7 +1014,7 @@ window.NPA_GRAPH = {
    "sec": "5.3",
    "changed": true,
    "role": null,
-   "analysis": true,
+   "analysis": false,
    "dev": false,
    "inModel": [
     "IFC-64"
@@ -1033,10 +1031,12 @@ window.NPA_GRAPH = {
     "Зонирование IfcSpace для расчёта СПП в ГНС и общей площади"
    ],
    "clauses": [
-    "5.3.4"
+    "5.3.7",
+    "5.3.11",
+    "5.3.13"
    ],
    "sec": "5.3",
-   "changed": false,
+   "changed": true,
    "role": null,
    "analysis": false,
    "dev": false,
@@ -1044,50 +1044,6 @@ window.NPA_GRAPH = {
     "IFC-65-66"
    ],
    "ord": 41,
-   "side": "",
-   "disc": "ar"
-  },
-  {
-   "id": "IFC-68",
-   "label": "IFC-68",
-   "title": "Наружные ограждения: IfcCurtainWall / IfcMember+IfcPlate",
-   "parts": [
-    "Наружные ограждения: IfcCurtainWall / IfcMember+IfcPlate"
-   ],
-   "clauses": [
-    "5.3.6"
-   ],
-   "sec": "5.3",
-   "changed": false,
-   "role": null,
-   "analysis": false,
-   "dev": false,
-   "inModel": [
-    "IFC-68"
-   ],
-   "ord": 42,
-   "side": "",
-   "disc": "ar"
-  },
-  {
-   "id": "IFC-99",
-   "label": "IFC-99",
-   "title": "параметры ГЗК/ГПЗУ/ППТ для IfcSite",
-   "parts": [
-    "параметры ГЗК/ГПЗУ/ППТ для IfcSite"
-   ],
-   "clauses": [
-    "5.3.6"
-   ],
-   "sec": "5.3",
-   "changed": true,
-   "role": null,
-   "analysis": false,
-   "dev": true,
-   "inModel": [
-    "IFC-99"
-   ],
-   "ord": 43,
    "side": "",
    "disc": "ar"
   },
@@ -1111,29 +1067,7 @@ window.NPA_GRAPH = {
    "inModel": [
     "IFC-107"
    ],
-   "ord": 44,
-   "side": "",
-   "disc": "ar"
-  },
-  {
-   "id": "IFC-70",
-   "label": "IFC-70",
-   "title": "Атрибутивный состав элементов ЦИМ АР по приложению",
-   "parts": [
-    "Атрибутивный состав элементов ЦИМ АР по приложению"
-   ],
-   "clauses": [
-    "5.3.10"
-   ],
-   "sec": "5.3",
-   "changed": false,
-   "role": null,
-   "analysis": true,
-   "dev": true,
-   "inModel": [
-    "IFC-70"
-   ],
-   "ord": 45,
+   "ord": 42,
    "side": "",
    "disc": "ar"
   },
@@ -1155,35 +1089,13 @@ window.NPA_GRAPH = {
    "inModel": [
     "IFC-106"
    ],
-   "ord": 46,
+   "ord": 43,
    "side": "",
    "disc": "ar"
   },
   {
-   "id": "IFC-71",
-   "label": "IFC-71",
-   "title": "Элементы ЦИМ АР, отсутствующие в приложении",
-   "parts": [
-    "Элементы ЦИМ АР, отсутствующие в приложении"
-   ],
-   "clauses": [
-    "5.3.13"
-   ],
-   "sec": "5.3",
-   "changed": false,
-   "role": null,
-   "analysis": false,
-   "dev": false,
-   "inModel": [
-    "IFC-71"
-   ],
-   "ord": 47,
-   "side": "",
-   "disc": "ar"
-  },
-  {
-   "id": "IFC-110",
-   "label": "IFC-110",
+   "id": "IFC-68",
+   "label": "IFC-68",
    "title": "Моделирование наружних ограждающих конструкций",
    "parts": [
     "Моделирование наружних ограждающих конструкций"
@@ -1197,8 +1109,10 @@ window.NPA_GRAPH = {
    "role": null,
    "analysis": false,
    "dev": false,
-   "inModel": [],
-   "ord": 48,
+   "inModel": [
+    "IFC-68"
+   ],
+   "ord": 44,
    "side": "",
    "disc": "ar"
   },
@@ -1220,7 +1134,29 @@ window.NPA_GRAPH = {
    "inModel": [
     "IFC-100"
    ],
-   "ord": 49,
+   "ord": 45,
+   "side": "",
+   "disc": "ar"
+  },
+  {
+   "id": "IFC-111",
+   "label": "IFC-111",
+   "title": "Парковочные места для инвалидов моделируются в ЦИМ ПС",
+   "parts": [
+    "Парковочные места для инвалидов моделируются в ЦИМ ПС"
+   ],
+   "clauses": [
+    "5.3.17"
+   ],
+   "sec": "5.3",
+   "changed": true,
+   "role": null,
+   "analysis": false,
+   "dev": false,
+   "inModel": [
+    "IFC-111"
+   ],
+   "ord": 46,
    "side": "",
    "disc": "ar"
   },
@@ -1243,6 +1179,75 @@ window.NPA_GRAPH = {
    "inModel": [
     "IFC-105"
    ],
+   "ord": 47,
+   "side": "",
+   "disc": "ar"
+  },
+  {
+   "id": "IFC-104",
+   "label": "IFC-104",
+   "title": "Этап проектирования: атрибут RUS_Stage",
+   "parts": [
+    "Этап проектирования: атрибут RUS_Stage"
+   ],
+   "clauses": [
+    "5.3.20",
+    "5.3.21",
+    "5.3.22"
+   ],
+   "sec": "5.3",
+   "changed": true,
+   "role": null,
+   "analysis": false,
+   "dev": false,
+   "inModel": [
+    "IFC-104"
+   ],
+   "ord": 48,
+   "side": "",
+   "disc": "ar"
+  },
+  {
+   "id": "IFC-70",
+   "label": "IFC-70",
+   "title": "Атрибутивный состав элементов ЦИМ АР по приложению",
+   "parts": [
+    "Атрибутивный состав элементов ЦИМ АР по приложению"
+   ],
+   "clauses": [
+    "5.3.23",
+    "5.3.24"
+   ],
+   "sec": "5.3",
+   "changed": true,
+   "role": null,
+   "analysis": false,
+   "dev": false,
+   "inModel": [
+    "IFC-70"
+   ],
+   "ord": 49,
+   "side": "",
+   "disc": "ar"
+  },
+  {
+   "id": "IFC-71",
+   "label": "IFC-71",
+   "title": "Элементы ЦИМ отсутствующие в приложении",
+   "parts": [
+    "Элементы ЦИМ отсутствующие в приложении"
+   ],
+   "clauses": [
+    "5.3.25"
+   ],
+   "sec": "5.3",
+   "changed": false,
+   "role": null,
+   "analysis": false,
+   "dev": false,
+   "inModel": [
+    "IFC-71"
+   ],
    "ord": 50,
    "side": "",
    "disc": "ar"
@@ -1262,7 +1267,9 @@ window.NPA_GRAPH = {
    "role": null,
    "analysis": false,
    "dev": false,
-   "inModel": [],
+   "inModel": [
+    "IFC-74"
+   ],
    "ord": 51,
    "side": "ved",
    "disc": ""
@@ -1282,7 +1289,9 @@ window.NPA_GRAPH = {
    "role": null,
    "analysis": false,
    "dev": false,
-   "inModel": [],
+   "inModel": [
+    "IFC-75"
+   ],
    "ord": 52,
    "side": "ved",
    "disc": ""
@@ -1306,7 +1315,9 @@ window.NPA_GRAPH = {
    "role": null,
    "analysis": false,
    "dev": false,
-   "inModel": [],
+   "inModel": [
+    "IFC-76"
+   ],
    "ord": 53,
    "side": "ved",
    "disc": ""
@@ -1393,6 +1404,7 @@ window.NPA_GRAPH = {
     "7.1",
     "7.2",
     "7.3",
+    "7.4",
     "5.3.11"
    ],
    "sec": "7",
@@ -1433,7 +1445,6 @@ window.NPA_GRAPH = {
   }
  ],
  "notes": [
-  "IFC-109: номер встречается в таблице дважды — вторая строка (п. 5.2.18) показана как IFC-109 (2)",
-  "IFC-111: строка 64 без номера пункта и описания — не показана"
+  "IFC-109: номер встречается в таблице дважды — вторая строка (п. 5.2.18) показана как IFC-109 (2)"
  ]
 };
