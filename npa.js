@@ -904,9 +904,7 @@ window.NPA_GRAPH = {
    "role": null,
    "analysis": false,
    "dev": false,
-   "inModel": [
-    "IFC-109"
-   ],
+   "inModel": [],
    "ord": 35,
    "side": "",
    "disc": "ps"
@@ -1352,7 +1350,11 @@ window.NPA_GRAPH = {
    "role": null,
    "analysis": false,
    "dev": false,
-   "inModel": [],
+   "inModel": [
+    "IFC-88-1",
+    "IFC-88-2",
+    "IFC-88-3"
+   ],
    "ord": 55,
    "side": "",
    "disc": ""
