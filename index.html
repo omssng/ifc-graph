@@ -348,11 +348,6 @@
       <legend>Статус <a id="allst">все</a></legend>
       <div id="fSt"></div>
     </fieldset>
-    <fieldset>
-      <legend>Релиз</legend>
-      <div id="fRel"></div>
-      <label class="chk"><input type="checkbox" id="onlyAmb"><span>Только с неоднозначным исходом<small>исход может требовать ручной проверки или зависит от открытого вопроса</small></span></label>
-    </fieldset>
 
     <fieldset>
       <legend>Показывать связи</legend>
@@ -439,9 +434,9 @@
 <div id="modal"><div class="win"><header><div><h2 id="modalTitle">Выводы анализа</h2><small id="insSub"></small></div><span class="x" id="closeModal">×</span></header><div class="body" id="insBody"></div></div></div>
 
 <script src="vendor/d3.v7.min.js"></script>
-<script src="data.js?v=32"></script>
-<script src="facts.js?v=32"></script>
-<script src="npa.js?v=32"></script>
+<script src="data.js?v=33"></script>
+<script src="facts.js?v=33"></script>
+<script src="npa.js?v=33"></script>
 <script>
 (() => {
 'use strict';
@@ -593,8 +588,8 @@ const S = {
   brDisc: true, brSub: true, brDup: false, brSel: null, brOn: null, brAnc: true, brDesc: true,
   files: new Set(),   // выбор файла на IFC-01: пусто — все; иначе подмножество ps / ar / bf
   paOff: new Set(), paSel: null,
-  sec: new Set(secKeys), fam: new Set(famKeys), st: new Set(stKeys), rel: new Set(Object.keys(RELS)), ft: new Set(Object.keys(window.IFC_GRAPH.branches.types)),
-  onlyAmb: false, showGate: false, showImplied: false,
+  sec: new Set(secKeys), fam: new Set(famKeys), st: new Set(stKeys), ft: new Set(Object.keys(window.IFC_GRAPH.branches.types)),
+  showGate: false, showImplied: false,
   q: '', sel: null, failed: new Set(), rankSort: 'desc', rankDir: -1, cnt: '', cntMid: 40,
 };
 
@@ -604,7 +599,7 @@ const FT_KEYS = Object.keys(G.branches.types);
 const ftOf = id => G.branches.assign[id].split('.')[0];
 // совместные проверки ПС и АР отдельного пункта в фильтре не имеют: видны, если отмечен ПС или АР
 const secOn = n => n.sec === 'both' ? S.sec.has('ps') || S.sec.has('ar') : S.sec.has(n.sec);
-const isVisible = n => S.ft.has(ftOf(n.id)) && secOn(n) && S.fam.has(n.fam) && S.st.has(n.st) && S.rel.has(n.rel) && (!S.onlyAmb || n.amb);
+const isVisible = n => S.ft.has(ftOf(n.id)) && secOn(n) && S.fam.has(n.fam) && S.st.has(n.st);
 const visNodes = () => G.nodes.filter(isVisible);
 function edgeShown(e, ids) {
   if (!ids.has(e.from) || !ids.has(e.to)) return false;
@@ -1686,7 +1681,7 @@ function render(opts) {
   const isFacts = S.view === 'facts', isNpa = S.view === 'npa';
   ['#ruleSeg', '#stepsBox', '#copyTable', '#copyHint'].forEach(s => { if ($(s)) $(s).style.display = isFacts || isNpa ? 'none' : ''; });
   ['#vA', '#showGate', '#colorBy', '#clearFail'].forEach(s => { const box = $(s).closest('fieldset'); if (box) box.style.display = isFacts || isNpa ? 'none' : ''; });
-  ['#fFt', '#fSec', '#fFam', '#fSt', '#fRel'].forEach(s => { const box = $(s).closest('fieldset'); if (box) box.style.display = isNpa ? 'none' : ''; });
+  ['#fFt', '#fSec', '#fFam', '#fSt'].forEach(s => { const box = $(s).closest('fieldset'); if (box) box.style.display = isNpa ? 'none' : ''; });
   $('#npaBox').style.display = isNpa ? '' : 'none';
   $('#brBox').style.display = S.view === 'branches' ? '' : 'none';
   $('#paBox').style.display = S.view === 'paths' ? '' : 'none';
@@ -1862,7 +1857,7 @@ function renderSidebarState() {
   const fc = $('#failedChips');
   fc.innerHTML = S.failed.size ? [...S.failed].map(id => `<a class="chip f" data-id="${id}" title="убрать из сценария">${esc(N[id].label)} ×</a>`).join('') : '<span class="hint" style="margin:0">сценарий пуст</span>';
   fc.querySelectorAll('a').forEach(a => a.addEventListener('click', () => { S.failed.delete(a.dataset.id); render(); }));
-  ['#fFt', '#fSec', '#fFam', '#fSt', '#fRel'].forEach(sel => {
+  ['#fFt', '#fSec', '#fFam', '#fSt'].forEach(sel => {
     $(sel).querySelectorAll('.row').forEach(r => r.classList.toggle('off', !S[r.dataset.g].has(r.dataset.k)));
   });
 }
@@ -1878,7 +1873,6 @@ function buildFilters() {
   mk('#fFam', 'fam', famKeys.map(k => [k, G.families[k]]), k => G.nodes.filter(n => n.fam === k).length, () => 'background:var(--chipbd)');
   mk('#fSt', 'st', stKeys.map(k => [k, G.statuses[k]]), k => G.nodes.filter(n => n.st === k).length,
     k => ({ code: 'background:var(--ok)', work: 'background:var(--warn)', spec: 'border:2px solid var(--ink);border-radius:50%', idea: 'border:2px dashed var(--dim);border-radius:50%' }[k]));
-  mk('#fRel', 'rel', Object.entries(RELS), k => G.nodes.filter(n => n.rel === k).length, () => 'background:var(--chipbd)');
   const all = (btn, group, keys) => $(btn).addEventListener('click', () => { keys.forEach(k => S[group].add(k)); render({ fit: true, relayout: true }); });
   all('#allsec', 'sec', secKeys); all('#allft', 'ft', FT_KEYS); all('#allfam', 'fam', famKeys); all('#allst', 'st', stKeys);
 }
@@ -1968,7 +1962,7 @@ function renderDetail() {
   const sk = skippedSet();
   let h = `<span class="x" id="dx">×</span>
     <div class="code">${esc(n.label)}</div><div class="title">${esc(n.n)}</div>
-    <div class="tags"><span class="tag">${esc(G.sections[n.sec])}</span><span class="tag">${n.sc === 'batch' ? 'весь комплект' : 'по файлам'}</span><span class="tag">${esc(G.statuses[n.st])}</span><span class="tag">${esc(RELS[n.rel])}</span><span class="tag">${esc(G.families[n.fam])}</span></div>
+    <div class="tags"><span class="tag">${esc(G.sections[n.sec])}</span><span class="tag">${n.sc === 'batch' ? 'весь комплект' : 'по файлам'}</span><span class="tag">${esc(G.statuses[n.st])}</span><span class="tag">${esc(G.families[n.fam])}</span></div>
     <div class="desc">${esc(n.d)}</div>
     <div style="color:var(--muted);font-size:12px">Пункт требований: ${esc(n.p)}</div>`;
   if (sk.has(n.id)) h += `<div class="box danger">В текущем сценарии эта проверка <b>не выполнится</b>: один из её предков не прошёл.</div>`;
@@ -2264,7 +2258,6 @@ function bind() {
   [$('#vA'), $('#vB')].forEach(c => c.addEventListener('click', () => { S.variant = c.dataset.v; render(); }));
   $('#fit').addEventListener('click', () => fit(true));
   $('#colorBy').addEventListener('change', e => { S.colorBy = e.target.value; render({ relayout: false }); });
-  $('#onlyAmb').addEventListener('change', e => { S.onlyAmb = e.target.checked; render({ fit: true, relayout: true }); });
   $('#stepsSlider').addEventListener('input', e => { S.cols = +e.target.value; render({ fit: true, relayout: true }); });
   $('#showGate').addEventListener('change', e => { S.showGate = e.target.checked; render({ fit: false, relayout: true }); });
   $('#showImplied').addEventListener('change', e => { S.showImplied = e.target.checked; render({ fit: false, relayout: true }); });
