@@ -188,6 +188,7 @@
   .node.failed .cross,.node.skipped .cross{display:inline}
   .node.skipped .cross{fill:var(--muted)}
   .edge{fill:none;stroke-width:1.35;opacity:.42;pointer-events:none}
+  .edge.g01{opacity:.21}
   .edge.hov{opacity:1!important;stroke-width:2.8}
   .ehit{fill:none;stroke:transparent;stroke-width:12;pointer-events:stroke;cursor:help}
   .node.ehl .card{stroke:var(--accent);stroke-width:2.4}
@@ -229,6 +230,9 @@
   .node .sectag{display:none}
   svg.bysec .node .sectag{display:inline}
   svg.bysec .node .stripe:not(.copy){display:none}
+  svg.bysec .node .id,svg.bysec .node .nm{transform:translateX(22px)}
+  .sectag .sm text{font-size:8.5px}
+  .sectag .ext text{font-size:8.5px}
   .sectag text{font:700 9.5px system-ui,-apple-system,"Segoe UI",sans-serif;letter-spacing:.02em;text-anchor:middle}
   .sectag text{fill:var(--on-tag)}
   .sectag .t-ps rect{fill:var(--s-ps)} .sectag .t-ar rect{fill:var(--s-ar)}
@@ -445,9 +449,9 @@
 <div id="modal"><div class="win"><header><div><h2 id="modalTitle">Выводы анализа</h2><small id="insSub"></small></div><span class="x" id="closeModal">×</span></header><div class="body" id="insBody"></div></div></div>
 
 <script src="vendor/d3.v7.min.js"></script>
-<script src="data.js?v=43"></script>
-<script src="facts.js?v=43"></script>
-<script src="npa.js?v=43"></script>
+<script src="data.js?v=44"></script>
+<script src="facts.js?v=44"></script>
+<script src="npa.js?v=44"></script>
 <script>
 (() => {
 'use strict';
@@ -777,17 +781,18 @@ const edgePath = (a, b) => {
 // IFC — пишем раздел ЦИМ; не IFC — расширение файла, из которого берутся данные
 const EXT = { trm: 'TRM', xml: 'XML', bcf: 'BCF', dwg: 'DWG' };
 const SEC_TAG = { pkg: 'компл.', all: 'любой', ps: 'ПС', ar: 'АР', bf: 'БФ', ...EXT };
+const SEC_W = 26;   // плашки раздела — столбиком внутри карточки у левого края; текст карточки сдвигается вправо
 function secTag(g, h) {
   const t = g.append('g').attr('class', 'sectag');
   t.each(function (d) {
     const base = d.base || d.id, sec = N[base].sec, ft = ftOf(base);
     const parts = ft !== 'ifc' ? [ft] : sec === 'both' ? ['ar', 'ps'] : sec === 'all' ? ['ar', 'ps', 'bf'] : [sec];   // сверху вниз: АР, ПС, БФ
-    const ph = parts.length > 2 ? 13 : 15, pitch = ph + 2;   // три плашки — чуть ниже, чтобы уложиться в высоту карточки
-    let y = h / 2 - (parts.length * pitch - 2) / 2;
+    const ph = parts.length > 2 ? 12 : 14, pitch = ph + 1.5;   // три плашки — ниже, чтобы уложиться в высоту карточки
+    let y = h / 2 - (parts.length * pitch - 1.5) / 2;
     parts.forEach(p => {
-      const w = Math.max(24, 8 + SEC_TAG[p].length * 6.2), el = d3.select(this).append('g').attr('class', 't-' + p + (EXT[p] ? ' ext' : ''));
-      el.append('rect').attr('x', -w - 3).attr('y', y).attr('width', w).attr('height', ph).attr('rx', ph / 2);
-      el.append('text').attr('x', -w / 2 - 3).attr('y', y + ph / 2 + 3.4).text(SEC_TAG[p]);
+      const w = SEC_W, el = d3.select(this).append('g').attr('class', 't-' + p + (EXT[p] ? ' ext' : '') + (parts.length > 2 ? ' sm' : ''));
+      el.append('rect').attr('x', 5).attr('y', y).attr('width', w).attr('height', ph).attr('rx', ph / 2);
+      el.append('text').attr('x', 5 + w / 2).attr('y', y + ph / 2 + 3.2).text(SEC_TAG[p]);
       y += pitch;
     });
   });
@@ -803,7 +808,7 @@ function nodeShape(g) {
   const idt = g.append('text').attr('class', 'id').attr('x', 14).attr('y', 18);
   idt.append('tspan').text(d => N[d.base || d.id].label);
   idt.filter(d => N[d.base || d.id].amb).append('tspan').attr('dx', 5).attr('class', 'amb').text('⚠');
-  g.append('text').attr('class', 'nm').attr('x', 14).attr('y', 34).text(d => trunc(N[d.base || d.id].n, 27));
+  g.append('text').attr('class', 'nm').attr('x', 14).attr('y', 34).text(d => trunc(N[d.base || d.id].n, 24));
   // статус
   const st = g.append('g').attr('transform', `translate(${NW - 14},14)`);
   st.each(function (d) {
@@ -835,7 +840,7 @@ function drawLayered(lanes) {
   drawColHeads(L.depths, L.xs, L.cols, L.UF);
   const ge = gRoot.append('g'), gn = gRoot.append('g');
   edgeSel = ge.selectAll('path').data(edges.filter(e => L.P[e.from] && L.P[e.to])).join('path')
-    .attr('class', 'edge').attr('d', e => edgePath(L.P[e.from], L.P[e.to]))
+    .attr('class', 'edge').classed('g01', e => e.k === 'gate' && e.from === 'IFC-01').attr('d', e => edgePath(L.P[e.from], L.P[e.to]))
     .attr('stroke', edgeColor).attr('stroke-dasharray', edgeDash)
     .attr('marker-end', e => 'url(#ar-' + e.k + ')');
   nodeSel = gn.selectAll('g').data(nodes.map(n => ({ id: n.id, x: L.P[n.id].x, y: L.P[n.id].y }))).join('g')
@@ -1123,7 +1128,7 @@ function drawBranches() {
   const shown = VE.filter(x => edgeShown(x.e, brG.visIds) && P[x.from] && P[x.to]);
   const ge = gRoot.append('g'), gn = gRoot.append('g');
   edgeSel = ge.selectAll('path').data(shown).join('path')
-    .attr('class', 'edge').attr('d', x => edgePath(P[x.from], P[x.to]))
+    .attr('class', 'edge').classed('g01', x => x.e.k === 'gate' && x.e.from === 'IFC-01').attr('d', x => edgePath(P[x.from], P[x.to]))
     .attr('stroke', x => edgeColor(x.e)).attr('stroke-dasharray', x => edgeDash(x.e))
     .attr('marker-end', x => 'url(#ar-' + x.k + ')');
   nodeSel = gn.selectAll('g').data(VN.map(v => ({ id: v.id, base: v.base, copyOf: v.copyOf, x: P[v.id].x, y: P[v.id].y }))).join('g')
@@ -1340,7 +1345,7 @@ function drawPaths() {
   const shown = paG.VE.filter(x => edgeShown(x.e, paG.visIds) && P[x.from] && P[x.to]);
   const ge = gRoot.append('g'), gn = gRoot.append('g');
   edgeSel = ge.selectAll('path').data(shown).join('path')
-    .attr('class', 'edge').attr('d', x => edgePath(P[x.from], P[x.to]))
+    .attr('class', 'edge').classed('g01', x => x.e.k === 'gate' && x.e.from === 'IFC-01').attr('d', x => edgePath(P[x.from], P[x.to]))
     .attr('stroke', x => edgeColor(x.e)).attr('stroke-dasharray', x => edgeDash(x.e))
     .attr('marker-end', x => 'url(#ar-' + x.k + ')');
   nodeSel = gn.selectAll('g').data(paG.VN.filter(v => P[v.id]).map(v => ({ id: v.id, base: v.base, inPath: v.scen ? 'в полосе «' + PA_NAME[v.scen] + '»' : 'общее начало всех путей', x: P[v.id].x, y: P[v.id].y }))).join('g')
