@@ -155,6 +155,7 @@
   .lnk .rest{flex:1;min-width:0}
   .lnk .nm{display:block;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
   .lnk .via{display:block;color:var(--muted);font-size:11px;line-height:1.35}
+  .lnk .why{display:block;font-size:11px;color:var(--ink);opacity:.78;margin-top:2px;line-height:1.35}
   .kchip{display:inline-block;border-radius:4px;padding:0 5px;font-size:10px;margin-right:4px;border:1px solid currentColor;white-space:nowrap}
   .bchip{display:inline-block;border-radius:4px;padding:0 5px;font-size:10px;margin-right:4px;background:var(--chipbg);color:var(--chipink);white-space:nowrap}
   .bchip.infer{background:rgba(227,165,27,.18);color:var(--warn)}
@@ -187,6 +188,21 @@
   .node.failed .cross,.node.skipped .cross{display:inline}
   .node.skipped .cross{fill:var(--muted)}
   .edge{fill:none;stroke-width:1.35;opacity:.42;pointer-events:none}
+  .edge.hov{opacity:1!important;stroke-width:2.8}
+  .ehit{fill:none;stroke:transparent;stroke-width:12;pointer-events:stroke;cursor:help}
+  .node.ehl .card{stroke:var(--accent);stroke-width:2.4}
+  .node .qf{font-size:9.5px;font-weight:600;letter-spacing:.01em}
+  .node .qf.first{fill:var(--ok)}
+  .node .qf.last{fill:var(--warn)}
+  .lbrk{stroke:var(--line);stroke-width:1.2}
+  .colhead.subc{font-size:10px;fill:var(--accent);font-weight:600}
+  #etip{position:fixed;z-index:40;display:none;max-width:360px;background:var(--panel);border:1px solid var(--line);border-left:3px solid var(--kc,var(--accent));
+    border-radius:8px;box-shadow:var(--shadow);padding:8px 11px;font-size:12px;line-height:1.45;color:var(--ink);pointer-events:none}
+  #etip .hd{font-weight:600;margin-bottom:2px;display:flex;gap:8px;align-items:baseline;flex-wrap:wrap}
+  #etip .kc{font-weight:600;font-size:10.5px;text-transform:uppercase;letter-spacing:.05em}
+  #etip .lb{color:var(--muted)}
+  #etip .cons{color:var(--muted);font-size:11px;margin-top:4px}
+  #etip hr{border:0;border-top:1px solid var(--line);margin:7px 0}
   .edge.dim{opacity:.06}
   .edge.on-anc{stroke:var(--anc)!important;opacity:1;stroke-width:2.2}
   .edge.on-desc{stroke:var(--desc)!important;opacity:1;stroke-width:2.2}
@@ -311,9 +327,9 @@
     </fieldset>
 
     <fieldset id="stepsBox">
-      <legend>Число слоёв <span id="stepsVal" style="text-transform:none;letter-spacing:0;color:var(--ink);font-weight:600"></span></legend>
-      <input type="range" id="stepsSlider" min="2" max="2" value="2" style="width:100%">
-      <div class="hint" style="margin-top:4px">Действует в «Каскаде» и «Дорожках»: объединяет несколько соседних слоёв в один, крупнее, чтобы сразу было видно основные родительские проверки, а не тонкое деление на десяток слоёв. Полная детализация — вправо до конца.</div>
+      <legend>Развёртка слоёв <span id="stepsVal" style="text-transform:none;letter-spacing:0;color:var(--ink);font-weight:600"></span></legend>
+      <input type="range" id="stepsSlider" min="0" max="100" value="0" style="width:100%">
+      <div class="hint" style="margin-top:4px">Слева — по слоям. Вправо — каждый слой раскладывается на столбцы 3а, 3б, 3в… по очереди выполнения внутри слоя; до конца вправо — в одну линию, каждая проверка в своём столбце. Внутри слоя проверки друг от друга не зависят, поэтому стрелок назад не появляется. Очередь: сначала ▲ входные фильтры, дальше — у кого больше зависимых проверок, ▼ тяжёлые — в конце. Действует в «Каскаде», «Дорожках» и «Ветках по файлам».</div>
     </fieldset>
 
     <fieldset>
@@ -341,7 +357,7 @@
 
     <fieldset>
       <legend>Показывать связи</legend>
-      <label class="chk"><input type="checkbox" id="showGate"><span>Допуск IFC-01 к каждой проверке<small>неявные связи «файл должен читаться» — их много, по умолчанию скрыты</small></span></label>
+      <label class="chk"><input type="checkbox" id="showGate"><span>Допуск IFC-01 ко всем проверкам<small>«файл должен читаться». Где IFC-01 — единственный родитель, линия видна всегда; остальные допуски повторяют цепочку и по умолчанию скрыты</small></span></label>
       <label class="chk"><input type="checkbox" id="showImplied"><span>Выводимые (транзитивные)<small>связь, которая уже следует из цепочки других</small></span></label>
       <label class="chk"><input type="checkbox" id="showAgg" checked><span>Своды<small>IFC-21, IFC-44 собирают статусы, в каскаде не участвуют</small></span></label>
     </fieldset>
@@ -372,7 +388,7 @@
       <div class="btns">
         <button class="btn flat" id="copyTable">Скопировать в буфер: номер + слой</button>
       </div>
-      <div class="hint" id="copyHint">Копирует 2 колонки (номер проверки, слой — с учётом ползунка и текущих фильтров) — вставить как есть в свободный столбец общей таблицы и фильтровать по нему.</div>
+      <div class="hint" id="copyHint">Копирует 2 колонки (номер проверки, слой — с учётом текущих фильтров) — вставить как есть в свободный столбец общей таблицы и фильтровать по нему.</div>
       <div class="hint">Слева направо — от родительских проверок к дочерним: чем правее, тем больше проверок должно быть выполнено раньше. Пунктирная рамка и штрих — логика проверки ещё не написана, связи предположены.</div>
     </fieldset>
   </div>
@@ -420,13 +436,14 @@
 </main>
 
 <div id="detail"></div>
+<div id="etip"></div>
 
 <div id="modal"><div class="win"><header><div><h2 id="modalTitle">Выводы анализа</h2><small id="insSub"></small></div><span class="x" id="closeModal">×</span></header><div class="body" id="insBody"></div></div></div>
 
 <script src="vendor/d3.v7.min.js"></script>
-<script src="data.js?v=26"></script>
-<script src="facts.js?v=26"></script>
-<script src="npa.js?v=26"></script>
+<script src="data.js?v=27"></script>
+<script src="facts.js?v=27"></script>
+<script src="npa.js?v=27"></script>
 <script>
 (() => {
 'use strict';
@@ -454,12 +471,116 @@ const KIND_EX = {
 const kindRow = (k, line) => `<div class="li kx" style="--kc:var(--k-${k})">${line}${esc(G.meta.kindName[k])}<div class="ex"><b>${esc(KIND_EX[k][0])}</b><br>${esc(KIND_EX[k][1])}<div class="pr">${esc(KIND_EX[k][2])}</div></div></div>`;
 const KIND_SHORT = { gate: 'допуск', logic: 'смысл', scope: 'раздел', data: 'данные', rule: 'правило', agg: 'свод' };
 const BASIS = { doc: 'в аналитике', code: 'по коду', infer: 'предположение' };
-// Ползунок «Число слоёв»: при полной детализации показываемый слой совпадает с исходным
-// (S.steps === STEPS_MAX); при уменьшении несколько соседних исходных слоёв объединяются
-// в один укрупнённый — stepOf(n) даёт номер этого показываемого слоя.
-const MAX_DEPTH = Math.max(0, ...G.nodes.map(n => n.depth));
-const STEPS_MAX = MAX_DEPTH + 1;
-const stepOf = n => Math.min(S.steps - 1, Math.floor(n.depth * S.steps / STEPS_MAX));
+const NW_ = 186;
+const stepOf = n => n.depth;
+// Очередь выполнения внутри слоя (проверки одного слоя друг от друга не зависят):
+// ▲ входные фильтры → у кого больше зависимых проверок (Σ после) → больше прямых дочерних → ▼ тяжёлые.
+const Q_GRP = { first: 0, '': 1, last: 2 };
+const qGrp = id => Q_GRP[N[id].q || ''];
+const kidsN = id => OUT[id].filter(e => !e.implicit && e.k !== 'agg').length;
+const qCmp = (a, b) => qGrp(a) - qGrp(b) || N[b].A.desc.length - N[a].A.desc.length || kidsN(b) - kidsN(a) || N[a].topo - N[b].topo;
+const QRANK = {};
+[...new Set(G.nodes.map(n => n.depth))].forEach(d => {
+  const ids = G.nodes.filter(n => n.depth === d).map(n => n.id).sort(qCmp);
+  ids.forEach((id, i) => { QRANK[id] = { i, n: ids.length }; });
+});
+const Q_MARK = { first: '▲ первой', last: '▼ в конце' };
+// Развёртка: слой из s проверок раскладывается на c ≤ s столбцов подряд по очереди. Дополнительные
+// столбцы делятся между слоями пропорционально (s − 1). Внутри слоя сначала режем на смене группы
+// очереди (▲ | обычные | ▼), потом пополам самый длинный кусок. Порядок разрезов не зависит от c —
+// при движении ползунка карточки только сдвигаются вправо, строка карточки не меняется.
+const SUBL = 'абвгдежзиклмнопрстуфхцчшщэюя';
+function cutOrder(a, grpOf) {
+  const all = [];
+  for (let k = 1; k < a.length; k++) if (grpOf(a[k]) !== grpOf(a[k - 1])) all.push(k);
+  while (all.length < a.length - 1) {
+    const b = [0, ...[...all].sort((x, y) => x - y), a.length];
+    let best = 0, len = 0;
+    for (let i = 0; i + 1 < b.length; i++) if (b[i + 1] - b[i] > len) { len = b[i + 1] - b[i]; best = i; }
+    all.push(b[best] + Math.floor(len / 2));
+  }
+  return all;
+}
+function unfold(layers, grpOf) {
+  const L = layers.length, total = layers.reduce((x, a) => x + a.length, 0);
+  const U = Math.round(L + S.unf / 100 * (total - L));
+  const cap = layers.map(a => a.length - 1), sum = cap.reduce((x, c) => x + c, 0), extra = U - L;
+  const alloc = cap.map(c => sum ? Math.floor(extra * c / sum) : 0);
+  let rest = extra - alloc.reduce((x, c) => x + c, 0);
+  cap.map((c, i) => ({ i, f: sum ? extra * c / sum - alloc[i] : 0 })).sort((a, b) => b.f - a.f || a.i - b.i)
+    .forEach(({ i }) => { if (rest > 0 && alloc[i] < cap[i]) { alloc[i]++; rest--; } });
+  const sub = {}, nsub = [];
+  layers.forEach((a, li) => {
+    const cuts = cutOrder(a, grpOf).slice(0, alloc[li]).sort((x, y) => x - y);
+    nsub.push(cuts.length + 1);
+    a.forEach((id, k) => { let j = 0; while (j < cuts.length && k >= cuts[j]) j++; sub[id] = j; });
+  });
+  $('#stepsVal').textContent = U + ' ' + plural(U, ['столбец', 'столбца', 'столбцов']) + (U === L ? ' — по слоям' : U === total ? ' — линия' : '');
+  return { U, L, total, sub, nsub };
+}
+// Шаг подстолбца меньше ширины карточки: внутри слоя у каждой карточки своя строка, поэтому
+// подстолбцы идут лесенкой и не перекрываются — граф не растягивается в 3 раза.
+const SUB_PITCH = 92;
+function unfoldX(nsub, LM, GX) {
+  const xs = [];
+  let x = LM;
+  nsub.forEach(c => { xs.push(x); x += (c - 1) * SUB_PITCH + NW_ + GX; });
+  return { xs, W: x - GX };
+}
+function plural(n, f) { const m10 = n % 10, m100 = n % 100; return f[m10 === 1 && m100 !== 11 ? 0 : m10 >= 2 && m10 <= 4 && (m100 < 12 || m100 > 14) ? 1 : 2]; }
+// Заголовки столбцов: «Слой 3» / «14 проверок»; при развёртке — скобка над слоем и подстолбцы 3а, 3б…
+function drawColHeads(depths, xs, cols, UF) {
+  depths.forEach((d, r) => {
+    const x = xs[r], c = UF.nsub[r], n = cols[r].length;
+    gRoot.append('text').attr('class', 'colhead big').attr('x', x).attr('y', 14).text('Слой ' + d);
+    gRoot.append('text').attr('class', 'colhead sub').attr('x', x).attr('y', 28).text(n + ' ' + plural(n, ['проверка', 'проверки', 'проверок']));
+    if (c < 2) return;
+    gRoot.append('line').attr('class', 'lbrk').attr('x1', x).attr('x2', x + (c - 1) * SUB_PITCH + NW_).attr('y1', 35).attr('y2', 35);
+    for (let j = 0; j < c; j++) gRoot.append('text').attr('class', 'colhead subc').attr('x', x + j * SUB_PITCH).attr('y', 50).text(d + SUBL[j]);
+  });
+}
+
+// ───────── подписи связей: при наведении на линию ─────────
+function edgeTipHtml(e) {
+  const a = N[e.from], b = N[e.to];
+  const why = e.z || e.why || KIND_EX[e.k][2];
+  const cons = e.k === 'agg' ? `Если ${a.label} не прошла — ${b.label} всё равно соберёт итог и отметит провал.`
+    : blocks(e) ? `Если ${a.label} не прошла — ${b.label} не выполняется.`
+    : `Если ${a.label} не прошла — ${b.label} всё равно выполняется и сама сообщит, что данных не хватает (правило «смягчённо»).`;
+  return `<div class="hd">${esc(a.label)} → ${esc(b.label)}<span class="kc" style="color:var(--k-${e.k})">${esc(G.meta.kindName[e.k])}</span></div>`
+    + `<div><span class="lb">Передаёт:</span> ${esc(e.via)}</div>`
+    + `<div><span class="lb">Зачем:</span> ${esc(why)}</div>`
+    + `<div class="cons">${esc(cons)}${e.implied ? ' Связь повторяет цепочку других — показана для справки.' : ''}${e.b === 'infer' ? ' Связь предположена: логика дочерней проверки ещё не написана.' : ''}</div>`;
+}
+function moveTip(ev) {
+  const el = $('#etip'), w = el.offsetWidth, h = el.offsetHeight;
+  let x = ev.clientX + 16, y = ev.clientY + 16;
+  if (x + w > innerWidth - 8) x = ev.clientX - w - 16;
+  if (y + h > innerHeight - 8) y = Math.max(8, ev.clientY - h - 16);
+  el.style.left = x + 'px'; el.style.top = y + 'px';
+}
+const hideTip = () => { const el = $('#etip'); if (el) el.style.display = 'none'; };
+// Поверх видимых линий — прозрачные «толстые» дорожки для наведения (сами линии тонкие и не ловят мышь)
+function bindEdgeHover(sel, edgesOf, endsOf) {
+  if (!sel || sel.empty()) return;
+  const hits = d3.select(sel.node().parentNode).append('g').attr('class', 'ehits');
+  sel.each(function (d) {
+    const vis = this;
+    hits.append('path').attr('class', 'ehit').attr('d', vis.getAttribute('d'))
+      .on('mouseenter', ev => {
+        d3.select(vis).classed('hov', true);
+        const [f, t] = endsOf(d);
+        if (nodeSel) nodeSel.classed('ehl', n => n.id === f || n.id === t);
+        const list = edgesOf(d), el = $('#etip');
+        el.innerHTML = list.map(edgeTipHtml).join('<hr>');
+        el.style.setProperty('--kc', `var(--k-${list[0].k})`);
+        el.style.display = 'block';
+        moveTip(ev);
+      })
+      .on('mousemove', moveTip)
+      .on('mouseleave', () => { d3.select(vis).classed('hov', false); if (nodeSel) nodeSel.classed('ehl', false); hideTip(); });
+  });
+}
 
 const $ = s => document.querySelector(s);
 const esc = s => String(s == null ? '' : s).replace(/[&<>"]/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]));
@@ -467,7 +588,7 @@ const cssv = n => getComputedStyle(document.documentElement).getPropertyValue(n)
 
 // ───────── состояние ─────────
 const S = {
-  view: 'cascade', variant: 'A', colorBy: 'sec', steps: STEPS_MAX,
+  view: 'cascade', variant: 'A', colorBy: 'sec', unf: 0,
   npaPsAr: false, npaVed: false, npaEmpty: true, npaLinks: false, npaSel: null,
   brDisc: true, brSub: true, brDup: false, brSel: null, brOn: null, brAnc: true, brDesc: true,
   fileDisc: '',
@@ -486,7 +607,7 @@ const visNodes = () => G.nodes.filter(isVisible);
 function edgeShown(e, ids) {
   if (!ids.has(e.from) || !ids.has(e.to)) return false;
   if (e.k === 'agg') return S.showAgg;
-  if (e.implicit) return S.showGate;
+  if (e.implicit) return S.showGate || e.sole;
   if (e.implied) return S.showImplied;
   return true;
 }
@@ -508,7 +629,7 @@ function chainOf(id) {
 }
 const M = n => n[S.variant];
 const nextCount = n => new Set(OUT[n.id]
-  .filter(e => blocks(e) && (!e.implicit || S.showGate) && (!e.implied || S.showImplied))
+  .filter(e => blocks(e) && (!e.implicit || S.showGate || e.sole) && (!e.implied || S.showImplied))
   .map(e => e.to)).size;
 // Turbo без бледной середины (в отличие от RdYlBu); тёмные края срезаны — на тёмной теме они сливаются с фоном
 const heat = t => d3.interpolateTurbo(0.12 + 0.8 * t);
@@ -535,9 +656,10 @@ function edgeDash(e) {
 const svg = d3.select('#svg');
 let gRoot = null, zoomB = null, curTransform = d3.zoomIdentity;
 let nodeSel = null, edgeSel = null, cellSel = null, mlabSel = null;
-const NW = 186, NH = 46;
+const NW = NW_, NH = 46;
 
 function setupSvg() {
+  hideTip();
   svg.selectAll('*').remove();
   const defs = svg.append('defs');
   KIND_ORDER.forEach(k => {
@@ -590,60 +712,37 @@ function fit(animate) {
 
 // ───────── компоновка «слои слева направо» ─────────
 function layered(nodes, edges, lanes) {
-  const ids = new Set(nodes.map(n => n.id));
-  const depths = [...new Set(nodes.map(n => stepOf(n)))].sort((a, b) => a - b);
+  const depths = [...new Set(nodes.map(n => n.depth))].sort((a, b) => a - b);
   const rank = Object.fromEntries(depths.map((d, i) => [d, i]));
   const cols = depths.map(() => []);
+  nodes.forEach(n => cols[rank[n.depth]].push(n.id));
+  cols.forEach(c => c.sort(qCmp));                      // сверху вниз — очередь выполнения в слое
+  const UF = unfold(cols, qGrp);
   const laneOrder = lanes ? secKeys.filter(k => nodes.some(n => n.sec === k)) : [];
-  const laneOf = id => lanes ? laneOrder.indexOf(N[id].sec) : 0;
-  nodes.slice().sort((a, b) => (laneOf(a.id) - laneOf(b.id)) || (famIdx[a.fam] - famIdx[b.fam]) || (a.topo - b.topo))
-    .forEach(n => cols[rank[stepOf(n)]].push(n.id));
-  const nb = { in: {}, out: {} };
-  ids.forEach(i => { nb.in[i] = []; nb.out[i] = []; });
-  edges.forEach(e => { if (!e.implicit) { nb.out[e.from].push(e.to); nb.in[e.to].push(e.from); } });
-  const pos = {};
-  const refresh = () => cols.forEach(c => c.forEach((id, i) => pos[id] = c.length > 1 ? i / (c.length - 1) : 0.5));
-  refresh();
-  for (let it = 0; it < 10; it++) {
-    const fwd = it % 2 === 0;
-    const order = cols.map((_, i) => i);
-    if (!fwd) order.reverse();
-    for (const r of order) {
-      const c = cols[r];
-      const key = {};
-      c.forEach(id => {
-        const ns = (fwd ? nb.in[id] : nb.out[id]);
-        key[id] = ns.length ? ns.reduce((s, x) => s + pos[x], 0) / ns.length : pos[id];
-      });
-      c.sort((a, b) => (laneOf(a) - laneOf(b)) || (key[a] - key[b]) || (N[a].topo - N[b].topo));
-      c.forEach((id, i) => pos[id] = c.length > 1 ? i / (c.length - 1) : 0.5);
-    }
-  }
-  const GX = 84, GY = 12, LM = lanes ? 128 : 30, TOP = 40;
-  const P = {};
-  let W = LM + depths.length * (NW + GX), H = 0, laneBands = [];
+  const GX = 84, GY = 12, LM = lanes ? 128 : 30, TOP = UF.nsub.some(c => c > 1) ? 62 : 44;
+  const X = unfoldX(UF.nsub, LM, GX);
+  const P = {}, laneBands = [];
+  let H = 0;
+  const place = (ids, y0) => ids.forEach((id, i) => {
+    const r = rank[N[id].depth];
+    P[id] = { x: X.xs[r] + UF.sub[id] * SUB_PITCH, y: y0 + i * (NH + GY), r };
+  });
   if (lanes) {
     let y = TOP;
     laneOrder.forEach(lk => {
       const mx = Math.max(1, ...cols.map(c => c.filter(id => N[id].sec === lk).length));
       const h = mx * (NH + GY) + 22;
       laneBands.push({ key: lk, y, h });
-      cols.forEach((c, r) => c.filter(id => N[id].sec === lk).forEach((id, i) => {
-        P[id] = { x: LM + r * (NW + GX), y: y + 12 + i * (NH + GY), r };
-      }));
+      cols.forEach(c => place(c.filter(id => N[id].sec === lk), y + 12));
       y += h;
     });
     H = y;
   } else {
-    const mx = Math.max(...cols.map(c => c.length));
-    const full = mx * (NH + GY);
-    cols.forEach((c, r) => {
-      const off = (full - c.length * (NH + GY)) / 2;
-      c.forEach((id, i) => { P[id] = { x: LM + r * (NW + GX), y: TOP + off + i * (NH + GY), r }; });
-    });
+    const mx = Math.max(...cols.map(c => c.length)), full = mx * (NH + GY);
+    cols.forEach(c => place(c, TOP + (full - c.length * (NH + GY)) / 2));
     H = TOP + full;
   }
-  return { P, depths, laneBands, W, H, LM, GX };
+  return { P, depths, cols, UF, xs: X.xs, laneBands, W: X.W, H, LM, GX };
 }
 
 const edgePath = (a, b) => {
@@ -655,10 +754,12 @@ const trunc = (s, n) => s.length > n ? s.slice(0, n - 1) + '…' : s;
 
 function nodeShape(g) {
   g.attr('class', d => 'node ' + N[d.base || d.id].st).attr('data-id', d => d.id);
-  g.append('title').text(d => { const n = N[d.base || d.id]; return n.label + ' — ' + n.n + (d.copyOf ? '\nкопия общей проверки в разделе «' + d.copyOf + '»' : '') + (d.inPath ? '\n' + d.inPath : '') + (n.amb ? '\n⚠ ' + n.amb : ''); });
+  g.append('title').text(d => { const n = N[d.base || d.id]; return n.label + ' — ' + n.n + (d.copyOf ? '\nкопия общей проверки в разделе «' + d.copyOf + '»' : '') + (d.inPath ? '\n' + d.inPath : '') + (n.q ? '\n' + Q_MARK[n.q] + ' в слое: ' + n.qw : '') + (n.amb ? '\n⚠ ' + n.amb : ''); });
   g.append('rect').attr('class', 'card').attr('width', NW).attr('height', NH).attr('rx', 8);
   g.append('rect').attr('class', d => 'stripe' + (d.copyOf ? ' copy' : '')).attr('width', 5).attr('height', NH - 10).attr('x', 0).attr('y', 5).attr('rx', 2.5);
-  g.append('text').attr('class', 'id').attr('x', 14).attr('y', 18).text(d => N[d.base || d.id].label);
+  const idt = g.append('text').attr('class', 'id').attr('x', 14).attr('y', 18);
+  idt.append('tspan').text(d => N[d.base || d.id].label);
+  idt.filter(d => N[d.base || d.id].q).append('tspan').attr('dx', 7).attr('class', d => 'qf ' + N[d.base || d.id].q).text(d => Q_MARK[N[d.base || d.id].q]);
   g.append('text').attr('class', 'nm').attr('x', 14).attr('y', 34).text(d => trunc(N[d.base || d.id].n, 27));
   // статус
   const st = g.append('g').attr('transform', `translate(${NW - 14},14)`);
@@ -689,21 +790,15 @@ function drawLayered(lanes) {
       gRoot.append('text').attr('class', 'lanelabel').attr('x', 16).attr('y', b.y + 22).text(G.sections[b.key]);
     });
   }
-  // заголовки колонок
-  const counts = {};
-  nodes.forEach(n => counts[stepOf(n)] = (counts[stepOf(n)] || 0) + 1);
-  L.depths.forEach((d, r) => {
-    gRoot.append('text').attr('class', 'colhead').attr('x', L.LM + r * (NW + L.GX)).attr('y', 24)
-      .text((r === 0 ? 'родительские · ' : '') + 'слой ' + d + ' · ' + counts[d]);
-  });
+  drawColHeads(L.depths, L.xs, L.cols, L.UF);
   const ge = gRoot.append('g'), gn = gRoot.append('g');
   edgeSel = ge.selectAll('path').data(edges.filter(e => L.P[e.from] && L.P[e.to])).join('path')
     .attr('class', 'edge').attr('d', e => edgePath(L.P[e.from], L.P[e.to]))
     .attr('stroke', edgeColor).attr('stroke-dasharray', edgeDash)
     .attr('marker-end', e => 'url(#ar-' + e.k + ')');
-  edgeSel.append('title').text(e => N[e.from].label + ' → ' + N[e.to].label + ': ' + e.via);
   nodeSel = gn.selectAll('g').data(nodes.map(n => ({ id: n.id, x: L.P[n.id].x, y: L.P[n.id].y }))).join('g')
     .attr('transform', d => `translate(${d.x},${d.y})`).call(nodeShape);
+  bindEdgeHover(edgeSel, e => [e], e => [e.from, e.to]);
   cellSel = null;
 }
 
@@ -866,7 +961,7 @@ function brBuild() {
   }
   return { VN, VE, V, vin, vout, byBase, visIds, dup, copies: VN.length - vis.length + (dup ? vis.filter(n => brPath(n.id)[1] === 'common' && n.id in byBase).length : 0) };
 }
-const brStep = v => Math.min(S.steps - 1, Math.floor(v.depth * S.steps / STEPS_MAX));
+const brStep = v => v.depth;
 // Ветки-форки: TRM → xml / bcf / dwg / ifc; ifc → общие / ПС / АР / ПС+АР / БФ.
 const BR_FORKS = [['xml'], ['bcf'], ['dwg'], ['ifc', ['ifc.common', 'ifc.ps', 'ifc.ar', 'ifc.both', 'ifc.bf']]];
 const BR_LEAVES = BR_FORKS.flatMap(f => f[1] || [f[0]]);
@@ -889,7 +984,7 @@ function brVisible() {
     while (q.length) {
       const u = q.shift();
       (dir === 'in' ? brG.vin[u] : brG.vout[u]).forEach(x => {
-        if (x.implicit) return;
+        if (x.implicit && !x.e.sole) return;
         const w = dir === 'in' ? x.from : x.to;
         if (!seen.has(w)) { seen.add(w); vis.add(w); q.push(w); }
       });
@@ -940,7 +1035,7 @@ function brReach(id, dir, pred) {
   return seen;
 }
 const brCnt = v => S.cnt === 'next'
-  ? new Set(brG.vout[v.id].filter(x => blocks(x) && (!x.implicit || S.showGate) && (!x.implied || S.showImplied)).map(x => x.to)).size
+  ? new Set(brG.vout[v.id].filter(x => blocks(x) && (!x.implicit || S.showGate || x.e.sole) && (!x.implied || S.showImplied)).map(x => x.to)).size
   : S.cnt === 'all' ? brReach(v.id, 'out', blocks).size : 0;
 
 function drawBranches() {
@@ -953,32 +1048,18 @@ function drawBranches() {
   const depths = [...new Set(VN.map(brStep))].sort((a, b) => a - b);
   const rank = Object.fromEntries(depths.map((d, i) => [d, i]));
   const cols = depths.map(() => []);
-  VN.slice().sort((a, b) => laneIdx[a.lane] - laneIdx[b.lane] || famIdx[a.fam] - famIdx[b.fam] || a.topo - b.topo)
-    .forEach(v => cols[rank[brStep(v)]].push(v.id));
-  // упорядочить внутри колонки по соседям (как в «Дорожках»)
-  const pos = {};
-  cols.forEach(c => c.forEach((id, i) => pos[id] = c.length > 1 ? i / (c.length - 1) : 0.5));
-  for (let it = 0; it < 10; it++) {
-    const fwd = it % 2 === 0, idxs = cols.map((_, i) => i);
-    if (!fwd) idxs.reverse();
-    idxs.forEach(r => {
-      const c = cols[r], key = {};
-      c.forEach(id => {
-        const ns = (fwd ? brG.vin[id].map(x => x.from) : brG.vout[id].map(x => x.to)).filter(x => pos[x] !== undefined);
-        key[id] = ns.length ? ns.reduce((s2, x) => s2 + pos[x], 0) / ns.length : pos[id];
-      });
-      c.sort((a, b) => laneIdx[brG.V[a].lane] - laneIdx[brG.V[b].lane] || key[a] - key[b] || brG.V[a].topo - brG.V[b].topo);
-      c.forEach((id, i) => pos[id] = c.length > 1 ? i / (c.length - 1) : 0.5);
-    });
-  }
-  const GX = 84, GY = 12, LM = 212, TOP = 40, P = {}, bands = [];
-  const W = LM + depths.length * (NW + GX);
+  VN.forEach(v => cols[rank[brStep(v)]].push(v.id));
+  // сверху вниз внутри дорожки — очередь выполнения в слое
+  cols.forEach(c => c.sort((a, b) => qCmp(brG.V[a].base, brG.V[b].base) || laneIdx[brG.V[a].lane] - laneIdx[brG.V[b].lane]));
+  const UF = unfold(cols, id => qGrp(brG.V[id].base));
+  const GX = 84, GY = 12, LM = 212, TOP = UF.nsub.some(c => c > 1) ? 62 : 44, P = {}, bands = [];
+  const X = unfoldX(UF.nsub, LM, GX), W = X.W;
   let y = TOP;
   order.forEach(k => {
     const mx = Math.max(1, ...cols.map(c => c.filter(id => brG.V[id].lane === k).length));
     const h = mx * (NH + GY) + 22;
     bands.push({ k, y, h });
-    cols.forEach((c, r) => c.filter(id => brG.V[id].lane === k).forEach((id, i) => { P[id] = { x: LM + r * (NW + GX), y: y + 12 + i * (NH + GY) }; }));
+    cols.forEach((c, r) => c.filter(id => brG.V[id].lane === k).forEach((id, i) => { P[id] = { x: X.xs[r] + UF.sub[id] * SUB_PITCH, y: y + 12 + i * (NH + GY) }; }));
     y += h;
   });
   bands.forEach((b, i) => {
@@ -994,21 +1075,16 @@ function drawBranches() {
     if (i && prev !== b.k.split('.').slice(0, 2).join('.'))
       gRoot.append('line').attr('x1', 0).attr('x2', W).attr('y1', b.y).attr('y2', b.y).attr('stroke', cssv('--line')).attr('stroke-width', 2);
   });
-  const counts = {};
-  VN.forEach(v => counts[brStep(v)] = (counts[brStep(v)] || 0) + 1);
-  depths.forEach((d, r) => {
-    gRoot.append('text').attr('class', 'colhead').attr('x', LM + r * (NW + GX)).attr('y', 24)
-      .text((r === 0 ? 'родительские · ' : '') + 'слой ' + d + ' · ' + counts[d]);
-  });
+  drawColHeads(depths, X.xs, cols, UF);
   const shown = VE.filter(x => edgeShown(x.e, brG.visIds) && P[x.from] && P[x.to]);
   const ge = gRoot.append('g'), gn = gRoot.append('g');
   edgeSel = ge.selectAll('path').data(shown).join('path')
     .attr('class', 'edge').attr('d', x => edgePath(P[x.from], P[x.to]))
     .attr('stroke', x => edgeColor(x.e)).attr('stroke-dasharray', x => edgeDash(x.e))
     .attr('marker-end', x => 'url(#ar-' + x.k + ')');
-  edgeSel.append('title').text(x => N[x.e.from].label + ' → ' + N[x.e.to].label + ': ' + x.via);
   nodeSel = gn.selectAll('g').data(VN.map(v => ({ id: v.id, base: v.base, copyOf: v.copyOf, x: P[v.id].x, y: P[v.id].y }))).join('g')
     .attr('transform', d => `translate(${d.x},${d.y})`).call(nodeShape);
+  bindEdgeHover(edgeSel, x => [x.e], x => [x.from, x.to]);
   nodeSel.classed('ctx', d => !FV.core.has(d.id));
   // метки обрыва: связь уходит в ветку, которая сейчас скрыта
   if (S.brOn) nodeSel.each(function (d) {
@@ -1161,7 +1237,7 @@ function paBuild() {
   return { VN, VE, V, vin, vout, byBase, members, visIds, on };
 }
 const paCnt = v => S.cnt === 'next'
-  ? new Set(paG.vout[v.id].filter(x => blocks(x) && (!x.implicit || S.showGate) && (!x.implied || S.showImplied)).map(x => x.to)).size
+  ? new Set(paG.vout[v.id].filter(x => blocks(x) && (!x.implicit || S.showGate || x.e.sole) && (!x.implied || S.showImplied)).map(x => x.to)).size
   : S.cnt === 'all' ? paReach(v.id, 'out', blocks).size : 0;
 function paReach(id, dir, pred) {
   const seen = new Set(), q = [id];
@@ -1222,9 +1298,9 @@ function drawPaths() {
     .attr('class', 'edge').attr('d', x => edgePath(P[x.from], P[x.to]))
     .attr('stroke', x => edgeColor(x.e)).attr('stroke-dasharray', x => edgeDash(x.e))
     .attr('marker-end', x => 'url(#ar-' + x.k + ')');
-  edgeSel.append('title').text(x => N[x.e.from].label + ' → ' + N[x.e.to].label + ': ' + x.via);
   nodeSel = gn.selectAll('g').data(paG.VN.filter(v => P[v.id]).map(v => ({ id: v.id, base: v.base, inPath: v.scen ? 'в полосе «' + PA_NAME[v.scen] + '»' : 'общее начало всех путей', x: P[v.id].x, y: P[v.id].y }))).join('g')
     .attr('transform', d => `translate(${d.x},${d.y})`).call(nodeShape);
+  bindEdgeHover(edgeSel, x => [x.e], x => [x.from, x.to]);
   // метки обрыва
   nodeSel.each(function (d) {
     const v = paG.V[d.id], g = d3.select(this);
@@ -1339,7 +1415,7 @@ function npaLinks() {
     const key = a + '>' + b;
     if (!seen.has(key)) seen.set(key, { from: a, to: b, k: e.k, items: [] });
     const l = seen.get(key);
-    l.items.push({ from: e.from, to: e.to, k: e.k, via: e.via, b: e.b });
+    l.items.push({ from: e.from, to: e.to, k: e.k, via: e.via, b: e.b, e });
     if (KIND_ORDER.indexOf(e.k) < KIND_ORDER.indexOf(l.k)) l.k = e.k;
   });
   return [...seen.values()].map(l => {
@@ -1464,11 +1540,10 @@ function drawNpa() {
         const x1 = a.x, x2 = b.x + NW + 2, up = 70 + Math.abs(x1 - x2) * 0.08;  // назад — дугой сверху
         return `M${x1},${cy(a)}C${x1 - 40},${cy(a) - up} ${x2 + 40},${cy(b) - up} ${x2},${cy(b)}`;
       });
-    npaLinkSel.append('title').text(l => `${NPA_C[l.from].label} → ${NPA_C[l.to].label} (${NPA_DIR[l.dir]})\n`
-      + l.items.map(i => `${G.meta.kindName[i.k]}: ${i.via}`).join('\n'));
   }
   nodeSel = gRoot.append('g').selectAll('g').data(pos).join('g')
     .attr('transform', d => `translate(${d.x},${d.y})`).call(npaShape);
+  if (npaLinkSel) bindEdgeHover(npaLinkSel, l => l.items.map(i => i.e), l => [l.from, l.to]);
   edgeSel = null; cellSel = null;
 }
 let npaEdgeSel = null;
@@ -1766,9 +1841,7 @@ function renderSidebarState() {
     ? NPA.checks.length + ' проверок из таблицы · ' + (npaM ? npaM.steps : '') + ' ступеней'
     : vis.length + ' из ' + G.nodes.length + ' проверок';
   $('#npaPsAr').checked = S.npaPsAr; $('#npaVed').checked = S.npaVed; $('#npaEmpty').checked = S.npaEmpty; $('#npaLinks').checked = S.npaLinks;
-  const slider = $('#stepsSlider');
-  slider.max = STEPS_MAX; slider.value = S.steps;
-  $('#stepsVal').textContent = S.steps + ' из ' + STEPS_MAX + (S.steps === STEPS_MAX ? ' (полная детализация)' : '');
+  $('#stepsSlider').value = S.unf;
   $('#stepsBox').style.opacity = ['cascade', 'lanes', 'branches'].includes(S.view) ? '1' : '.45';
   $('#brDisc').checked = S.brDisc; $('#brSub').checked = S.brSub; $('#brDup').checked = S.brDup;
   $('#brSub').disabled = !S.brDisc; $('#brDup').disabled = !S.brDisc;
@@ -1843,7 +1916,8 @@ function renderLegend() {
       dotRow('<circle cx="6" cy="6" r="4.4" fill="none" stroke="var(--dim)" stroke-width="1.6" stroke-dasharray="2 2"/>', 'логика предположена (пунктир)');
   }
   h += '<h4>Связи <span style="text-transform:none;letter-spacing:0;font-weight:400">· наведите — пример</span></h4>' + KIND_ORDER.map(k => kindRow(k, `<svg width="26" height="8"><line x1="0" y1="4" x2="24" y2="4" stroke="var(--k-${k})" stroke-width="2.2" ${k === 'agg' ? 'stroke-dasharray="2 4"' : ''}/></svg>`)).join('');
-  h += '<div class="hint" style="margin-top:4px">' + (S.variant === 'A' ? 'Все линии, кроме свода, блокируют.' : 'Сплошная — блокирует, пунктир — только данные.') + '</div>';
+  h += '<div class="hint" style="margin-top:4px">' + (S.variant === 'A' ? 'Все линии, кроме свода, блокируют.' : 'Сплошная — блокирует, пунктир — только данные.') + ' <b>Наведите на линию</b> — что передаёт связь и зачем она.</div>';
+  if (['cascade', 'lanes', 'branches'].includes(S.view)) h += '<h4>Очередь в слое</h4><div class="hint" style="margin-top:0">Сверху вниз — порядок выполнения внутри слоя: <b style="color:var(--ok)">▲ первой</b> — входной фильтр, дальше — у кого больше зависимых проверок, <b style="color:var(--warn)">▼ в конце</b> — тяжёлая.' + (S.unf ? ' Подстолбцы 3а, 3б… — та же очередь, разложенная вправо; проверки одного слоя друг от друга не зависят.' : '') + '</div>';
   if (S.view === 'paths') h += '<h4>Все пути</h4><div class="hint" style="margin-top:0">Слева — общий контейнер TRM, от него веером полосы: каждая — полный путь одного файла от первой проверки до последней. Одна и та же проверка повторяется в каждой полосе, где её проходит файл. <b style="color:var(--fail)">↤N</b> — нужны ещё проверки из других путей, <b style="color:var(--fail)">N↦</b> — результат нужен в других путях.</div>';
   if (S.view === 'branches') h += '<h4>Ветки по файлам</h4><div class="hint" style="margin-top:0">Дорожка — тип файла → раздел ЦИМ → подветка; цветная полоса слева — тип файла или раздел.'
     + (S.brDisc && S.brDup ? ' Общие проверки скопированы в каждый раздел: у копии полоса на карточке — контуром, связи копии не выходят за свой раздел.' : '') + '</div>'
@@ -1871,14 +1945,14 @@ function linkRow(e, dir) {
   const id = dir === 'in' ? e.from : e.to, n = N[id];
   const blk = blocks(e);
   return `<div class="lnk" data-id="${id}"><span class="cd">${esc(n.label)}</span><span class="rest"><span class="nm">${esc(n.n)}</span>
-    <span class="via"><span class="kchip" style="color:var(--k-${e.k})">${esc(KIND_SHORT[e.k])}</span>${e.k === 'agg' ? '' : `<span class="bchip">${blk ? 'блокирует' : 'данные'}</span>`}<span class="bchip ${e.b === 'infer' ? 'infer' : ''}">${esc(BASIS[e.b])}</span>${esc(e.via)}${e.implied ? ' · <i>выводима из цепочки</i>' : ''}</span></span></div>`;
+    <span class="via"><span class="kchip" style="color:var(--k-${e.k})">${esc(KIND_SHORT[e.k])}</span>${e.k === 'agg' ? '' : `<span class="bchip">${blk ? 'блокирует' : 'данные'}</span>`}<span class="bchip ${e.b === 'infer' ? 'infer' : ''}">${esc(BASIS[e.b])}</span>${esc(e.via)}${e.implied ? ' · <i>выводима из цепочки</i>' : ''}</span>${e.z ? `<span class="why">${esc(e.z)}</span>` : ''}</span></div>`;
 }
 function renderDetail() {
   const box = $('#detail');
   if (!S.sel) { box.classList.remove('on'); box.innerHTML = ''; return; }
   const n = N[S.sel], m = M(n);
-  const parents = IN[n.id].filter(e => !e.implicit).sort((a, b) => N[a.from].depth - N[b.from].depth);
-  const gate = IN[n.id].find(e => e.implicit);
+  const parents = IN[n.id].filter(e => !e.implicit || e.sole).sort((a, b) => N[a.from].depth - N[b.from].depth);
+  const gate = IN[n.id].find(e => e.implicit && !e.sole);
   const children = OUT[n.id].sort((a, b) => N[a.to].depth - N[b.to].depth);
   const dA = n.A.desc.length, dB = n.B.desc.length;
   const failed = S.failed.has(n.id);
@@ -1890,11 +1964,13 @@ function renderDetail() {
     <div style="color:var(--muted);font-size:12px">Пункт требований: ${esc(n.p)}</div>`;
   if (sk.has(n.id)) h += `<div class="box danger">В текущем сценарии эта проверка <b>не выполнится</b>: один из её предков не прошёл.</div>`;
   h += `<div class="sub">Каскад</div><div class="kv">
-    <span>Слой (порядок выполнения)</span><b>${stepOf(n)}${S.steps < STEPS_MAX ? ` <span style="color:var(--muted);font-weight:400">(при полной детализации — ${n.depth})</span>` : ''}</b>
+    <span>Слой (порядок выполнения)</span><b>${n.depth}</b>
+    <span>Место в очереди слоя</span><b>${QRANK[n.id].i + 1} из ${QRANK[n.id].n}${n.q ? ` <span style="color:var(--${n.q === 'first' ? 'ok' : 'warn'})">${Q_MARK[n.q]}</span>` : ''}</b>
     <span>Должны пройти раньше (предков)${S.variant === 'A' ? ' ◀' : ''}: жёстко</span><b>${n.A.anc.length}</b>
     <span>Должны пройти раньше (предков)${S.variant === 'B' ? ' ◀' : ''}: смягчённо</span><b>${n.B.anc.length}</b>
     <span>Не выполнится при провале: жёстко</span><b style="color:${dA ? 'var(--fail)' : 'inherit'}">${dA}</b>
     <span>Не выполнится при провале: смягчённо</span><b>${dB}</b></div>`;
+  if (n.q) h += `<div class="box note"><b>${n.q === 'first' ? '▲ Первой в слое.' : '▼ В конце слоя.'}</b> ${esc(n.qw)}</div>`;
   if (n.amb) h += `<div class="box amb"><b>⚠ Неоднозначный исход.</b> ${esc(n.amb)}${m.desc.length ? `<br><br>Проверка родительская: если при сомнении она вернёт false, каскадом не выполнятся ещё <b>${m.desc.length}</b> дочерних (при выбранном правиле).` : ''}</div>`;
   if (n.logic) h += `<div class="box logic"><b>Предполагаемая логика.</b> ${esc(n.logic)}</div>`;
   if (n.note) h += `<div class="box note">${esc(n.note)}</div>`;
@@ -2012,8 +2088,9 @@ function glossary() {
     agg: 'проверка сама ничего не проверяет, а только собирает статусы других — в каскаде пропусков не участвует.',
   }[k])}</div>`).join('');
   return [
+    { t: 'Подпись связи', p: 'Если навести мышь на любую линию, появится подпись: какие проверки она соединяет, что передаёт родитель дочерней, зачем эта связь нужна и что будет с дочерней, если родитель не прошёл.' },
     { t: 'Слой', p: 'Столбец на схеме «Каскад» и «Дорожки». Слой проверки — это длина самой длинной цепочки её родителей: чем правее проверка, тем больше проверок в принципе должно быть выполнено до неё. Слой 0 — проверки совсем без родителей.' },
-    { t: 'Ползунок «Число слоёв»', p: 'Регулирует, сколько слоёв показано на схеме. При максимуме — полная детализация, каждый исходный слой виден отдельно. Если уменьшить, несколько соседних слоёв объединяются в один, более крупный — так сразу видно, какие проверки самые основные, без мелкого деления на десяток шагов. Номер слоя в карточке проверки и в «Рейтинге» тоже считается с учётом ползунка; если он сдвинут, рядом в скобках показан исходный слой при полной детализации.' },
+    { t: 'Развёртка слоёв и очередь в слое', p: 'Внутри одного слоя проверки друг от друга не зависят, но порядок всё равно есть: сверху вниз — очередь выполнения. Первыми идут входные фильтры (▲ первой): дешёвые проверки, которые отсеивают кривую модель до тяжёлых — имя файла, уникальность GlobalId, топология, дубли элементов и атрибутов. Дальше — проверки, от которых зависит больше остальных. В конце (▼ в конце) — тяжёлые, например сопоставление каждого элемента с таблицами приложений. Ползунок «Развёртка слоёв» раскладывает эту очередь вправо: слой 3 становится столбцами 3а, 3б, 3в…, а до конца вправо весь граф вытягивается в одну линию — каждая проверка в своём столбце. Стрелок назад при этом не появляется.' },
     { t: 'Правило каскада: «жёстко» и «смягчённо»', p: 'Переключатель наверху страницы. Он не меняет граф, а меняет только то, что считается блокирующей связью для сценария отказа и для колонок «потомков / предков» в карточке и рейтинге.<br><br><b>Жёстко</b> — как сейчас принято для первого выпуска сервиса: любая родительская проверка, которая не прошла, блокирует все дочерние, какая бы ни была связь между ними.<br><br><b>Смягчённо</b> — блокируют только связи «допуск» и «смысловая предпосылка», то есть там, где дочерней проверке правда нужен вердикт родителя. Связи «данные», «выбор файлов по разделу» и «правило» не блокируют: считается, что дочерняя сама вернёт отрицательный результат с понятной причиной, если нужных ей данных не нашлось.' },
     { t: 'Виды связей между проверками', p: 'Стрелка на схеме — не просто «после», а конкретная зависимость одного из шести видов:', h: `<div style="margin-top:4px">${kindLi}</div>` },
     { t: 'Неоднозначный исход', p: 'Помечен значком ⚠ у проверки и жёлтой рамкой в карточке. Значит: у этой проверки есть ситуации, где по имеющимся данным нельзя однозначно сказать «пройдено» или «не пройдено» — например, что-то в модели можно понять двумя способами, нормативный порог не задан явно, или нужного признака в модели просто нет. Пример — открытый вопрос в самой карточке. Если такая проверка ещё и родительская, при жёстком правиле неоднозначность каскадом гасит все её дочерние проверки — сколько именно, видно в самой карточке.' },
@@ -2092,7 +2169,7 @@ function writeHash() {
   try {
     const p = new URLSearchParams();
     p.set('view', S.view); p.set('rule', S.variant);
-    if (S.steps !== STEPS_MAX) p.set('steps', S.steps);
+    if (S.unf) p.set('unf', S.unf);
     if (S.cnt) p.set('cnt', S.cnt);
     if (S.cnt && S.cntMid !== 40) p.set('mid', S.cntMid);
     if (S.sel) p.set('sel', S.sel);
@@ -2139,8 +2216,8 @@ function readHash() {
   if (FILE_DISCS[p.get('file')]) S.fileDisc = p.get('file');
   const midN = +p.get('mid');
   if (midN >= 5 && midN <= 90) S.cntMid = midN;
-  const stepsN = +p.get('steps');
-  if (stepsN >= 2 && stepsN <= STEPS_MAX) S.steps = stepsN;
+  const unfN = +p.get('unf');
+  if (unfN > 0 && unfN <= 100) S.unf = Math.round(unfN);
   if (p.get('sel') && N[p.get('sel')]) S.sel = p.get('sel');
   if (p.get('fail')) p.get('fail').split(',').forEach(id => { if (N[id]) S.failed.add(id); });
 }
@@ -2179,7 +2256,7 @@ function bind() {
   $('#fit').addEventListener('click', () => fit(true));
   $('#colorBy').addEventListener('change', e => { S.colorBy = e.target.value; render({ relayout: false }); });
   $('#onlyAmb').addEventListener('change', e => { S.onlyAmb = e.target.checked; render({ fit: true, relayout: true }); });
-  $('#stepsSlider').addEventListener('input', e => { S.steps = +e.target.value; render({ fit: true, relayout: true }); });
+  $('#stepsSlider').addEventListener('input', e => { S.unf = +e.target.value; render({ fit: true, relayout: true }); });
   $('#showGate').addEventListener('change', e => { S.showGate = e.target.checked; render({ fit: false, relayout: true }); });
   $('#showImplied').addEventListener('change', e => { S.showImplied = e.target.checked; render({ fit: false, relayout: true }); });
   $('#showAgg').addEventListener('change', e => { S.showAgg = e.target.checked; render({ fit: false, relayout: true }); });
