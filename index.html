@@ -153,6 +153,8 @@
   .tag{display:inline-block;background:var(--chipbg);border:1px solid var(--chipbd);color:var(--chipink);border-radius:5px;padding:1px 6px;font-size:11px;margin:0 3px 3px 0}
   .tags{margin:4px 0 2px}
   .kv{display:grid;grid-template-columns:1fr auto;gap:2px 10px;font-size:12px}
+  #detail .req{font-size:12px;color:var(--muted);margin:0 0 6px;line-height:1.45}
+  #detail .req span{display:block;font-size:10px;text-transform:uppercase;letter-spacing:.08em;color:var(--dim);margin-bottom:2px}
   .kv b{font-variant-numeric:tabular-nums}
   .box{border-radius:8px;padding:8px 10px;margin:8px 0;font-size:12px;line-height:1.45}
   .box.amb{background:rgba(227,165,27,.13);border:1px solid rgba(227,165,27,.5)}
@@ -185,7 +187,7 @@
   .node .amb{font-size:11px;fill:var(--warn)}
   .node .cnt rect{fill:var(--chipbg);stroke:var(--chipbd);stroke-width:1}
   .node .cnt text{font:700 10.5px ui-monospace,"SF Mono",Menlo,Consolas,monospace;fill:var(--chipink);font-variant-numeric:tabular-nums}
-  .node:hover .card{stroke:var(--accent)}
+  .node:hover .card{stroke:var(--glow)}
   .node.sel .card{stroke:var(--hl);stroke-width:3}
   .node.anc .card,.node.desc .card{stroke:var(--hl);stroke-width:1.8}
   .node.match .card{stroke:var(--warn);stroke-width:3}
@@ -430,9 +432,9 @@
 <div id="modal"><div class="win"><header><div><h2 id="modalTitle">Выводы анализа</h2><small id="insSub"></small></div><span class="x" id="closeModal">×</span></header><div class="body" id="insBody"></div></div></div>
 
 <script src="vendor/d3.v7.min.js"></script>
-<script src="data.js?v=58"></script>
-<script src="facts.js?v=58"></script>
-<script src="npa.js?v=58"></script>
+<script src="data.js?v=59"></script>
+<script src="facts.js?v=59"></script>
+<script src="npa.js?v=59"></script>
 <script>
 (() => {
 'use strict';
@@ -642,7 +644,7 @@ const nextCount = n => new Set(OUT[n.id]
 const heat = t => d3.interpolateTurbo(0.12 + 0.8 * t);
 const cntOf = n => S.cnt === 'next' ? nextCount(n) : S.cnt === 'all' ? M(n).desc.length : 0;
 const maxDesc = () => Math.max(1, ...G.nodes.map(n => M(n).desc.length));
-const matches = (n, q) => (n.label + ' ' + n.n + ' ' + n.d + ' ' + n.id).toLowerCase().includes(q);
+const matches = (n, q) => (n.label + ' ' + n.n + ' ' + n.what + ' ' + n.d + ' ' + n.id).toLowerCase().includes(q);
 
 // заливка SVG по переменной цвета: «ПС + АР» — полоска пополам (зелёный сверху, красный снизу)
 const svgFill = v => v === '--s-both' ? 'url(#g-both)' : cssv(v);
@@ -1783,7 +1785,7 @@ function renderLegend() {
 }
 
 function renderScenario() {
-  const el = $('#scen');
+  const el = $('#scen'); el.classList.remove('on'); return;   // сценарий отказа убран 28.09
   if (!S.failed.size) { el.classList.remove('on'); return; }
   const sk = skippedSet();
   el.classList.add('on');
@@ -1811,18 +1813,12 @@ function renderDetail() {
   let h = `<span class="x" id="dx">×</span>
     <div class="code">${esc(n.label)}</div><div class="title">${esc(n.n)}</div>
     <div class="tags"><span class="tag">${esc(ftOf(n.id) === 'ifc' ? G.sections[n.sec] : G.branches.types[ftOf(n.id)])}</span><span class="tag">${esc(G.statuses[n.st])}</span><span class="tag">${esc(G.families[n.fam])}</span></div>
-    <div class="desc">${esc(n.d)}</div>
+    <div class="desc">${esc(n.what)}</div>
+    <div class="req"><span>Требование</span>${esc(n.d)}</div>
     <div style="color:var(--muted);font-size:12px">Пункт требований: ${esc(n.p)}</div>`;
-  if (sk.has(n.id)) h += `<div class="box danger">В текущем сценарии эта проверка <b>не выполнится</b>: один из её предков не прошёл.</div>`;
-  h += `<div class="sub">Каскад</div><div class="kv">
-    <span>Слой (порядок выполнения)</span><b>${n.depth}</b>
-    <span>Место в очереди слоя</span><b>${QRANK[n.id].i + 1} из ${QRANK[n.id].n} · ${W_NAME[n.w]}</b>
-    <span>Должны пройти раньше (предков)</span><b>${n.A.anc.length}</b>
-    <span>Не выполнится при провале</span><b style="color:${dA ? 'var(--fail)' : 'inherit'}">${dA}</b></div>`;
   if (n.amb) h += `<div class="box amb"><b>⚠ Внимание.</b> ${esc(n.amb)}${m.desc.length ? `<br><br>Проверка родительская: если при сомнении она вернёт false, каскадом не выполнятся ещё <b>${m.desc.length}</b> дочерних.` : ''}</div>`;
   if (n.logic) h += `<div class="box logic"><b>Предполагаемая логика.</b> ${esc(n.logic)}</div>`;
   if (n.note) h += `<div class="box note">${esc(n.note)}</div>`;
-  h += `<div class="btns" style="margin:10px 0 0"><button class="btn ${failed ? 'danger' : ''}" id="toggleFail">${failed ? 'Убрать из сценария отказа' : 'Сымитировать провал'}</button></div>`;
   h += `<div class="sub">Родители — что должно выполниться раньше (${parents.length}${gate ? ' + допуск' : ''})</div>`;
   h += parents.length ? parents.map(e => linkRow(e, 'in')).join('') : '<div class="hint" style="margin:0">нет — проверка корневая' + (gate ? ', кроме неявного допуска IFC-01' : '') + '</div>';
   if (gate) h += `<div class="hint">Неявный допуск: ${esc(N[GATE_ID].label)} — файл должен читаться парсером.</div>`;
@@ -1832,7 +1828,6 @@ function renderDetail() {
   box.innerHTML = h;
   box.classList.add('on');
   $('#dx').addEventListener('click', () => select(null));
-  $('#toggleFail').addEventListener('click', () => { S.failed.has(n.id) ? S.failed.delete(n.id) : S.failed.add(n.id); render(); });
   box.querySelectorAll('.lnk,a.chip').forEach(x => x.addEventListener('click', () => select(x.dataset.id)));
 }
 const GATE_ID = 'IFC-01';
@@ -1938,8 +1933,7 @@ function glossary() {
     { t: 'Основание связи: «в аналитике» / «по коду» / «предположение»', p: 'Серый или жёлтый значок рядом с каждой связью в карточке проверки — откуда взята эта связь.<br><br><b>«в аналитике»</b> — прямо написано в карточке проверки или в командной аналитике.<br><b>«по коду»</b> — не написано явно, но видно по тому, как связь реализована в существующем коде.<br><b>«предположение»</b> (жёлтый) — связь для проверки, у которой ещё нет ни кода, ни аналитики: логика продумана по смыслу нормы, но не подтверждена, стоит перепроверить, когда аналитика появится.' },
     { t: 'Статус реализации проверки', p: 'Кружок в правом верхнем углу карточки на схеме.<br><br>🟢 заполненный — <b>реализована</b> в коде.<br>🟡 заполненный — <b>в работе / переработке</b>.<br>⚪ пунктирная обводка — <b>есть аналитика, кода нет</b>.<br>⚪ пунктирная обводка тоньше, рамка карточки штрихом — <b>аналитики нет, логика предположена</b> (в карточке — раздел «Предполагаемая логика»: как эта проверка могла бы работать и что бы использовала от других).' },
     { t: '«Предполагаемая логика» в карточке', p: 'Появляется только у проверок без аналитики. Это не задание и не решение по существу — черновая гипотеза, как проверку можно было бы реализовать и какие данные других проверок для этого понадобились бы, чтобы граф не обрывался в пустоте там, где норма в требованиях уже есть, а разбора ещё нет.' },
-    { t: 'Сценарий отказа', p: 'Кнопка «Сымитировать провал» в карточке проверки. Отмечает проверку как не прошедшую и подсвечивает штриховкой всё, что перестанет выполняться по цепочке. Внизу экрана появляется счётчик; сценарий можно расширять, отмечая ещё проверки, и сбросить одной кнопкой.' },
-    { t: 'Потомков / предков (в карточке и в «Рейтинге»)', p: '«Потомков» — сколько проверок перестанет выполняться, если эта не пройдёт. «Предков» — сколько проверок должно пройти раньше, чтобы эта вообще запустилась.' },
+    { t: 'Потомков / предков (в «Рейтинге»)', p: '«Потомков» — сколько проверок перестанет выполняться, если эта не пройдёт. «Предков» — сколько проверок должно пройти раньше, чтобы эта вообще запустилась.' },
     { t: 'Своды', p: 'Проверки вроде «все параметры заполнены», которые не проверяют что-то своё, а просто собирают статусы других проверок в один общий результат. На схеме связи к ним идут пунктиром и подписаны «свод» — такие связи никогда не блокируют, при любом правиле каскада. По умолчанию показаны — галочка «Своды».' },
     { t: 'Допуск IFC-01', p: 'Скрытая по умолчанию связь: почти всем проверкам, которым нужна разобранная модель, добавлена связь-допуск от IFC-01 (файл вообще должен читаться). Таких связей больше полусотни, поэтому они спрятаны, чтобы не загромождать схему — включаются галочкой «Допуск IFC-01 ко всем проверкам». Если IFC-01 — единственный родитель проверки, линия видна всегда, иначе проверка выглядела бы висящей без родителей.' },
     { t: 'Вид «Все пути»', p: 'Все возможные пути движения по графу сразу. Слева — один контейнер TRM (общее начало), от него веером расходятся полосы: путь файла ЦИМ ПС, путь ЦИМ АР, путь ЦИМ ПС + АР вместе, путь ЦИМ БФ, путь XML, путь аннотаций BCF, путь 2D-документации. В каждой полосе — полная копия всех проверок, которые этот файл проходит, от IFC-01 до последнего узла, со своими связями и своим счётчиком; общие проверки повторяются в каждой полосе. В полосах ПС и АР есть и совместные проверки (классы, реквизиты участка, ТЭП, своды) — у них метка ↤N: нужны ещё проверки из другого пути. Метка N↦ — результат проверки нужен в других путях. Полосы включаются и выключаются в левой панели, «только» — одна полоса.' },
@@ -2048,7 +2042,6 @@ function readHash() {
   S.files = new Set((p.get('file') || '').replace('psar', 'ps,ar').split(',').filter(k => FILE_KEYS.includes(k)));
   if (p.get('cols')) S.cols = Math.max(1, Math.round(+p.get('cols')) || 20);
   if (p.get('sel') && N[p.get('sel')]) S.sel = p.get('sel');
-  if (p.get('fail')) p.get('fail').split(',').forEach(id => { if (N[id]) S.failed.add(id); });
 }
 
 // ───────── события ─────────
