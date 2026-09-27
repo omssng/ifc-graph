@@ -94,6 +94,8 @@
   .fork.lvl1{margin-left:18px}
   #fit{position:absolute;top:12px;left:50%;transform:translateX(-50%);z-index:7}
   #openInsights{position:absolute;bottom:12px;left:50%;transform:translateX(-50%);z-index:7}
+  #viewDesc .hint{margin:0 0 6px}
+  #viewDesc b{color:var(--ink);font-weight:600}
   .glos{display:inline-block;margin-top:8px;color:var(--accent);cursor:pointer;font-size:12px}
   .glos:hover{text-decoration:underline}
   #legend .glos{display:inline-block;margin-top:8px;color:var(--accent);cursor:pointer;font-size:12px}
@@ -249,6 +251,9 @@
   .sectag .t-trm rect{fill:var(--t-trm)} .sectag .t-xml rect{fill:var(--t-xml)} .sectag .t-bcf rect{fill:var(--t-bcf)} .sectag .t-dwg rect{fill:var(--t-dwg)}
   .sectag .ext text{font-family:ui-monospace,"SF Mono",Menlo,Consolas,monospace;letter-spacing:0}
   .lgtag{display:inline-block;min-width:38px;padding:0 6px;border-radius:8px;font:700 9.5px/15px system-ui,sans-serif;text-align:center;margin-right:8px;color:var(--on-tag)}
+  .lgtag[data-pick]{cursor:pointer}
+  .lgtag[data-pick]:hover{outline:2px solid var(--ink);outline-offset:1px}
+  #legend .hex{margin-left:auto;padding-left:8px;font:10.5px ui-monospace,Consolas,monospace;color:var(--muted)}
   .lgtag.ext{font-family:ui-monospace,"SF Mono",Menlo,Consolas,monospace}
   .lgtag.t-ps{background:var(--s-ps)} .lgtag.t-ar{background:var(--s-ar)} .lgtag.t-bf{background:var(--t-bf)} .lgtag.t-pkg{background:var(--s-pkg);color:var(--on-pkg)}
   .lgtag.t-trm{background:var(--t-trm)} .lgtag.t-xml{background:var(--t-xml)} .lgtag.t-bcf{background:var(--t-bcf)} .lgtag.t-dwg{background:var(--t-dwg)}
@@ -385,8 +390,7 @@
     </div>
 
     <fieldset>
-      <div class="hint">Слева направо — от родительских проверок к дочерним: чем правее, тем больше проверок должно быть выполнено раньше.</div>
-      <div class="hint">Пунктирная рамка и штрих — логика проверки ещё не написана, связи предположены.</div>
+      <div id="viewDesc"></div>
       <a id="exportSvg" class="glos">Скачать SVG</a>
     </fieldset>
   </div>
@@ -414,6 +418,7 @@
     <div class="pill" id="counter" style="display:none"></div>
   </div>
   <button class="btn" id="fit">К центру</button>
+  <input type="color" id="colPick" style="position:absolute;right:320px;bottom:220px;width:1px;height:1px;opacity:0;border:0;padding:0" tabindex="-1" aria-hidden="true">
   <button class="btn" id="openInsights">Выводы анализа</button>
   <div id="legend"></div>
   <div id="scen"></div>
@@ -425,9 +430,9 @@
 <div id="modal"><div class="win"><header><div><h2 id="modalTitle">Выводы анализа</h2><small id="insSub"></small></div><span class="x" id="closeModal">×</span></header><div class="body" id="insBody"></div></div></div>
 
 <script src="vendor/d3.v7.min.js"></script>
-<script src="data.js?v=54"></script>
-<script src="facts.js?v=54"></script>
-<script src="npa.js?v=54"></script>
+<script src="data.js?v=55"></script>
+<script src="facts.js?v=55"></script>
+<script src="npa.js?v=55"></script>
 <script>
 (() => {
 'use strict';
@@ -1640,6 +1645,7 @@ function drawRank() {
 function renderSidebarState() {
   document.querySelectorAll('#views button[data-v]').forEach(b => b.classList.toggle('on', b.dataset.v === S.view));
   document.querySelectorAll('#cntSeg button').forEach(b => b.classList.toggle('on', b.dataset.v === S.cnt));
+  renderViewDesc();
   $('#cntBox').style.display = ['cascade', 'lanes', 'branches', 'npa'].includes(S.view) ? '' : 'none';
   const inMore = ['matrix', 'rank', 'facts', 'npa'].includes(S.view);
   $('#moreSeg').style.display = inMore || S.more ? '' : 'none';
@@ -1681,6 +1687,44 @@ function buildFilters() {
 }
 
 // ───────── легенда ─────────
+// ───────── как читать вид — короткое описание под фильтрами ─────────
+const Q_TEXT = 'Сверху вниз в слое — очередь выполнения: сначала лёгкие проверки (заголовок, имена, значения атрибутов), потом средние (обход элементов, сверка с таблицами), в конце тяжёлые (геометрия, 3D). Развёртка режет слой на подстолбцы 3А, 3Б… — тогда очередь идёт слева направо.';
+const FAIL_TEXT = 'Не прошла проверка хотя бы по одному файлу — все её дочерние не выполняются. Пунктирная рамка — логика проверки ещё не написана, связи предположены.';
+const VIEW_DESC = {
+  cascade: ['<b>Слева направо</b> — от родительских проверок к дочерним: чем правее, тем больше проверок должно пройти раньше. Столбец — слой: проверки одного слоя друг от друга не зависят.', Q_TEXT, FAIL_TEXT],
+  lanes: ['<b>Слева направо</b> — от родительских проверок к дочерним, по дорожкам разделов ЦИМ.', Q_TEXT, FAIL_TEXT],
+  branches: ['Те же проверки и связи, что в каскаде: <b>слева направо</b> — от родительских к дочерним, сверху вниз в слое — очередь от лёгких к тяжёлым.',
+    '<b>Строки</b> — файлы, которые проходят проверки: TRM, аннотации BCF, IFC по разделам ЦИМ и подветкам, внизу XML и DWG. «Детализация строк» делит их подробнее; клик по названию строки — одна ветка целиком, от TRM до конца.', FAIL_TEXT],
+  matrix: ['<b>Матрица</b> — те же связи таблицей: строка — дочерняя проверка, столбец — родитель, от которого она зависит. Строки и столбцы идут по слоям, цвет клетки — вид связи.',
+    'Удобно найти по строке, от чего зависит конкретная проверка, а по столбцу — кого она держит.'],
+  rank: ['<b>Рейтинг</b>: «потомков» — сколько проверок не выполнится, если эта не пройдёт; «предков» — сколько должно пройти раньше, чтобы она запустилась.',
+    'Сверху — проверки с самым широким каскадом: их исход важнее всего сделать точным. Сортировка — кликом по заголовку столбца.'],
+  facts: ['<b>Данные → нормы</b>: слева — блоки данных, которые извлекаются из файлов один раз; справа — проверки, которые применяют к ним требования.',
+    'Клик по блоку — показать проверки, которые его используют.'],
+  npa: ['<b>По пунктам в39</b> — другой взгляд на порядок: проверки строго по разделам требований. Колонка — раздел документа, рамка — группа его проверок, внутри они независимы.',
+    'Стрелка — следующий раздел ждёт, пока пройдут все проверки предыдущего. Связи модели здесь не используются — только порядок пунктов.'],
+};
+function renderViewDesc() {
+  const box = $('#viewDesc');
+  if (box) box.innerHTML = (VIEW_DESC[S.view] || []).map(t => `<div class="hint">${t}</div>`).join('');
+}
+// ───────── подбор цветов плашек (отладка палитры): клик по плашке в легенде ─────────
+const TAG_VAR = { ar: '--s-ar', ps: '--s-ps', bf: '--t-bf', trm: '--t-trm', xml: '--t-xml', bcf: '--t-bcf', dwg: '--t-dwg' };
+const COLOR_KEY = 'ifc-graph-colors';
+let userColors = {};
+try { userColors = JSON.parse(localStorage.getItem(COLOR_KEY) || '{}') || {}; } catch (e) { userColors = {}; }
+const applyColors = () => Object.entries(userColors).forEach(([v, c]) => document.documentElement.style.setProperty(v, c));
+const saveColors = () => { try { localStorage.setItem(COLOR_KEY, JSON.stringify(userColors)); } catch (e) { } };
+const toHex = c => { const m = String(c).trim().match(/^#([0-9a-f]{3}){1,2}$/i); if (m) return c.trim().toLowerCase(); const r = String(c).match(/\d+/g); return r ? '#' + r.slice(0, 3).map(x => (+x).toString(16).padStart(2, '0')).join('') : '#000000'; };
+applyColors();
+function pickColor(k) {
+  const v = TAG_VAR[k], inp = $('#colPick');
+  inp.value = toHex(cssv(v));
+  inp.oninput = () => { userColors[v] = inp.value; applyColors(); renderLegend(); };
+  inp.onchange = () => { saveColors(); render({ relayout: false }); };
+  if (inp.showPicker) { try { inp.showPicker(); return; } catch (e) { } }
+  inp.click();
+}
 const GLOS_LINK = '<a class="glos">Словарь терминов</a>';
 function renderLegend() {
   const el = $('#legend');
@@ -1689,7 +1733,6 @@ function renderLegend() {
   let h = '';
   if (S.view === 'npa') {
     const dot = (inner, t) => `<div class="li"><svg width="16" height="12" viewBox="0 0 16 12">${inner}</svg><span>${t}</span></div>`;
-    h += '<h4>Порядок по пунктам в39</h4><div class="hint" style="margin-top:0">Рамка — раздел требований; проверки внутри независимы. Стрелка — следующий раздел ждёт, пока пройдут все проверки предыдущего.</div>';
     h += '<h4>Статус по таблице</h4>' + dot('<circle cx="6" cy="6" r="5" fill="var(--ok)"/>', 'разработка готова')
       + dot('<circle cx="6" cy="6" r="4.4" fill="none" stroke="var(--ink)" stroke-width="1.6"/>', 'аналитика готова')
       + dot('<circle cx="6" cy="6" r="4.4" fill="none" stroke="var(--dim)" stroke-width="1.6" stroke-dasharray="2 2"/>', 'аналитика не отмечена');
@@ -1714,11 +1757,13 @@ function renderLegend() {
   const dotRow = (svgInner, t) => `<div class="li"><svg width="16" height="12" viewBox="0 0 16 12">${svgInner}</svg><span>${t}</span></div>`;
   if (S.view !== 'matrix') {
     {   // цвет карточек — всегда по разделу ЦИМ (переключатель убран 28.09)
-      const tg = (k, t) => `<span class="lgtag t-${k}${EXT[k] ? ' ext' : ''}">${t || SEC_TAG[k]}</span>`;
+      const tg = (k, t) => `<span class="lgtag t-${k}${EXT[k] ? ' ext' : ''}" data-pick="${k}" title="Выбрать цвет">${t || SEC_TAG[k]}</span>`;
+      const hx = k => `<code class="hex">${toHex(cssv(TAG_VAR[k]))}</code>`;
       h += '<h4>Плашка на карточке · IFC — раздел ЦИМ</h4>'
-        + [['ar', 'ЦИМ АР'], ['ps', 'ЦИМ ПС'], ['bf', 'ЦИМ БФ']].map(([k, t]) => `<div class="li">${tg(k)}${t}</div>`).join('')
+        + [['ar', 'ЦИМ АР'], ['ps', 'ЦИМ ПС'], ['bf', 'ЦИМ БФ']].map(([k, t]) => `<div class="li">${tg(k)}${t}${hx(k)}</div>`).join('')
         + '<h4>Не IFC — расширение файла</h4>'
-        + FT_KEYS.filter(k => k !== 'ifc').map(k => `<div class="li">${tg(k)}${esc(G.branches.types[k].split(' — ')[1] || G.branches.types[k])}</div>`).join('');
+        + FT_KEYS.filter(k => k !== 'ifc').map(k => `<div class="li">${tg(k)}${esc(G.branches.types[k].split(' — ')[1] || G.branches.types[k])}${hx(k)}</div>`).join('')
+        + `<div class="hint" style="margin:2px 0 0">Клик по плашке — подобрать цвет. ${Object.keys(userColors).length ? '<a class="glos" data-copycol style="margin:0">Скопировать цвета</a> · <a class="glos" data-resetcol style="margin:0">Сбросить</a>' : ''}</div>`;
     }
     h += '<h4>Статус (значок справа)</h4>' +
       dotRow('<circle cx="6" cy="6" r="5" fill="var(--ok)"/>', 'реализована') + dotRow('<circle cx="6" cy="6" r="5" fill="var(--warn)"/>', 'в работе / переработке') +
@@ -1727,9 +1772,7 @@ function renderLegend() {
   }
   h += '<h4>Связи <span style="text-transform:none;letter-spacing:0;font-weight:400">· наведите — пример</span></h4>' + KIND_ORDER.map(k => kindRow(k, `<svg width="26" height="8"><line x1="0" y1="4" x2="24" y2="4" stroke="var(--k-${k})" stroke-width="2.2" ${k === 'agg' ? 'stroke-dasharray="2 4"' : ''}/></svg>`)).join('');
   h += '<div class="hint" style="margin-top:4px">' + 'Все линии, кроме свода, блокируют.' + ' <b>Наведите на линию</b> — что передаёт связь и зачем она.</div>';
-  if (['cascade', 'lanes', 'branches'].includes(S.view)) h += '<h4>Очередь в слое</h4><div class="hint" style="margin-top:0">Сверху вниз (при развёртке — слева направо) — порядок выполнения внутри слоя: сначала лёгкие проверки (заголовок, имена, значения атрибутов), потом средние (обход элементов, сопоставление с таблицами), тяжёлые — в конце (геометрия, 3D-пересечения). Внутри веса — у кого больше зависимых проверок.</div>';
-  if (S.view === 'branches') h += '<h4>Строки</h4><div class="hint" style="margin-top:0">Дорожка — тип файла → раздел ЦИМ → подветка; цветная полоса слева — тип файла или раздел.'
-    + (S.brDisc && S.brDup ? ' Общие проверки скопированы в каждый раздел: у копии полоса на карточке — контуром, связи копии не выходят за свой раздел.' : '') + '</div>'
+  if (S.view === 'branches') h += ''
     + (S.brOn ? '<div class="hint">Показаны выбранные ветки; бледные карточки с пунктирной рамкой — из других веток, но лежат на пути. <b style="color:var(--fail)">↤N / N↦</b> — связь обрывается: столько проверок из скрытых веток ещё нужны этой (слева) или ждут её (справа); наведите — список.</div>' : '');
   if (S.files.size && FILE_VIEWS.includes(S.view)) h += `<h4>${S.files.size > 1 ? 'Файлы' : 'Файл'}: ${esc(fileNames())}</h4><div class="hint" style="margin-top:0">Выбрано на узле IFC-01. Насыщенные карточки — проверки, которые ${S.files.size > 1 ? 'проходят выбранные IFC-файлы' : 'проходит IFC-файл этого раздела'}: контейнер TRM, общие проверки ПС, АР и БФ, проверки ${S.files.size > 1 ? 'выбранных разделов' : 'раздела'}${S.files.has('ps') || S.files.has('ar') ? ' и совместные ПС+АР' : ''}. Серые — не задействованы (другие разделы и другие типы файлов: XML, аннотации, 2D).</div>`;
   if (S.cnt && S.view !== 'matrix') h += '<h4>Число на карточке</h4><div class="hint" style="margin-top:0">' + (S.cnt === 'next'
@@ -2050,7 +2093,17 @@ function bind() {
   $('#showAgg').addEventListener('change', e => { S.showAgg = e.target.checked; render({ fit: false, relayout: true }); });
   $('#showImplied').addEventListener('change', e => { S.showImplied = e.target.checked; render({ fit: false, relayout: true }); });
   $('#openInsights').addEventListener('click', openInsights);
-  $('#legend').addEventListener('click', ev => { if (ev.target.closest('.glos')) openGlossary(); });
+  $('#legend').addEventListener('click', ev => {
+    const t = ev.target;
+    if (t.closest('[data-pick]')) { pickColor(t.closest('[data-pick]').dataset.pick); return; }
+    if (t.closest('[data-copycol]')) {
+      const txt = Object.entries(TAG_VAR).map(([k, v]) => `${SEC_TAG[k]}: ${toHex(cssv(v))}`).join('\n');
+      navigator.clipboard.writeText(txt).then(() => { t.textContent = 'Скопировано'; }, () => { t.textContent = 'Буфер недоступен'; });
+      return;
+    }
+    if (t.closest('[data-resetcol]')) { Object.keys(userColors).forEach(v => document.documentElement.style.removeProperty(v)); userColors = {}; saveColors(); render({ relayout: false }); return; }
+    if (t.closest('.glos')) openGlossary();
+  });
   $('#exportSvg').addEventListener('click', exportSvg);
   $('#closeModal').addEventListener('click', () => $('#modal').classList.remove('on'));
   $('#modal').addEventListener('click', e => { if (e.target.id === 'modal') $('#modal').classList.remove('on'); });
