@@ -452,9 +452,9 @@
 <div id="modal"><div class="win"><header><div><h2 id="modalTitle">Выводы анализа</h2><small id="insSub"></small></div><span class="x" id="closeModal">×</span></header><div class="body" id="insBody"></div></div></div>
 
 <script src="vendor/d3.v7.min.js"></script>
-<script src="data.js?v=38"></script>
-<script src="facts.js?v=38"></script>
-<script src="npa.js?v=38"></script>
+<script src="data.js?v=39"></script>
+<script src="facts.js?v=39"></script>
+<script src="npa.js?v=39"></script>
 <script>
 (() => {
 'use strict';
@@ -2019,7 +2019,7 @@ function renderDetail() {
   const sk = skippedSet();
   let h = `<span class="x" id="dx">×</span>
     <div class="code">${esc(n.label)}</div><div class="title">${esc(n.n)}</div>
-    <div class="tags"><span class="tag">${esc(ftOf(n.id) === 'ifc' ? G.sections[n.sec] : G.branches.types[ftOf(n.id)])}</span><span class="tag">${n.sc === 'batch' ? 'весь комплект' : 'по файлам'}</span><span class="tag">${esc(G.statuses[n.st])}</span><span class="tag">${esc(G.families[n.fam])}</span></div>
+    <div class="tags"><span class="tag">${esc(ftOf(n.id) === 'ifc' ? G.sections[n.sec] : G.branches.types[ftOf(n.id)])}</span><span class="tag">${n.sc === 'batch' ? 'комплект ' + (ftOf(n.id) === 'ifc' ? 'IFC' : EXT[ftOf(n.id)]) : 'по файлам'}</span><span class="tag">${esc(G.statuses[n.st])}</span><span class="tag">${esc(G.families[n.fam])}</span></div>
     <div class="desc">${esc(n.d)}</div>
     <div style="color:var(--muted);font-size:12px">Пункт требований: ${esc(n.p)}</div>`;
   if (sk.has(n.id)) h += `<div class="box danger">В текущем сценарии эта проверка <b>не выполнится</b>: один из её предков не прошёл.</div>`;
