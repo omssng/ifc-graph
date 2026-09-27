@@ -181,6 +181,7 @@
   svg text{font-family:inherit}
   .node{cursor:pointer}
   .node .card{fill:var(--panel);stroke:var(--line);stroke-width:1.2}
+  svg.nost .node .stat{display:none}
   .node.idea .card{stroke-dasharray:4 3;stroke:var(--dim)}
   .node .id{font:700 11.5px ui-monospace,"SF Mono",Menlo,Consolas,monospace;fill:var(--ink)}
   .node .nm{font-size:10px;fill:var(--muted)}
@@ -353,10 +354,11 @@
 
 
     <fieldset>
-      <legend>Показывать связи</legend>
+      <legend>Показывать</legend>
       <label class="chk"><input type="checkbox" id="showGate" checked><span>Допуск IFC-01 ко всем проверкам<small>«файл должен читаться». Где IFC-01 — единственный родитель, линия видна всегда; остальные допуски повторяют цепочку и по умолчанию скрыты</small></span></label>
       <label class="chk"><input type="checkbox" id="showAgg" checked><span>Своды<small>точечные линии к IFC-21 и IFC-44: собирают итоги «прошла / не прошла» других проверок, сами ничего не проверяют и не блокируют</small></span></label>
       <label class="chk"><input type="checkbox" id="showImplied" checked><span>Связи в обход цепочки<small>настоящие зависимости любого вида, но порядок они не меняют: карточка и так стоит после родителя через другую цепочку, а линия лишь показывает, что она напрямую берёт у него данные</small></span></label>
+      <label class="chk"><input type="checkbox" id="showSt"><span>Статус реализации<small>кружок в углу карточки: реализована, в работе, есть аналитика; пунктирная рамка «логика предположена» видна всегда</small></span></label>
     </fieldset>
 
 
@@ -432,9 +434,9 @@
 <div id="modal"><div class="win"><header><div><h2 id="modalTitle">Выводы анализа</h2><small id="insSub"></small></div><span class="x" id="closeModal">×</span></header><div class="body" id="insBody"></div></div></div>
 
 <script src="vendor/d3.v7.min.js"></script>
-<script src="data.js?v=59"></script>
-<script src="facts.js?v=59"></script>
-<script src="npa.js?v=59"></script>
+<script src="data.js?v=60"></script>
+<script src="facts.js?v=60"></script>
+<script src="npa.js?v=60"></script>
 <script>
 (() => {
 'use strict';
@@ -591,7 +593,7 @@ const S = {
   files: new Set(),   // выбор файла на IFC-01: пусто — все; иначе подмножество ps / ar / bf
   // sec: pkg / all / both в фильтре не показываются, но должны оставаться включёнными
   sec: new Set([...secKeys, 'bf']), fam: new Set(famKeys), st: new Set(stKeys), ft: new Set(Object.keys(window.IFC_GRAPH.branches.types)),
-  showGate: true, showImplied: true, showAgg: true,
+  showGate: true, showImplied: true, showAgg: true, showSt: false,
   q: '', sel: null, failed: new Set(), rankSort: 'desc', rankDir: -1, cnt: '',
 };
 
@@ -801,7 +803,7 @@ function nodeShape(g) {
   idt.filter(d => N[d.base || d.id].amb).append('tspan').attr('dx', 5).attr('class', 'amb').text('⚠');
   g.append('text').attr('class', 'nm').attr('x', 14).attr('y', 34).text(d => trunc(N[d.base || d.id].n, 24));
   // статус
-  const st = g.append('g').attr('transform', `translate(${NW - 14},14)`);
+  const st = g.append('g').attr('class', 'stat').attr('transform', `translate(${NW - 14},14)`);
   st.each(function (d) {
     const n = N[d.base || d.id], el = d3.select(this);
     if (n.st === 'code') el.append('circle').attr('r', 5).attr('fill', cssv('--ok'));
@@ -1543,7 +1545,7 @@ function render(opts) {
 }
 
 function restyle() {
-  svg.classed('bysec', S.colorBy === 'sec');
+  svg.classed('bysec', S.colorBy === 'sec').classed('nost', !S.showSt);
   if (S.view === 'npa') { npaRestyle(); return; }
   if (S.view === 'branches') { brRestyle(); applyFileDisc(); return; }
   const sk = skippedSet();
@@ -1767,13 +1769,13 @@ function renderLegend() {
         + FT_KEYS.filter(k => k !== 'ifc').map(k => `<div class="li">${tg(k)}${esc(G.branches.types[k].split(' — ')[1] || G.branches.types[k])}${hx(k)}</div>`).join('')
         + `<div class="hint" style="margin:2px 0 0">Клик по плашке — подобрать цвет. ${Object.keys(userColors).length ? '<a class="glos" data-copycol style="margin:0">Скопировать цвета</a> · <a class="glos" data-resetcol style="margin:0">Сбросить</a>' : ''}</div>`;
     }
-    h += '<h4>Статус (значок справа)</h4>' +
-      dotRow('<circle cx="6" cy="6" r="5" fill="var(--ok)"/>', 'реализована') + dotRow('<circle cx="6" cy="6" r="5" fill="var(--warn)"/>', 'в работе / переработке') +
-      dotRow('<circle cx="6" cy="6" r="4.4" fill="none" stroke="var(--ink)" stroke-width="1.6"/>', 'есть аналитика, кода нет') +
-      dotRow('<circle cx="6" cy="6" r="4.4" fill="none" stroke="var(--dim)" stroke-width="1.6" stroke-dasharray="2 2"/>', 'логика предположена (пунктир)');
   }
   h += '<h4>Связи <span style="text-transform:none;letter-spacing:0;font-weight:400">· наведите — пример</span></h4>' + KIND_ORDER.map(k => kindRow(k, `<svg width="26" height="8"><line x1="0" y1="4" x2="24" y2="4" stroke="var(--k-${k})" stroke-width="2.2" ${k === 'agg' ? 'stroke-dasharray="2 4"' : ''}/></svg>`)).join('');
   h += '<div class="hint" style="margin-top:4px">' + 'Все линии, кроме свода, блокируют.' + ' <b>Наведите на линию</b> — что передаёт связь и зачем она.</div>';
+  if (S.showSt && S.view !== 'matrix') h += '<h4>Статус (значок справа)</h4>' +
+      dotRow('<circle cx="6" cy="6" r="5" fill="var(--ok)"/>', 'реализована') + dotRow('<circle cx="6" cy="6" r="5" fill="var(--warn)"/>', 'в работе / переработке') +
+      dotRow('<circle cx="6" cy="6" r="4.4" fill="none" stroke="var(--ink)" stroke-width="1.6"/>', 'есть аналитика, кода нет') +
+      dotRow('<circle cx="6" cy="6" r="4.4" fill="none" stroke="var(--dim)" stroke-width="1.6" stroke-dasharray="2 2"/>', 'логика предположена (пунктир)');
   if (S.view === 'branches') h += ''
     + (S.brOn ? '<div class="hint">Показаны выбранные ветки; бледные карточки с пунктирной рамкой — из других веток, но лежат на пути. <b style="color:var(--fail)">↤N / N↦</b> — связь обрывается: столько проверок из скрытых веток ещё нужны этой (слева) или ждут её (справа); наведите — список.</div>' : '');
   if (S.files.size && FILE_VIEWS.includes(S.view)) h += `<h4>${S.files.size > 1 ? 'Файлы' : 'Файл'}: ${esc(fileNames())}</h4><div class="hint" style="margin-top:0">Выбрано на узле IFC-01. Насыщенные карточки — проверки, которые ${S.files.size > 1 ? 'проходят выбранные IFC-файлы' : 'проходит IFC-файл этого раздела'}: контейнер TRM, общие проверки ПС, АР и БФ, проверки ${S.files.size > 1 ? 'выбранных разделов' : 'раздела'}${S.files.has('ps') || S.files.has('ar') ? ' и совместные ПС+АР' : ''}. Серые — не задействованы (другие разделы и другие типы файлов: XML, аннотации, 2D).</div>`;
@@ -2083,6 +2085,7 @@ function bind() {
   });
   $('#stepsSlider').addEventListener('input', e => { S.cols = +e.target.value; render({ fit: true, relayout: true }); });
   $('#showGate').addEventListener('change', e => { S.showGate = e.target.checked; render({ fit: false, relayout: true }); });
+  $('#showSt').addEventListener('change', e => { S.showSt = e.target.checked; restyle(); renderLegend(); });
   $('#showAgg').addEventListener('change', e => { S.showAgg = e.target.checked; render({ fit: false, relayout: true }); });
   $('#showImplied').addEventListener('change', e => { S.showImplied = e.target.checked; render({ fit: false, relayout: true }); });
   $('#openInsights').addEventListener('click', openInsights);
