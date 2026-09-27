@@ -110,6 +110,8 @@
   .seg button.on{background:var(--bg);color:var(--ink);font-weight:600}
   .seg.rule button.on[data-v=A]{color:var(--fail)}
   .seg.rule button.on[data-v=B]{color:var(--ok)}
+  #moreBtn.on{background:var(--bg);color:var(--ink);font-weight:600}
+  aside .seg button{flex:1;padding:6px 4px}
   .seg .lab{color:var(--muted);font-size:11px;padding:6px 4px 6px 7px;white-space:nowrap}
   .pill{background:var(--panel);border:1px solid var(--line);border-radius:9px;box-shadow:var(--shadow);padding:6px 10px;font-size:12px;color:var(--muted)}
 
@@ -337,6 +339,15 @@
       <input type="range" id="stepsSlider" min="0" max="100" value="0" style="width:100%">
     </fieldset>
 
+    <fieldset id="cntBox">
+      <legend>Число на карточке</legend>
+      <div class="seg" id="cntSeg" role="group" aria-label="Число на карточках" style="box-shadow:none">
+        <button data-v="" class="on" title="Карточки без числа">Без счёта</button>
+        <button data-v="next" title="Сколько проверок ждут эту напрямую — на следующем шаге цепочки">→ Следующий слой</button>
+        <button data-v="all" title="Сколько проверок всего стоят после этой до самого конца цепочки">Σ Всего после</button>
+      </div>
+      <div class="hint" style="margin-top:4px">Цвет контура: 1–2 зелёный, 3 жёлтый, больше — оранжевый → красный.</div>
+    </fieldset>
     <fieldset>
       <legend>Тип файла <a id="allft">все</a></legend>
       <div id="fFt"></div>
@@ -391,25 +402,18 @@
   <div id="factsView"></div>
   <div class="topbar">
     <div id="views" style="display:flex;gap:12px;flex-wrap:wrap">
-    <div class="seg" role="group" aria-label="Зависимости проверок">
+    <div class="seg" role="group" aria-label="Основные виды">
       <button data-v="cascade" class="on">Каскад</button>
       <button data-v="lanes" hidden>Дорожки</button>
       <button data-v="branches" title="Строки по типу файла → разделу ЦИМ → подветке">Строки</button>
+      <button id="moreBtn" title="Матрица, рейтинг, данные → нормы, порядок по пунктам в39">Дополнительно ▸</button>
+    </div>
+    <div class="seg" id="moreSeg" role="group" aria-label="Дополнительно" style="display:none">
       <button data-v="matrix">Матрица</button>
       <button data-v="rank">Рейтинг</button>
-    </div>
-    <div class="seg" role="group" aria-label="Данные и требования в39">
       <button data-v="facts">Данные → нормы</button>
       <button data-v="npa" title="Проверки строго в порядке пунктов требований в39: колонки — разделы документа">По пунктам в39</button>
     </div>
-    </div>
-    <div class="seg" id="cntSeg" role="group" aria-label="Число на карточках">
-      <button data-v="" class="on" title="Карточки без числа">Без счёта</button>
-      <button data-v="next" title="Сколько проверок ждут эту напрямую — на следующем шаге цепочки">→ Следующий слой</button>
-      <button data-v="all" title="Сколько проверок всего стоят после этой до самого конца цепочки">Σ Всего после</button>
-      <label id="cntMidBox" class="lab" title="Середина шкалы: при каком числе контур жёлтый. Вправо — красным горят только самые большие числа, влево — теплее становятся и средние">
-        середина <input type="range" id="cntMid" min="5" max="90" step="5" style="width:90px;vertical-align:middle"> <b id="cntMidVal" style="color:var(--ink);font-variant-numeric:tabular-nums"></b>
-      </label>
     </div>
     <button class="btn" id="fit">К центру</button>
     <div class="pill" id="counter" style="display:none"></div>
@@ -424,9 +428,9 @@
 <div id="modal"><div class="win"><header><div><h2 id="modalTitle">Выводы анализа</h2><small id="insSub"></small></div><span class="x" id="closeModal">×</span></header><div class="body" id="insBody"></div></div></div>
 
 <script src="vendor/d3.v7.min.js"></script>
-<script src="data.js?v=50"></script>
-<script src="facts.js?v=50"></script>
-<script src="npa.js?v=50"></script>
+<script src="data.js?v=51"></script>
+<script src="facts.js?v=51"></script>
+<script src="npa.js?v=51"></script>
 <script>
 (() => {
 'use strict';
@@ -581,7 +585,7 @@ const S = {
   // sec: pkg / all / both в фильтре не показываются, но должны оставаться включёнными
   sec: new Set([...secKeys, 'bf']), fam: new Set(famKeys), st: new Set(stKeys), ft: new Set(Object.keys(window.IFC_GRAPH.branches.types)),
   showGate: true, showImplied: true, showAgg: true,
-  q: '', sel: null, failed: new Set(), rankSort: 'desc', rankDir: -1, cnt: '', cntMid: 40,
+  q: '', sel: null, failed: new Set(), rankSort: 'desc', rankDir: -1, cnt: '',
 };
 
 // ───────── вычисления ─────────
@@ -698,13 +702,19 @@ function refreshMarkerCss() {
   svgCss.textContent = css;
 }
 
+// середина шкалы числа на карточке — всегда 3 (жёлтый)
+const CNT_MID = 3;
+const cntMid = cntMax => Math.min(0.95, CNT_MID / cntMax);
+const CNT_T = 0.65;   // на шкале heat() жёлтый — около 0.65
 function fit(animate) {
   const node = gRoot && gRoot.node();
   if (!node) return;
   const bb = node.getBBox();
-  const W = $('#stage').clientWidth, H = $('#stage').clientHeight;
+  const st = $('#stage'), H = st.clientHeight;
   if (!bb.width || !bb.height) return;
-  const pad = 46, top = 70;
+  const lg = $('#legend'), lgW = lg && lg.offsetParent && lg.offsetWidth ? lg.offsetWidth + 24 : 0;
+  const tb = document.querySelector('.topbar'), top = tb ? tb.getBoundingClientRect().bottom - st.getBoundingClientRect().top + 16 : 70;
+  const W = st.clientWidth - lgW, pad = 40;
   const k = Math.min((W - 2 * pad) / bb.width, (H - top - pad) / bb.height, 1.15);
   const tx = (W - bb.width * k) / 2 - bb.x * k, ty = top + (H - top - pad - bb.height * k) / 2 - bb.y * k;
   const t = d3.zoomIdentity.translate(tx, ty).scale(k);
@@ -1153,8 +1163,7 @@ function brRestyle() {
   });
   nodeSel.select('.cross').text(d => S.failed.has(d.base) ? '×' : '⊘');
   const cntMax = Math.max(1, ...brG.VN.map(brCnt));
-  const mid = S.cntMid / 100, gamma = Math.log(0.5) / Math.log(mid);
-  $('#cntMidVal').textContent = '≈ ' + Math.max(1, Math.round(mid * cntMax));
+  const mid = cntMid(cntMax), gamma = Math.log(CNT_T) / Math.log(mid);
   nodeSel.select('.cnt').each(function (d) {
     const v = brG.V[d.id], n = N[d.base], val = brCnt(v), el = d3.select(this);
     if (!S.cnt || !val) { el.style('display', 'none'); return; }
@@ -1400,8 +1409,7 @@ function npaRestyle() {
     .classed('on', l => !!S.npaSel && (l.from === S.npaSel || l.to === S.npaSel))
     .classed('dim', l => !!S.npaSel && l.from !== S.npaSel && l.to !== S.npaSel);
   const cntMax = Math.max(1, ...NPA.checks.map(npaCnt));
-  const mid = S.cntMid / 100, gamma = Math.log(0.5) / Math.log(mid);
-  $('#cntMidVal').textContent = '≈ ' + Math.max(1, Math.round(mid * cntMax));
+  const mid = cntMid(cntMax), gamma = Math.log(CNT_T) / Math.log(mid);
   nodeSel.select('.cnt').each(function (d) {
     const c = NPA_C[d.id], v = npaCnt(c), el = d3.select(this);
     if (!S.cnt || !v) { el.style('display', 'none'); return; }
@@ -1544,9 +1552,8 @@ function restyle() {
     nodeSel.select('.stripe').attr('fill', d => colorOf(N[d.id]));
     nodeSel.select('.cross').text(d => S.failed.has(d.id) ? '×' : '⊘');
     const cntMax = Math.max(1, ...nodeSel.data().map(d => cntOf(N[d.id])));
-    // показатель степени подобран так, чтобы доля S.cntMid% от максимума попадала ровно в середину шкалы
-    const mid = S.cntMid / 100, gamma = Math.log(0.5) / Math.log(mid);
-    $('#cntMidVal').textContent = '≈ ' + Math.max(1, Math.round(mid * cntMax));
+    // показатель степени подобран так, чтобы число CNT_MID попадало ровно в середину шкалы
+    const mid = cntMid(cntMax), gamma = Math.log(CNT_T) / Math.log(mid);
     nodeSel.select('.cnt').each(function (d) {
       const n = N[d.id], v = cntOf(n), el = d3.select(this);
       if (!S.cnt || !v) { el.style('display', 'none'); return; }
@@ -1634,11 +1641,13 @@ function drawRank() {
 
 // ───────── боковая панель ─────────
 function renderSidebarState() {
-  document.querySelectorAll('#views button').forEach(b => b.classList.toggle('on', b.dataset.v === S.view));
+  document.querySelectorAll('#views button[data-v]').forEach(b => b.classList.toggle('on', b.dataset.v === S.view));
   document.querySelectorAll('#cntSeg button').forEach(b => b.classList.toggle('on', b.dataset.v === S.cnt));
-  $('#cntMidBox').style.display = S.cnt ? '' : 'none';
-  $('#cntMid').value = S.cntMid;
-  $('#cntSeg').style.display = ['cascade', 'lanes', 'branches', 'npa'].includes(S.view) ? '' : 'none';
+  $('#cntBox').style.display = ['cascade', 'lanes', 'branches', 'npa'].includes(S.view) ? '' : 'none';
+  const inMore = ['matrix', 'rank', 'facts', 'npa'].includes(S.view);
+  $('#moreSeg').style.display = inMore || S.more ? '' : 'none';
+  $('#moreBtn').classList.toggle('on', inMore);
+  $('#moreBtn').textContent = inMore || S.more ? 'Дополнительно ◂' : 'Дополнительно ▸';
   const vis = visNodes();
   $('#counter').textContent = S.view === 'npa'
     ? NPA.checks.length + ' проверок из таблицы · ' + (npaM ? npaM.steps : '') + ' ступеней'
@@ -1730,8 +1739,8 @@ function renderLegend() {
   if (S.files.size && FILE_VIEWS.includes(S.view)) h += `<h4>${S.files.size > 1 ? 'Файлы' : 'Файл'}: ${esc(fileNames())}</h4><div class="hint" style="margin-top:0">Выбрано на узле IFC-01. Насыщенные карточки — проверки, которые ${S.files.size > 1 ? 'проходят выбранные IFC-файлы' : 'проходит IFC-файл этого раздела'}: контейнер TRM, общие проверки ПС, АР и БФ, проверки ${S.files.size > 1 ? 'выбранных разделов' : 'раздела'}${S.files.has('ps') || S.files.has('ar') ? ' и совместные ПС+АР' : ''}. Серые — не задействованы (другие разделы и другие типы файлов: XML, аннотации, 2D).</div>`;
   if (S.cnt && S.view !== 'matrix') h += '<h4>Число на карточке</h4><div class="hint" style="margin-top:0">' + (S.cnt === 'next'
     ? '→ N — сколько проверок ждут эту напрямую, на следующем шаге цепочки (по стрелкам, видимым на схеме).'
-    : 'Σ N — сколько проверок всего стоят после этой до конца цепочки.') + ' По выбранному правилу каскада; 0 не показывается.</div>'
-    + `<div class="li" style="margin-top:4px"><span class="sw" style="flex:0 0 70px;height:6px;background:linear-gradient(90deg,${d3.range(0, 1.01, 0.25).map(heat).join(',')})"></span>контур: меньше → больше</div>`;
+    : 'Σ N — сколько проверок всего стоят после этой до конца цепочки.') + ' 0 не показывается.</div>'
+    + `<div class="li" style="margin-top:4px"><span class="sw" style="flex:0 0 70px;height:6px;background:linear-gradient(90deg,${d3.range(0, 1.01, 0.25).map(heat).join(',')})"></span>контур: меньше → больше, жёлтый — 3</div>`;
   if (S.sel) h += '<h4>Выбор</h4><div class="li"><span class="sw" style="background:var(--anc)"></span>предки (слева)</div><div class="li"><span class="sw" style="background:var(--desc)"></span>потомки (справа)</div>';
   el.innerHTML = h;
 }
@@ -1966,7 +1975,6 @@ function writeHash() {
     p.set('view', S.view);
     if (S.cols !== 20) p.set('cols', S.cols);
     if (S.cnt) p.set('cnt', S.cnt);
-    if (S.cnt && S.cntMid !== 40) p.set('mid', S.cntMid);
     if (S.sel) p.set('sel', S.sel);
     if (S.failed.size) p.set('fail', [...S.failed].join(','));
     if (S.files.size) p.set('file', fileList().join(','));
@@ -2001,8 +2009,6 @@ function readHash() {
   if (p.get('view') === 'factsGraph') S.view = 'facts';
   if (['next', 'all'].includes(p.get('cnt'))) S.cnt = p.get('cnt');
   S.files = new Set((p.get('file') || '').replace('psar', 'ps,ar').split(',').filter(k => FILE_KEYS.includes(k)));
-  const midN = +p.get('mid');
-  if (midN >= 5 && midN <= 90) S.cntMid = midN;
   if (p.get('cols')) S.cols = Math.max(1, Math.round(+p.get('cols')) || 20);
   if (p.get('sel') && N[p.get('sel')]) S.sel = p.get('sel');
   if (p.get('fail')) p.get('fail').split(',').forEach(id => { if (N[id]) S.failed.add(id); });
@@ -2010,7 +2016,12 @@ function readHash() {
 
 // ───────── события ─────────
 function bind() {
-  document.querySelectorAll('#views button').forEach(b => b.addEventListener('click', () => {
+  $('#moreBtn').addEventListener('click', () => {
+    const inMore = ['matrix', 'rank', 'facts', 'npa'].includes(S.view);
+    if (inMore) { S.more = false; S.view = 'cascade'; render({ fit: true, relayout: true }); return; }   // свернуть — вернуться в каскад
+    S.more = !S.more; renderSidebarState();
+  });
+  document.querySelectorAll('#views button[data-v]').forEach(b => b.addEventListener('click', () => {
     S.view = b.dataset.v;
     if (S.view === 'npa' && !S.cnt) S.cnt = 'all';
     render({ fit: true, relayout: true });
@@ -2031,7 +2042,6 @@ function bind() {
     applyFileDisc(); renderLegend(); writeHash();
   }));
   document.addEventListener('click', ev => { if (!$('#filePick').contains(ev.target)) $('#filePick').classList.remove('open'); });
-  $('#cntMid').addEventListener('input', e => { S.cntMid = +e.target.value; restyle(); writeHash(); });
   document.querySelectorAll('#cntSeg button').forEach(b => b.addEventListener('click', () => {
     S.cnt = b.dataset.v; restyle(); renderSidebarState(); renderLegend(); writeHash();
   }));
