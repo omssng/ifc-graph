@@ -36,7 +36,7 @@
   aside{width:300px;flex:0 0 300px;height:100%;background:var(--panel);border-right:1px solid var(--line);display:flex;flex-direction:column}
   aside h1{font-size:14px;margin:0;padding:14px 16px 2px;letter-spacing:.01em}
   aside h1 small{display:block;color:var(--muted);font-weight:400;font-size:11px;margin-top:3px}
-  .scroll{overflow-y:auto;overflow-x:hidden;padding:8px 16px 24px;flex:1;scrollbar-width:thin;scrollbar-color:transparent transparent}
+  .scroll{overflow-y:auto;overflow-x:hidden;padding:8px 16px 24px;flex:1;scrollbar-width:thin;scrollbar-color:transparent transparent;scrollbar-gutter:stable}
   .scroll:hover{scrollbar-color:var(--line) transparent}
   .scroll::-webkit-scrollbar{width:6px}
   .scroll::-webkit-scrollbar-thumb{background:transparent;border-radius:6px}
@@ -358,7 +358,11 @@
     </fieldset>
 
 
-    <button class="btn flat" id="filtBtn" style="width:100%;margin:6px 0 2px;text-align:left">Фильтры ▸</button>
+
+    <fieldset>
+      <div id="viewDesc"></div>
+      <a id="filtBtn" class="glos" style="display:block">Фильтры ▸</a>
+    </fieldset>
     <div id="filtBox" style="display:none">
     <fieldset id="cntBox">
       <legend>Число на карточке</legend>
@@ -388,11 +392,7 @@
       <div id="fSt"></div>
     </fieldset>
     </div>
-
-    <fieldset>
-      <div id="viewDesc"></div>
-      <a id="exportSvg" class="glos">Скачать SVG</a>
-    </fieldset>
+    <a id="exportSvg" class="glos" style="margin-top:10px">Скачать SVG</a>
   </div>
 </aside>
 
@@ -430,9 +430,9 @@
 <div id="modal"><div class="win"><header><div><h2 id="modalTitle">Выводы анализа</h2><small id="insSub"></small></div><span class="x" id="closeModal">×</span></header><div class="body" id="insBody"></div></div></div>
 
 <script src="vendor/d3.v7.min.js"></script>
-<script src="data.js?v=57"></script>
-<script src="facts.js?v=57"></script>
-<script src="npa.js?v=57"></script>
+<script src="data.js?v=58"></script>
+<script src="facts.js?v=58"></script>
+<script src="npa.js?v=58"></script>
 <script>
 (() => {
 'use strict';
