@@ -329,7 +329,6 @@
     <fieldset id="stepsBox">
       <legend>Развёртка слоёв <span id="stepsVal" style="text-transform:none;letter-spacing:0;color:var(--ink);font-weight:600"></span></legend>
       <input type="range" id="stepsSlider" min="0" max="100" value="0" style="width:100%">
-      <div class="hint" style="margin-top:4px">Слева — по слоям. Вправо — каждый слой раскладывается на столбцы 3а, 3б, 3в… по очереди выполнения внутри слоя; до конца вправо — в одну линию, каждая проверка в своём столбце. Внутри слоя проверки друг от друга не зависят, поэтому стрелок назад не появляется. Очередь: сначала ▲ входные фильтры, дальше — у кого больше зависимых проверок, ▼ тяжёлые — в конце. Действует в «Каскаде», «Дорожках» и «Ветках по файлам».</div>
     </fieldset>
 
     <fieldset>
@@ -441,9 +440,9 @@
 <div id="modal"><div class="win"><header><div><h2 id="modalTitle">Выводы анализа</h2><small id="insSub"></small></div><span class="x" id="closeModal">×</span></header><div class="body" id="insBody"></div></div></div>
 
 <script src="vendor/d3.v7.min.js"></script>
-<script src="data.js?v=28"></script>
-<script src="facts.js?v=28"></script>
-<script src="npa.js?v=28"></script>
+<script src="data.js?v=29"></script>
+<script src="facts.js?v=29"></script>
+<script src="npa.js?v=29"></script>
 <script>
 (() => {
 'use strict';
@@ -602,7 +601,9 @@ const S = {
 const blocks = e => S.variant === 'A' ? e.k !== 'agg' : e.need === 'verdict';
 const FT_KEYS = Object.keys(G.branches.types);
 const ftOf = id => G.branches.assign[id].split('.')[0];
-const isVisible = n => S.ft.has(ftOf(n.id)) && S.sec.has(n.sec) && S.fam.has(n.fam) && S.st.has(n.st) && S.rel.has(n.rel) && (!S.onlyAmb || n.amb);
+// совместные проверки ПС и АР отдельного пункта в фильтре не имеют: видны, если отмечен ПС или АР
+const secOn = n => n.sec === 'both' ? S.sec.has('ps') || S.sec.has('ar') : S.sec.has(n.sec);
+const isVisible = n => S.ft.has(ftOf(n.id)) && secOn(n) && S.fam.has(n.fam) && S.st.has(n.st) && S.rel.has(n.rel) && (!S.onlyAmb || n.amb);
 const visNodes = () => G.nodes.filter(isVisible);
 function edgeShown(e, ids) {
   if (!ids.has(e.from) || !ids.has(e.to)) return false;
@@ -1869,7 +1870,7 @@ function buildFilters() {
     }));
   };
   mk('#fFt', 'ft', FT_KEYS.map(k => [k, G.branches.types[k]]), k => G.nodes.filter(n => ftOf(n.id) === k).length, k => `background:var(${k === 'ifc' ? '--s-all' : '--t-' + k})`);
-  mk('#fSec', 'sec', secKeys.map(k => [k, G.sections[k]]), k => G.nodes.filter(n => n.sec === k).length, k => `background:var(--s-${k})`);
+  mk('#fSec', 'sec', secKeys.filter(k => k !== 'both').map(k => [k, G.sections[k]]), k => G.nodes.filter(n => n.sec === k || (n.sec === 'both' && (k === 'ps' || k === 'ar'))).length, k => `background:var(--s-${k})`);
   mk('#fFam', 'fam', famKeys.map(k => [k, G.families[k]]), k => G.nodes.filter(n => n.fam === k).length, () => 'background:var(--chipbd)');
   mk('#fSt', 'st', stKeys.map(k => [k, G.statuses[k]]), k => G.nodes.filter(n => n.st === k).length,
     k => ({ code: 'background:var(--ok)', work: 'background:var(--warn)', spec: 'border:2px solid var(--ink);border-radius:50%', idea: 'border:2px dashed var(--dim);border-radius:50%' }[k]));
