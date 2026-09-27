@@ -306,11 +306,6 @@
       <div id="results"></div>
     </fieldset>
 
-    <fieldset>
-      <legend>Правило каскада</legend>
-      <div class="vcard" id="vA" data-v="A"><b>Жёстко — как принято для MVP</b><span>Любая родительская проверка, не прошедшая, блокирует все дочерние. Любую объявленную связь считаем родительской.</span></div>
-      <div class="vcard" id="vB" data-v="B"><b>Смягчённо — рекомендация</b><span>Блокируют только связи, где по смыслу нужен вердикт родителя (допуск, смысловая предпосылка). Связи «передача данных» — пунктиром: не блокируют, дочерняя сама сообщает о нехватке входных данных.</span></div>
-    </fieldset>
 
     <fieldset id="paBox" style="display:none">
       <legend>Все пути</legend>
@@ -324,7 +319,6 @@
       <div class="hint" style="margin:0 0 8px">Те же проверки и связи, что в «Каскаде», но разложены по дорожкам: контейнер TRM → тип файла (IFC, XML, аннотации BCF, 2D) → раздел ЦИМ → подветка.</div>
       <label class="chk"><input type="checkbox" id="brDisc" checked><span>Делить IFC по разделам ЦИМ<small>общие для ПС, АР и БФ / ПС / АР / ПС и АР вместе / БФ</small></span></label>
       <label class="chk"><input type="checkbox" id="brSub" checked><span>Подветки внутри разделов<small>в ПС — участок, парковки, пожарные проезды, зонирование; в АР — здание, помещения, фасад, атрибуты</small></span></label>
-      <label class="chk"><input type="checkbox" id="brDup"><span>Общие проверки — копией в каждом разделе<small>выкл.: одна общая ветка «ЦИМ ПС, АР и БФ — общие» открывает все разделы. Вкл.: у ПС, АР и БФ своя копия общих проверок — каждая ветка читается и отваливается самостоятельно</small></span></label>
       <div style="margin:10px 0 4px;display:flex;justify-content:space-between;align-items:baseline"><b style="font-size:12px">Какие ветки показать</b><a id="brAll" style="color:var(--accent);font-size:11px;cursor:pointer">все</a></div>
       <div id="brForks"></div>
       <label class="chk"><input type="checkbox" id="brAnc" checked><span>Путь от контейнера TRM<small>дорисовать всё, что должно пройти раньше выбранных веток (из других веток — бледно)</small></span></label>
@@ -426,15 +420,11 @@
       <button data-v="npa" title="Проверки строго в порядке пунктов требований в39: колонки — разделы документа">По пунктам в39</button>
     </div>
     </div>
-    <div class="seg rule" id="ruleSeg">
-      <button data-v="A" class="on">Жёстко</button>
-      <button data-v="B">Смягчённо</button>
-    </div>
     <div class="seg" id="cntSeg" role="group" aria-label="Число на карточках">
       <span class="lab">На карточке:</span>
       <button data-v="" class="on" title="Карточки без числа">Без счёта</button>
-      <button data-v="next" title="Сколько проверок ждут эту напрямую — на следующем шаге цепочки (при выбранном правиле каскада)">→ Следующий слой</button>
-      <button data-v="all" title="Сколько проверок всего стоят после этой до самого конца цепочки (при выбранном правиле каскада)">Σ Всего после</button>
+      <button data-v="next" title="Сколько проверок ждут эту напрямую — на следующем шаге цепочки">→ Следующий слой</button>
+      <button data-v="all" title="Сколько проверок всего стоят после этой до самого конца цепочки">Σ Всего после</button>
       <label id="cntMidBox" class="lab" title="Середина шкалы: при каком числе контур жёлтый. Вправо — красным горят только самые большие числа, влево — теплее становятся и средние">
         середина <input type="range" id="cntMid" min="5" max="90" step="5" style="width:90px;vertical-align:middle"> <b id="cntMidVal" style="color:var(--ink);font-variant-numeric:tabular-nums"></b>
       </label>
@@ -452,9 +442,9 @@
 <div id="modal"><div class="win"><header><div><h2 id="modalTitle">Выводы анализа</h2><small id="insSub"></small></div><span class="x" id="closeModal">×</span></header><div class="body" id="insBody"></div></div></div>
 
 <script src="vendor/d3.v7.min.js"></script>
-<script src="data.js?v=40"></script>
-<script src="facts.js?v=40"></script>
-<script src="npa.js?v=40"></script>
+<script src="data.js?v=41"></script>
+<script src="facts.js?v=41"></script>
+<script src="npa.js?v=41"></script>
 <script>
 (() => {
 'use strict';
@@ -558,8 +548,7 @@ function edgeTipHtml(e) {
   const a = N[e.from], b = N[e.to];
   const why = e.z || e.why || KIND_EX[e.k][2];
   const cons = e.k === 'agg' ? `Если ${a.label} не прошла — ${b.label} всё равно соберёт итог и отметит провал.`
-    : blocks(e) ? `Если ${a.label} не прошла — ${b.label} не выполняется.`
-    : `Если ${a.label} не прошла — ${b.label} всё равно выполняется и сама сообщит, что данных не хватает (правило «смягчённо»).`;
+    : `Если ${a.label} не прошла — ${b.label} не выполняется.`;
   return `<div class="hd">${esc(a.label)} → ${esc(b.label)}<span class="kc" style="color:var(--k-${e.k})">${esc(G.meta.kindName[e.k])}</span></div>`
     + `<div><span class="lb">Передаёт:</span> ${esc(e.via)}</div>`
     + `<div><span class="lb">Зачем:</span> ${esc(why)}</div>`
@@ -603,7 +592,8 @@ const cssv = n => getComputedStyle(document.documentElement).getPropertyValue(n)
 const S = {
   view: 'cascade', variant: 'A', colorBy: 'sec', cols: 20,
   npaPsAr: false, npaVed: false, npaEmpty: true, npaLinks: false, npaSel: null,
-  brDisc: true, brSub: true, brDup: false, brSel: null, brOn: null, brAnc: true, brDesc: true,
+  brDisc: true, brSub: true, brDup: false,   // brDup (копии по разделам) выключен навсегда: провал общей проверки гасит все разделы
+  brSel: null, brOn: null, brAnc: true, brDesc: true,
   files: new Set(),   // выбор файла на IFC-01: пусто — все; иначе подмножество ps / ar / bf
   paOff: new Set(), paSel: null,
   // sec: pkg / all / both в фильтре не показываются, но должны оставаться включёнными
@@ -613,7 +603,8 @@ const S = {
 };
 
 // ───────── вычисления ─────────
-const blocks = e => S.variant === 'A' ? e.k !== 'agg' : e.need === 'verdict';
+// правило одно: не прошла — все дочерние не выполняются (кроме сводов, они собирают итог)
+const blocks = e => e.k !== 'agg';
 const FT_KEYS = Object.keys(G.branches.types);
 const ftOf = id => G.branches.assign[id].split('.')[0];
 // совместные проверки ПС и АР отдельного пункта в фильтре не имеют: видны, если отмечен ПС или АР
@@ -675,7 +666,6 @@ function colorOf(n) {
 function edgeColor(e) { return cssv('--k-' + e.k); }
 function edgeDash(e) {
   if (e.k === 'agg') return '2 4';
-  if (S.variant === 'B' && e.need === 'data') return '6 4';
   return null;
 }
 
@@ -798,10 +788,6 @@ function secTag(g, h) {
     });
   });
 }
-// как запускается: IFC — один раз по файлам своих разделов вместе или по каждому файлу отдельно
-const SEC_FILES = { all: 'АР, ПС и БФ', both: 'АР и ПС', ar: 'АР', ps: 'ПС' };
-const runTag = n => ftOf(n.id) !== 'ifc' ? (n.sc === 'batch' ? 'комплект ' + EXT[ftOf(n.id)] : 'по файлам')
-  : n.sc === 'batch' ? 'один запуск: файлы ' + SEC_FILES[n.sec] + ' вместе' : 'каждый файл отдельно';
 const trunc = (s, n) => s.length > n ? s.slice(0, n - 1) + '…' : s;
 
 function nodeShape(g) {
@@ -1181,7 +1167,6 @@ function brRestyle() {
     if (d.base !== d.id) el.attr('fill', 'none').attr('stroke', c); else el.attr('fill', c).attr('stroke', null);
   });
   nodeSel.select('.cross').text(d => S.failed.has(d.base) ? '×' : '⊘');
-  const rule = S.variant === 'A' ? 'жёстко' : 'смягчённо';
   const cntMax = Math.max(1, ...brG.VN.map(brCnt));
   const mid = S.cntMid / 100, gamma = Math.log(0.5) / Math.log(mid);
   $('#cntMidVal').textContent = '≈ ' + Math.max(1, Math.round(mid * cntMax));
@@ -1194,7 +1179,7 @@ function brRestyle() {
     el.select('rect').attr('x', right - w).attr('width', w).style('stroke', heat(t)).style('stroke-width', 1.6 + 1.2 * t);
     el.select('text').attr('x', right - w / 2).text(label);
     el.select('title').text((S.cnt === 'next' ? `${val} — проверок на следующем шаге после ${n.label}` : `${val} — проверок всего после ${n.label} до конца ветки`)
-      + (d.copyOf ? ` (копия в разделе «${d.copyOf}»)` : '') + ` (${rule})`);
+      + (d.copyOf ? ` (копия в разделе «${d.copyOf}»)` : ''));
   });
   if (edgeSel) {
     const on = x => !!sel && x.k !== 'agg';
@@ -1401,7 +1386,6 @@ function paRestyle() {
     .classed('match', d => !!q && matches(N[d.base], q));
   nodeSel.select('.stripe').attr('fill', d => colorOf(N[d.base]));
   nodeSel.select('.cross').text(d => S.failed.has(d.base) ? '×' : '⊘');
-  const rule = S.variant === 'A' ? 'жёстко' : 'смягчённо';
   const cntMax = Math.max(1, ...paG.VN.map(paCnt));
   const mid = S.cntMid / 100, gamma = Math.log(0.5) / Math.log(mid);
   $('#cntMidVal').textContent = '≈ ' + Math.max(1, Math.round(mid * cntMax));
@@ -1414,7 +1398,7 @@ function paRestyle() {
     el.select('rect').attr('x', right - w).attr('width', w).style('stroke', heat(t)).style('stroke-width', 1.6 + 1.2 * t);
     el.select('text').attr('x', right - w / 2).text(label);
     el.select('title').text((S.cnt === 'next' ? `${val} — проверок на следующем шаге после ${n.label}` : `${val} — проверок после ${n.label} до конца пути`)
-      + (v.scen ? ` (${PA_NAME[v.scen]})` : ' (все пути)') + ` (${rule})`);
+      + (v.scen ? ` (${PA_NAME[v.scen]})` : ' (все пути)'));
   });
   if (edgeSel) {
     const on = x => !!sel && x.k !== 'agg';
@@ -1730,8 +1714,8 @@ let epoch = 0;
 function render(opts) {
   opts = opts || {};
   const isFacts = S.view === 'facts', isNpa = S.view === 'npa';
-  ['#ruleSeg', '#stepsBox', '#copyTable', '#copyHint'].forEach(s => { if ($(s)) $(s).style.display = isFacts || isNpa ? 'none' : ''; });
-  ['#vA', '#showGate', '#colorBy', '#clearFail'].forEach(s => { const box = $(s).closest('fieldset'); if (box) box.style.display = isFacts || isNpa ? 'none' : ''; });
+  ['#stepsBox', '#copyTable', '#copyHint'].forEach(s => { if ($(s)) $(s).style.display = isFacts || isNpa ? 'none' : ''; });
+  ['#showGate', '#colorBy', '#clearFail'].forEach(s => { const box = $(s).closest('fieldset'); if (box) box.style.display = isFacts || isNpa ? 'none' : ''; });
   ['#fFt', '#fSec', '#fFam', '#fSt'].forEach(s => { const box = $(s).closest('fieldset'); if (box) box.style.display = isNpa ? 'none' : ''; });
   $('#npaBox').style.display = isNpa ? '' : 'none';
   $('#brBox').style.display = S.view === 'branches' ? '' : 'none';
@@ -1793,7 +1777,6 @@ function restyle() {
       .classed('match', d => !!q && matches(N[d.id], q));
     nodeSel.select('.stripe').attr('fill', d => colorOf(N[d.id]));
     nodeSel.select('.cross').text(d => S.failed.has(d.id) ? '×' : '⊘');
-    const rule = S.variant === 'A' ? 'жёстко' : 'смягчённо';
     const cntMax = Math.max(1, ...nodeSel.data().map(d => cntOf(N[d.id])));
     // показатель степени подобран так, чтобы доля S.cntMid% от максимума попадала ровно в середину шкалы
     const mid = S.cntMid / 100, gamma = Math.log(0.5) / Math.log(mid);
@@ -1809,8 +1792,8 @@ function restyle() {
         .style('stroke', heat(t)).style('stroke-width', 1.6 + 1.2 * t);
       el.select('text').attr('x', right - w / 2).text(label);
       el.select('title').text(S.cnt === 'next'
-        ? `${v} — проверок на следующем шаге сразу после ${n.label} (${rule})`
-        : `${v} — проверок всего после ${n.label} до конца цепочки (${rule})`);
+        ? `${v} — проверок на следующем шаге сразу после ${n.label}`
+        : `${v} — проверок всего после ${n.label} до конца цепочки`);
     });
   }
   if (edgeSel) {
@@ -1857,18 +1840,18 @@ function drawRank() {
   rk.innerHTML = `
     <h2>Рейтинг: кто кого блокирует и от скольких зависит</h2>
     <p>«Потомков» — сколько проверок не выполнится, если эта не пройдёт. «Предков» — сколько проверок должно пройти раньше, чтобы эта вообще запустилась. Столбцы — оба правила рядом, активное подсвечено. Клик по строке — открыть карточку.</p>
-    <div class="rootbox"><h3>Родительские проверки без родителей при выбранном правиле (${roots.length})</h3>
+    <div class="rootbox"><h3>Проверки без родителей (${roots.length})</h3>
       <div class="chips">${roots.map(n => `<a class="chip" data-id="${n.id}">${esc(n.label)}</a>`).join('')}</div>
-      <div class="hint">${S.variant === 'A' ? 'При жёстком правиле корень один: допуск на приём комплекта — всё остальное вырастает из него.' : 'При смягчённом правиле независимых стартовых проверок несколько: их можно реализовывать и запускать параллельно.'}</div></div>
+      <div class="hint">Корень один: допуск на приём комплекта — всё остальное вырастает из него.</div></div>
     <table><thead><tr>
       <th data-s="id">Проверка</th><th data-s="st">Статус</th><th data-s="depth">Слой</th>
-      <th data-s="desc" style="min-width:210px">Потомков (жёстко / смягчённо)</th><th data-s="ancs" style="min-width:210px">Предков (жёстко / смягчённо)</th><th>Обратить внимание</th></tr></thead>
+      <th data-s="desc" style="min-width:210px">Потомков</th><th data-s="ancs" style="min-width:210px">Предков</th><th>Обратить внимание</th></tr></thead>
     <tbody>${rows.map(n => `<tr class="r${n.id === S.sel ? ' sel' : ''}" data-id="${n.id}">
       <td><span class="cd">${esc(n.label)}</span><br><span style="color:var(--muted);font-size:11px">${esc(trunc(n.n, 38))}</span></td>
       <td>${stDot(n)}<span style="font-size:11px;color:var(--muted)">${esc(G.statuses[n.st].split(' — ')[0].split(' /')[0])}</span></td>
       <td>${stepOf(n)}</td>
-      <td>${bar(n.A.desc.length, maxD, S.variant === 'A' ? cssv('--fail') : cssv('--dim'))}<div style="height:3px"></div>${bar(n.B.desc.length, maxD, S.variant === 'B' ? cssv('--ok') : cssv('--dim'))}</td>
-      <td>${bar(n.A.anc.length, maxA, S.variant === 'A' ? cssv('--fail') : cssv('--dim'))}<div style="height:3px"></div>${bar(n.B.anc.length, maxA, S.variant === 'B' ? cssv('--ok') : cssv('--dim'))}</td>
+      <td>${bar(n.A.desc.length, maxD, cssv('--fail'))}</td>
+      <td>${bar(n.A.anc.length, maxA, cssv('--fail'))}</td>
       <td style="font-size:11px;color:${n.amb ? 'var(--warn)' : 'var(--dim)'}">${n.amb ? '⚠ ' + esc(trunc(n.amb, 60)) : '—'}</td></tr>`).join('')}</tbody></table>`;
   const box = $('#rank');
   box.innerHTML = '';
@@ -1885,9 +1868,6 @@ function drawRank() {
 
 // ───────── боковая панель ─────────
 function renderSidebarState() {
-  $('#vA').classList.toggle('on', S.variant === 'A');
-  $('#vB').classList.toggle('on', S.variant === 'B');
-  document.querySelectorAll('#ruleSeg button').forEach(b => b.classList.toggle('on', b.dataset.v === S.variant));
   document.querySelectorAll('#views button').forEach(b => b.classList.toggle('on', b.dataset.v === S.view));
   document.querySelectorAll('#cntSeg button').forEach(b => b.classList.toggle('on', b.dataset.v === S.cnt));
   $('#cntMidBox').style.display = S.cnt ? '' : 'none';
@@ -1899,8 +1879,8 @@ function renderSidebarState() {
     : vis.length + ' из ' + G.nodes.length + ' проверок';
   $('#npaPsAr').checked = S.npaPsAr; $('#npaVed').checked = S.npaVed; $('#npaEmpty').checked = S.npaEmpty; $('#npaLinks').checked = S.npaLinks;
   $('#stepsBox').style.opacity = ['cascade', 'lanes', 'branches'].includes(S.view) ? '1' : '.45';
-  $('#brDisc').checked = S.brDisc; $('#brSub').checked = S.brSub; $('#brDup').checked = S.brDup;
-  $('#brSub').disabled = !S.brDisc; $('#brDup').disabled = !S.brDisc;
+  $('#brDisc').checked = S.brDisc; $('#brSub').checked = S.brSub;
+  $('#brSub').disabled = !S.brDisc;
   if (S.view === 'branches' && brG) $('#counter').textContent = S.brOn
     ? 'ветки: ' + [...S.brOn].map(brForkName).join(', ') + ' · ' + brG.core.size + ' карточек + ' + (brG.vis.size - brG.core.size) + ' на пути'
     : vis.length + ' из ' + G.nodes.length + ' проверок' + (brG.dup ? ' · карточек с копиями: ' + brG.VN.length : '');
@@ -1980,7 +1960,7 @@ function renderLegend() {
       dotRow('<circle cx="6" cy="6" r="4.4" fill="none" stroke="var(--dim)" stroke-width="1.6" stroke-dasharray="2 2"/>', 'логика предположена (пунктир)');
   }
   h += '<h4>Связи <span style="text-transform:none;letter-spacing:0;font-weight:400">· наведите — пример</span></h4>' + KIND_ORDER.map(k => kindRow(k, `<svg width="26" height="8"><line x1="0" y1="4" x2="24" y2="4" stroke="var(--k-${k})" stroke-width="2.2" ${k === 'agg' ? 'stroke-dasharray="2 4"' : ''}/></svg>`)).join('');
-  h += '<div class="hint" style="margin-top:4px">' + (S.variant === 'A' ? 'Все линии, кроме свода, блокируют.' : 'Сплошная — блокирует, пунктир — только данные.') + ' <b>Наведите на линию</b> — что передаёт связь и зачем она.</div>';
+  h += '<div class="hint" style="margin-top:4px">' + 'Все линии, кроме свода, блокируют.' + ' <b>Наведите на линию</b> — что передаёт связь и зачем она.</div>';
   if (['cascade', 'lanes', 'branches'].includes(S.view)) h += '<h4>Очередь в слое</h4><div class="hint" style="margin-top:0">Сверху вниз (при развёртке — слева направо) — порядок выполнения внутри слоя: сначала лёгкие проверки (заголовок, имена, значения атрибутов), потом средние (обход элементов, сопоставление с таблицами), тяжёлые — в конце (геометрия, 3D-пересечения). Внутри веса — у кого больше зависимых проверок.</div>';
   if (S.view === 'paths') h += '<h4>Все пути</h4><div class="hint" style="margin-top:0">Слева — общий контейнер TRM, от него веером полосы: каждая — полный путь одного файла от первой проверки до последней. Одна и та же проверка повторяется в каждой полосе, где её проходит файл. <b style="color:var(--fail)">↤N</b> — нужны ещё проверки из других путей, <b style="color:var(--fail)">N↦</b> — результат нужен в других путях.</div>';
   if (S.view === 'branches') h += '<h4>Ветки по файлам</h4><div class="hint" style="margin-top:0">Дорожка — тип файла → раздел ЦИМ → подветка; цветная полоса слева — тип файла или раздел.'
@@ -2000,7 +1980,7 @@ function renderScenario() {
   if (!S.failed.size) { el.classList.remove('on'); return; }
   const sk = skippedSet();
   el.classList.add('on');
-  el.innerHTML = `<div>Сценарий: не прошли <b>${S.failed.size}</b> · не выполнятся <b>${sk.size}</b> из ${G.nodes.length} (правило: ${S.variant === 'A' ? 'жёсткое' : 'смягчённое'})</div><button class="btn flat" id="scenClear">Сбросить</button>`;
+  el.innerHTML = `<div>Сценарий: не прошли <b>${S.failed.size}</b> · не выполнятся <b>${sk.size}</b> из ${G.nodes.length}</div><button class="btn flat" id="scenClear">Сбросить</button>`;
   $('#scenClear').addEventListener('click', () => { S.failed.clear(); render(); });
 }
 
@@ -2023,18 +2003,16 @@ function renderDetail() {
   const sk = skippedSet();
   let h = `<span class="x" id="dx">×</span>
     <div class="code">${esc(n.label)}</div><div class="title">${esc(n.n)}</div>
-    <div class="tags"><span class="tag">${esc(ftOf(n.id) === 'ifc' ? G.sections[n.sec] : G.branches.types[ftOf(n.id)])}</span><span class="tag">${runTag(n)}</span><span class="tag">${esc(G.statuses[n.st])}</span><span class="tag">${esc(G.families[n.fam])}</span></div>
+    <div class="tags"><span class="tag">${esc(ftOf(n.id) === 'ifc' ? G.sections[n.sec] : G.branches.types[ftOf(n.id)])}</span><span class="tag">${esc(G.statuses[n.st])}</span><span class="tag">${esc(G.families[n.fam])}</span></div>
     <div class="desc">${esc(n.d)}</div>
     <div style="color:var(--muted);font-size:12px">Пункт требований: ${esc(n.p)}</div>`;
   if (sk.has(n.id)) h += `<div class="box danger">В текущем сценарии эта проверка <b>не выполнится</b>: один из её предков не прошёл.</div>`;
   h += `<div class="sub">Каскад</div><div class="kv">
     <span>Слой (порядок выполнения)</span><b>${n.depth}</b>
     <span>Место в очереди слоя</span><b>${QRANK[n.id].i + 1} из ${QRANK[n.id].n} · ${W_NAME[n.w]}</b>
-    <span>Должны пройти раньше (предков)${S.variant === 'A' ? ' ◀' : ''}: жёстко</span><b>${n.A.anc.length}</b>
-    <span>Должны пройти раньше (предков)${S.variant === 'B' ? ' ◀' : ''}: смягчённо</span><b>${n.B.anc.length}</b>
-    <span>Не выполнится при провале: жёстко</span><b style="color:${dA ? 'var(--fail)' : 'inherit'}">${dA}</b>
-    <span>Не выполнится при провале: смягчённо</span><b>${dB}</b></div>`;
-  if (n.amb) h += `<div class="box amb"><b>⚠ Внимание.</b> ${esc(n.amb)}${m.desc.length ? `<br><br>Проверка родительская: если при сомнении она вернёт false, каскадом не выполнятся ещё <b>${m.desc.length}</b> дочерних (при выбранном правиле).` : ''}</div>`;
+    <span>Должны пройти раньше (предков)</span><b>${n.A.anc.length}</b>
+    <span>Не выполнится при провале</span><b style="color:${dA ? 'var(--fail)' : 'inherit'}">${dA}</b></div>`;
+  if (n.amb) h += `<div class="box amb"><b>⚠ Внимание.</b> ${esc(n.amb)}${m.desc.length ? `<br><br>Проверка родительская: если при сомнении она вернёт false, каскадом не выполнятся ещё <b>${m.desc.length}</b> дочерних.` : ''}</div>`;
   if (n.logic) h += `<div class="box logic"><b>Предполагаемая логика.</b> ${esc(n.logic)}</div>`;
   if (n.note) h += `<div class="box note">${esc(n.note)}</div>`;
   h += `<div class="btns" style="margin:10px 0 0"><button class="btn ${failed ? 'danger' : ''}" id="toggleFail">${failed ? 'Убрать из сценария отказа' : 'Сымитировать провал'}</button></div>`;
@@ -2092,21 +2070,18 @@ function insights() {
   E.filter(e => !e.implicit).forEach(e => bas[e.b]++);
   const explicit = E.filter(e => !e.implicit).length;
 
-  list.push({ t: 'С чего начинать: проверки без родителей',
-    p: `При жёстком правиле дерево одно: всё вырастает из ${lab('IFC-96')}, затем ${lab('IFC-01')} блокирует остальные ${N['IFC-01'].A.desc.length} файловых проверок. При смягчённом правиле стартовых (независимых) проверок несколько — их можно разрабатывать и запускать параллельно:`,
-    h: chips(rootsB) });
   list.push({ t: 'Второй эшелон: зависят только от допуска',
     p: `Эти проверки не ждут никого, кроме читаемости файла — их можно начинать сразу после ${lab('IFC-01')}, не дожидаясь остальных (${second.length}):`,
     h: chips(second) });
   list.push({ t: 'Хабы: где каскад самый широкий (кроме допуска)',
-    p: 'Если такая проверка не прошла, при жёстком правиле не выполнятся все её потомки. Чем шире хаб, тем важнее, чтобы его исход был однозначным и точным:',
-    h: '<div class="chips">' + hubs.map(n => `<a class="chip" data-id="${n.id}">${esc(n.label)} · ${n.A.desc.length}→${n.B.desc.length}</a>`).join('') + '</div><div class="lab">в подписи: потомков при жёстком → при смягчённом правиле</div>' });
+    p: 'Если такая проверка не прошла, не выполнятся все её потомки. Чем шире хаб, тем важнее, чтобы его исход был однозначным и точным:',
+    h: '<div class="chips">' + hubs.map(n => `<a class="chip" data-id="${n.id}">${esc(n.label)} · ${n.A.desc.length}</a>`).join('') + '</div><div class="lab">в подписи: потомков</div>' });
   list.push({ t: 'Хрупкие листья: сколько всего должно пройти',
-    p: `Дочерняя проверка запускается, только если прошли все её предки. Например, ${lab(fragile[0].id)} выполнится, лишь когда пройдут ещё ${fragile[0].A.anc.length} проверок; при смягчённом правиле — ${fragile[0].B.anc.length}. На реальных комплектах, где ошибки почти всегда есть, пользователь может так и не увидеть результат по ТЭП — это надо учитывать при выборе правила и порядка реализации.`,
-    h: '<div class="chips">' + fragile.map(n => `<a class="chip" data-id="${n.id}">${esc(n.label)} · ${n.A.anc.length}→${n.B.anc.length}</a>`).join('') + '</div><div class="lab">в подписи: предков при жёстком → при смягчённом правиле</div>' });
+    p: `Дочерняя проверка запускается, только если прошли все её предки. Например, ${lab(fragile[0].id)} выполнится, лишь когда пройдут ещё ${fragile[0].A.anc.length} проверок. На реальных комплектах, где ошибки почти всегда есть, пользователь может так и не увидеть результат по ТЭП — это надо учитывать при выборе порядка реализации.`,
+    h: '<div class="chips">' + fragile.map(n => `<a class="chip" data-id="${n.id}">${esc(n.label)} · ${n.A.anc.length}</a>`).join('') + '</div><div class="lab">в подписи: предков</div>' });
   list.push({ t: 'Родители с пометкой «обратить внимание» — главная точка риска',
     p: `По принятому подходу при сомнении родитель отдаёт false, а значит каскадом гасит потомков. У ${ambPar.length} родительских проверок есть пометка «обратить внимание». Сначала стоит доопределить именно их исходы (или вынести спорную часть в предупреждение, не в вердикт):`,
-    h: '<div class="chips">' + ambPar.map(n => `<a class="chip" data-id="${n.id}">${esc(n.label)} · ${n.A.desc.length}</a>`).join('') + '</div><div class="lab">в подписи: потомков при жёстком правиле</div>' });
+    h: '<div class="chips">' + ambPar.map(n => `<a class="chip" data-id="${n.id}">${esc(n.label)} · ${n.A.desc.length}</a>`).join('') + '</div><div class="lab">в подписи: потомков</div>' });
   list.push({ t: `${lab('IFC-45')} — только комплектность, не маршрутизатор`,
     p: `Она выдаёт вердикт о комплектности (есть ли ЦИМ ПС и АР) и в графе — лист. Раздел каждого файла проверки ПС и АР берут сами из поля 4 «Шифр ЦИМ» имени файла, поэтому false по комплектности (например, нет ПС) не блокирует проверки файлов АР.`,
     h: chips(['IFC-45', 'IFC-11-19']) });
@@ -2114,14 +2089,11 @@ function insights() {
     p: `Для определения раздела нужен только один фрагмент имени — «ЦИМ», но ошибка в любом из девяти фрагментов делает группу false. Дальше по цепочке — ${N['IFC-11-19'].A.desc.length} проверок. Стоит отделить разбор имени (раздел файла — данные для всех проверок по разделам и для ${lab('IFC-45')}) от оценки корректности каждого поля.`,
     h: '' });
   list.push({ t: 'Своды — не родители',
-    p: `${lab('IFC-44')} и ${lab('IFC-21')} собирают статусы других проверок. При жёстком каскаде они пропускались бы при любом падении родителей и теряли смысл, поэтому в модели они помечены как «свод» и в каскаде не участвуют — их вердикт считается по статусам.`,
+    p: `${lab('IFC-44')} и ${lab('IFC-21')} собирают статусы других проверок. При каскаде они пропускались бы при любом падении родителей и теряли смысл, поэтому в модели они помечены как «свод» и в каскаде не участвуют — их вердикт считается по статусам.`,
     h: chips(['IFC-44', 'IFC-21']) });
   list.push({ t: 'Общие правила чтения — не проверки-блокеры',
     p: `${lab('IFC-72')}, ${lab('IFC-73')}, ${lab('IFC-95')} описывают, как читать имена наборов и значения. Их лучше реализовать общей функцией чтения, а не родителями: иначе одна неверная приставка набора спрячет содержательные ошибки атрибутных проверок.`,
     h: chips(['IFC-72', 'IFC-73', 'IFC-95']) });
-  list.push({ t: 'Передача данных вместо вердиктов',
-    p: `Из ${explicit} связей ${dataEdges} — «передача данных» (карта «элемент → строка приложения», выборка элементов АР, раздел файла, подземность уровня, единицы), и только ${verdictEdges} — связи, где нужен вердикт родителя. Если данные хранить в общем контексте разбора файла и не блокировать по вердикту, каскад сокращается радикально (см. рейтинг: потомков при жёстком → смягчённом правиле). Цена: каждая дочерняя проверка сама обязана вернуть false с понятной причиной, если входных данных нет.`,
-    h: '' });
   list.push({ t: 'Укрупнение проверок расширяет каскад',
     p: `Объединение проверок (например, ${lab('IFC-22')}, ${lab('IFC-23')}, ${lab('IFC-24')} в одну «координацию» или ${lab('IFC-96')} с ${lab('IFC-01')}) делает родителя шире: любой сбой одной части блокирует всё, что зависит от остальных. Мелкие проверки — меньший радиус, но больше связей.`,
     h: chips(['IFC-22', 'IFC-23', 'IFC-24', 'IFC-96', 'IFC-01']) });
@@ -2154,14 +2126,14 @@ function glossary() {
     { t: 'Подпись связи', p: 'Если навести мышь на любую линию, появится подпись: какие проверки она соединяет, что передаёт родитель дочерней, зачем эта связь нужна и что будет с дочерней, если родитель не прошёл.' },
     { t: 'Слой', p: 'Столбец на схеме «Каскад» и «Дорожки». Слой проверки — это длина самой длинной цепочки её родителей: чем правее проверка, тем больше проверок в принципе должно быть выполнено до неё. Слой 0 — проверки совсем без родителей.' },
     { t: 'Развёртка слоёв и очередь в слое', p: 'Внутри одного слоя проверки друг от друга не зависят, но порядок всё равно есть: сверху вниз — очередь выполнения. Сначала лёгкие проверки (заголовок файла, имена, значения атрибутов, система координат, отметки), потом средние (обход элементов, сопоставление с таблицами приложений), в конце тяжёлые (геометрия, топология, 3D-пересечения, расчёты по телам): если не прошла лёгкая проверка, тяжёлую нет смысла запускать и нагружать сервис. Внутри одного веса — сначала те, от которых зависит больше проверок. Ползунок «Развёртка слоёв» (по умолчанию 20 столбцов) раскладывает эту очередь вправо: слой 3 становится столбцами 3а, 3б, 3в…, до конца вправо весь граф вытягивается в одну линию. Стрелок назад при этом не появляется.' },
-    { t: 'Правило каскада: «жёстко» и «смягчённо»', p: 'Переключатель наверху страницы. Он не меняет граф, а меняет только то, что считается блокирующей связью для сценария отказа и для колонок «потомков / предков» в карточке и рейтинге.<br><br><b>Жёстко</b> — как сейчас принято для первого выпуска сервиса: любая родительская проверка, которая не прошла, блокирует все дочерние, какая бы ни была связь между ними.<br><br><b>Смягчённо</b> — блокируют только связи «допуск» и «смысловая предпосылка», то есть там, где дочерней проверке правда нужен вердикт родителя. Связи «данные», «выбор файлов по разделу» и «правило» не блокируют: считается, что дочерняя сама вернёт отрицательный результат с понятной причиной, если нужных ей данных не нашлось.' },
+    { t: 'Правило каскада', p: 'Одно для всех: если проверка не прошла хотя бы для одного файла или раздела, она не прошла целиком, и все её дочерние проверки не выполняются — дальше по цепочке ничего не пропускается. Исключение — своды (IFC-21, IFC-44): они собирают итог и в каскаде не участвуют.' },
     { t: 'Виды связей между проверками', p: 'Стрелка на схеме — не просто «после», а конкретная зависимость одного из шести видов:', h: `<div style="margin-top:4px">${kindLi}</div>` },
-    { t: 'Обратить внимание', p: 'Значок ⚠ сразу после номера проверки и жёлтая плашка «Внимание» в карточке: там записан открытый вопрос. Значит: у этой проверки есть ситуации, где по имеющимся данным нельзя однозначно сказать «пройдено» или «не пройдено» — например, что-то в модели можно понять двумя способами, нормативный порог не задан явно, или нужного признака в модели просто нет. Пример — открытый вопрос в самой карточке. Если такая проверка ещё и родительская, при жёстком правиле сомнение каскадом гасит все её дочерние проверки — сколько именно, видно в самой карточке.' },
+    { t: 'Обратить внимание', p: 'Значок ⚠ сразу после номера проверки и жёлтая плашка «Внимание» в карточке: там записан открытый вопрос. Значит: у этой проверки есть ситуации, где по имеющимся данным нельзя однозначно сказать «пройдено» или «не пройдено» — например, что-то в модели можно понять двумя способами, нормативный порог не задан явно, или нужного признака в модели просто нет. Пример — открытый вопрос в самой карточке. Если такая проверка ещё и родительская, сомнение каскадом гасит все её дочерние проверки — сколько именно, видно в самой карточке.' },
     { t: 'Основание связи: «в аналитике» / «по коду» / «предположение»', p: 'Серый или жёлтый значок рядом с каждой связью в карточке проверки — откуда взята эта связь.<br><br><b>«в аналитике»</b> — прямо написано в карточке проверки или в командной аналитике.<br><b>«по коду»</b> — не написано явно, но видно по тому, как связь реализована в существующем коде.<br><b>«предположение»</b> (жёлтый) — связь для проверки, у которой ещё нет ни кода, ни аналитики: логика продумана по смыслу нормы, но не подтверждена, стоит перепроверить, когда аналитика появится.' },
     { t: 'Статус реализации проверки', p: 'Кружок в правом верхнем углу карточки на схеме.<br><br>🟢 заполненный — <b>реализована</b> в коде.<br>🟡 заполненный — <b>в работе / переработке</b>.<br>⚪ пунктирная обводка — <b>есть аналитика, кода нет</b>.<br>⚪ пунктирная обводка тоньше, рамка карточки штрихом — <b>аналитики нет, логика предположена</b> (в карточке — раздел «Предполагаемая логика»: как эта проверка могла бы работать и что бы использовала от других).' },
     { t: '«Предполагаемая логика» в карточке', p: 'Появляется только у проверок без аналитики. Это не задание и не решение по существу — черновая гипотеза, как проверку можно было бы реализовать и какие данные других проверок для этого понадобились бы, чтобы граф не обрывался в пустоте там, где норма в требованиях уже есть, а разбора ещё нет.' },
-    { t: 'Сценарий отказа', p: 'Кнопка «Сымитировать провал» в карточке проверки. Отмечает проверку как не прошедшую и подсвечивает штриховкой всё, что перестанет выполняться по цепочке при выбранном правиле каскада (жёстко/смягчённо). Внизу экрана появляется счётчик; сценарий можно расширять, отмечая ещё проверки, и сбросить одной кнопкой.' },
-    { t: 'Потомков / предков (в карточке и в «Рейтинге»)', p: '«Потомков» — сколько проверок перестанет выполняться, если эта не пройдёт (при выбранном правиле). «Предков» — сколько проверок должно пройти раньше, чтобы эта вообще запустилась. В «Рейтинге» оба правила показаны рядом, чтобы было видно разницу.' },
+    { t: 'Сценарий отказа', p: 'Кнопка «Сымитировать провал» в карточке проверки. Отмечает проверку как не прошедшую и подсвечивает штриховкой всё, что перестанет выполняться по цепочке. Внизу экрана появляется счётчик; сценарий можно расширять, отмечая ещё проверки, и сбросить одной кнопкой.' },
+    { t: 'Потомков / предков (в карточке и в «Рейтинге»)', p: '«Потомков» — сколько проверок перестанет выполняться, если эта не пройдёт. «Предков» — сколько проверок должно пройти раньше, чтобы эта вообще запустилась.' },
     { t: 'Своды', p: 'Проверки вроде «все параметры заполнены», которые не проверяют что-то своё, а просто собирают статусы других проверок в один общий результат. На схеме связи к ним идут пунктиром и подписаны «свод» — такие связи никогда не блокируют, при любом правиле каскада. По умолчанию скрыты вместе с запросами данных — галочка «Запрос данных».' },
     { t: 'Допуск IFC-01', p: 'Скрытая по умолчанию связь: почти всем проверкам, которым нужна разобранная модель, добавлена связь-допуск от IFC-01 (файл вообще должен читаться). Таких связей больше полусотни, поэтому они спрятаны, чтобы не загромождать схему — включаются галочкой «Допуск IFC-01 ко всем проверкам». Если IFC-01 — единственный родитель проверки, линия видна всегда, иначе проверка выглядела бы висящей без родителей.' },
     { t: 'Вид «Все пути»', p: 'Все возможные пути движения по графу сразу. Слева — один контейнер TRM (общее начало), от него веером расходятся полосы: путь файла ЦИМ ПС, путь ЦИМ АР, путь ЦИМ ПС + АР вместе, путь ЦИМ БФ, путь XML, путь аннотаций BCF, путь 2D-документации. В каждой полосе — полная копия всех проверок, которые этот файл проходит, от IFC-01 до последнего узла, со своими связями и своим счётчиком; общие проверки повторяются в каждой полосе. В полосах ПС и АР есть и совместные проверки (классы, реквизиты участка, ТЭП, своды) — у них метка ↤N: нужны ещё проверки из другого пути. Метка N↦ — результат проверки нужен в других путях. Полосы включаются и выключаются в левой панели, «только» — одна полоса.' },
@@ -2231,7 +2203,7 @@ async function copyTable() {
 function writeHash() {
   try {
     const p = new URLSearchParams();
-    p.set('view', S.view); p.set('rule', S.variant);
+    p.set('view', S.view);
     if (S.cols !== 20) p.set('cols', S.cols);
     if (S.cnt) p.set('cnt', S.cnt);
     if (S.cnt && S.cntMid !== 40) p.set('mid', S.cntMid);
@@ -2245,7 +2217,6 @@ function writeHash() {
     if (S.view === 'branches') {
       if (!S.brDisc) p.set('bdisc', 0);
       if (!S.brSub) p.set('bsub', 0);
-      if (S.brDup) p.set('bdup', 1);
       if (S.brSel && S.brSel !== S.sel) p.set('bsel', S.brSel);
       if (S.brOn) p.set('bon', [...S.brOn].join(','));
       if (!S.brAnc) p.set('banc', 0);
@@ -2266,7 +2237,7 @@ function readHash() {
   if (['cascade', 'lanes', 'branches', 'paths', 'matrix', 'rank', 'facts', 'npa'].includes(p.get('view'))) S.view = p.get('view');
   if (p.get('paoff')) S.paOff = new Set(p.get('paoff').split(',').filter(Boolean));
   if (p.get('psel')) S.paSel = p.get('psel');
-  S.brDisc = p.get('bdisc') !== '0'; S.brSub = p.get('bsub') !== '0'; S.brDup = p.get('bdup') === '1';
+  S.brDisc = p.get('bdisc') !== '0'; S.brSub = p.get('bsub') !== '0';
   if (p.get('bsel')) S.brSel = p.get('bsel');
   if (p.get('bon')) S.brOn = new Set(p.get('bon').split(',').filter(Boolean));
   S.brAnc = p.get('banc') !== '0'; S.brDesc = p.get('bdesc') !== '0';
@@ -2274,7 +2245,6 @@ function readHash() {
   if (p.get('nsel') && NPA_C[p.get('nsel')]) S.npaSel = p.get('nsel');
   // Архивный граф недоступен: старые ссылки открывают карточный вид.
   if (p.get('view') === 'factsGraph') S.view = 'facts';
-  if (['A', 'B'].includes(p.get('rule'))) S.variant = p.get('rule');
   if (['next', 'all'].includes(p.get('cnt'))) S.cnt = p.get('cnt');
   S.files = new Set((p.get('file') || '').replace('psar', 'ps,ar').split(',').filter(k => FILE_KEYS.includes(k)));
   const midN = +p.get('mid');
@@ -2294,7 +2264,6 @@ function bind() {
   $('#npaPsAr').addEventListener('change', e => { S.npaPsAr = e.target.checked; render({ fit: true }); });
   $('#brDisc').addEventListener('change', e => { S.brDisc = e.target.checked; render({ fit: true }); });
   $('#brSub').addEventListener('change', e => { S.brSub = e.target.checked; render({ fit: true }); });
-  $('#brDup').addEventListener('change', e => { S.brDup = e.target.checked; render({ fit: true }); });
   $('#brAnc').addEventListener('change', e => { S.brAnc = e.target.checked; render({ fit: true }); });
   $('#brDesc').addEventListener('change', e => { S.brDesc = e.target.checked; render({ fit: true }); });
   $('#brAll').addEventListener('click', () => { S.brOn = null; render({ fit: true }); });
@@ -2311,12 +2280,10 @@ function bind() {
     applyFileDisc(); renderLegend(); writeHash();
   }));
   document.addEventListener('click', ev => { if (!$('#filePick').contains(ev.target)) $('#filePick').classList.remove('open'); });
-  document.querySelectorAll('#ruleSeg button').forEach(b => b.addEventListener('click', () => { S.variant = b.dataset.v; render({ relayout: false }); }));
   $('#cntMid').addEventListener('input', e => { S.cntMid = +e.target.value; restyle(); writeHash(); });
   document.querySelectorAll('#cntSeg button').forEach(b => b.addEventListener('click', () => {
     S.cnt = b.dataset.v; restyle(); renderSidebarState(); renderLegend(); writeHash();
   }));
-  [$('#vA'), $('#vB')].forEach(c => c.addEventListener('click', () => { S.variant = c.dataset.v; render(); }));
   $('#fit').addEventListener('click', () => fit(true));
   $('#colorBy').addEventListener('change', e => { S.colorBy = e.target.value; render({ relayout: false }); });
   $('#stepsSlider').addEventListener('input', e => { S.cols = +e.target.value; render({ fit: true, relayout: true }); });
