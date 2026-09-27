@@ -452,9 +452,9 @@
 <div id="modal"><div class="win"><header><div><h2 id="modalTitle">Выводы анализа</h2><small id="insSub"></small></div><span class="x" id="closeModal">×</span></header><div class="body" id="insBody"></div></div></div>
 
 <script src="vendor/d3.v7.min.js"></script>
-<script src="data.js?v=39"></script>
-<script src="facts.js?v=39"></script>
-<script src="npa.js?v=39"></script>
+<script src="data.js?v=40"></script>
+<script src="facts.js?v=40"></script>
+<script src="npa.js?v=40"></script>
 <script>
 (() => {
 'use strict';
@@ -798,6 +798,10 @@ function secTag(g, h) {
     });
   });
 }
+// как запускается: IFC — один раз по файлам своих разделов вместе или по каждому файлу отдельно
+const SEC_FILES = { all: 'АР, ПС и БФ', both: 'АР и ПС', ar: 'АР', ps: 'ПС' };
+const runTag = n => ftOf(n.id) !== 'ifc' ? (n.sc === 'batch' ? 'комплект ' + EXT[ftOf(n.id)] : 'по файлам')
+  : n.sc === 'batch' ? 'один запуск: файлы ' + SEC_FILES[n.sec] + ' вместе' : 'каждый файл отдельно';
 const trunc = (s, n) => s.length > n ? s.slice(0, n - 1) + '…' : s;
 
 function nodeShape(g) {
@@ -2019,7 +2023,7 @@ function renderDetail() {
   const sk = skippedSet();
   let h = `<span class="x" id="dx">×</span>
     <div class="code">${esc(n.label)}</div><div class="title">${esc(n.n)}</div>
-    <div class="tags"><span class="tag">${esc(ftOf(n.id) === 'ifc' ? G.sections[n.sec] : G.branches.types[ftOf(n.id)])}</span><span class="tag">${n.sc === 'batch' ? 'комплект ' + (ftOf(n.id) === 'ifc' ? 'IFC' : EXT[ftOf(n.id)]) : 'по файлам'}</span><span class="tag">${esc(G.statuses[n.st])}</span><span class="tag">${esc(G.families[n.fam])}</span></div>
+    <div class="tags"><span class="tag">${esc(ftOf(n.id) === 'ifc' ? G.sections[n.sec] : G.branches.types[ftOf(n.id)])}</span><span class="tag">${runTag(n)}</span><span class="tag">${esc(G.statuses[n.st])}</span><span class="tag">${esc(G.families[n.fam])}</span></div>
     <div class="desc">${esc(n.d)}</div>
     <div style="color:var(--muted);font-size:12px">Пункт требований: ${esc(n.p)}</div>`;
   if (sk.has(n.id)) h += `<div class="box danger">В текущем сценарии эта проверка <b>не выполнится</b>: один из её предков не прошёл.</div>`;
