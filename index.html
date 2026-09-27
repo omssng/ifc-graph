@@ -12,7 +12,7 @@
     --chipbg:#e7ebf3; --chipbd:#c2ccdd; --chipink:#3a465c;
     --anc:#2f6fed; --desc:#e0791a; --fail:#d64545; --ok:#2f9e58; --warn:#e3a51b;
     --lane1:rgba(120,130,150,.06); --lane2:rgba(120,130,150,.0);
-    --s-pkg:#2f3646; --s-all:#aeb6c4; --s-ps:#12a57a; --s-ar:#e5334f; --on-pkg:#ffffff; --on-tag:#ffffff; --hl:#aab1bd; --s-both:linear-gradient(180deg, var(--s-ps) 50%, var(--s-ar) 50%);
+    --s-pkg:#2f3646; --s-all:#aeb6c4; --s-ps:#12a57a; --s-ar:#e5334f; --on-pkg:#ffffff; --on-tag:#ffffff; --hl:#6b7280; --glow:#1d2330; --s-both:linear-gradient(180deg, var(--s-ps) 50%, var(--s-ar) 50%);
     --k-gate:#a33a3a; --k-logic:#e08a1e; --k-scope:#3d7fd6; --k-data:#7d8798; --k-rule:#8b5fd1; --k-agg:#9aa1ad;
     --r-parent:#e25555; --r-dep:#e0a82a; --r-lonely:#3f9ad6; --chg:#8b4fc6;
     --t-trm:#6b778c; --t-xml:#d08a12; --t-bcf:#a855c8; --t-dwg:#1f8fc4; --t-bf:#5b5fd6;
@@ -23,7 +23,7 @@
       --chipbg:#293040; --chipbd:#3b4557; --chipink:#c3cde0;
       --anc:#5b8cff; --desc:#ff9d3d; --fail:#ff6b6b; --ok:#4cc27a; --warn:#f0b93a;
       --lane1:rgba(160,170,190,.06);
-      --s-pkg:#8c95aa; --s-all:#e3e7ee; --s-ps:#34d19f; --s-ar:#ff5a72; --on-pkg:#12151c; --on-tag:#10131a; --hl:#d5dae2; --s-both:linear-gradient(180deg, var(--s-ps) 50%, var(--s-ar) 50%);
+      --s-pkg:#8c95aa; --s-all:#e3e7ee; --s-ps:#34d19f; --s-ar:#ff5a72; --on-pkg:#12151c; --on-tag:#10131a; --hl:#ffffff; --glow:#ffffff; --s-both:linear-gradient(180deg, var(--s-ps) 50%, var(--s-ar) 50%);
       --k-gate:#e06b6b; --k-logic:#f0a04a; --k-scope:#5b8cff; --k-data:#8d97a8; --k-rule:#a586e8; --k-agg:#6d7686;
       --r-parent:#ff7a7a; --r-dep:#f0c050; --r-lonely:#6ab8f0; --chg:#c49bff;
       --t-trm:#9aa5b8; --t-xml:#f2b544; --t-bcf:#cf8cf0; --t-dwg:#56bdf0; --t-bf:#9395ff; }
@@ -94,6 +94,8 @@
   .fork.lvl1{margin-left:18px}
   #fit{position:absolute;top:12px;left:50%;transform:translateX(-50%);z-index:7}
   #openInsights{position:absolute;bottom:12px;left:50%;transform:translateX(-50%);z-index:7}
+  .glos{display:inline-block;margin-top:8px;color:var(--accent);cursor:pointer;font-size:12px}
+  .glos:hover{text-decoration:underline}
   #legend .glos{display:inline-block;margin-top:8px;color:var(--accent);cursor:pointer;font-size:12px}
   #legend .glos:hover{text-decoration:underline}
   .btn{border:1px solid var(--line);background:var(--panel);color:var(--ink);border-radius:8px;padding:7px 10px;cursor:pointer;font-size:12px;box-shadow:var(--shadow)}
@@ -182,7 +184,7 @@
   .node .cnt rect{fill:var(--chipbg);stroke:var(--chipbd);stroke-width:1}
   .node .cnt text{font:700 10.5px ui-monospace,"SF Mono",Menlo,Consolas,monospace;fill:var(--chipink);font-variant-numeric:tabular-nums}
   .node:hover .card{stroke:var(--accent)}
-  .node.sel .card{stroke:var(--hl);stroke-width:3}
+  .node.sel .card{stroke:var(--hl);stroke-width:3;filter:drop-shadow(0 0 4px var(--hl))}
   .node.anc .card,.node.desc .card{stroke:var(--hl);stroke-width:1.8}
   .node.match .card{stroke:var(--warn);stroke-width:3}
   .node.dim{opacity:.2}
@@ -194,9 +196,9 @@
   .node.skipped .cross{fill:var(--muted)}
   .edge{fill:none;stroke-width:1.35;opacity:.42;pointer-events:none}
   .edge.g01{opacity:.21}
-  .edge.hov{opacity:1!important;stroke-width:2.8}
+  .edge.hov{opacity:1!important;stroke-width:3.2;filter:brightness(1.35)}
   .ehit{fill:none;stroke:transparent;stroke-width:12;pointer-events:stroke;cursor:help}
-  .node.ehl .card{stroke:var(--accent);stroke-width:2.4}
+  .node.ehl .card{stroke:var(--glow);stroke-width:2.6}
   .node .qf{font-size:9.5px;font-weight:600;letter-spacing:.01em}
   .node .qf.first{fill:var(--ok)}
   .node .qf.last{fill:var(--warn)}
@@ -383,10 +385,9 @@
     </div>
 
     <fieldset>
-      <div class="btns">
-        <button class="btn flat" id="exportSvg">Скачать SVG</button>
-      </div>
-      <div class="hint">Слева направо — от родительских проверок к дочерним: чем правее, тем больше проверок должно быть выполнено раньше. Пунктирная рамка и штрих — логика проверки ещё не написана, связи предположены.</div>
+      <div class="hint">Слева направо — от родительских проверок к дочерним: чем правее, тем больше проверок должно быть выполнено раньше.</div>
+      <div class="hint">Пунктирная рамка и штрих — логика проверки ещё не написана, связи предположены.</div>
+      <a id="exportSvg" class="glos">Скачать SVG</a>
     </fieldset>
   </div>
 </aside>
@@ -424,9 +425,9 @@
 <div id="modal"><div class="win"><header><div><h2 id="modalTitle">Выводы анализа</h2><small id="insSub"></small></div><span class="x" id="closeModal">×</span></header><div class="body" id="insBody"></div></div></div>
 
 <script src="vendor/d3.v7.min.js"></script>
-<script src="data.js?v=53"></script>
-<script src="facts.js?v=53"></script>
-<script src="npa.js?v=53"></script>
+<script src="data.js?v=54"></script>
+<script src="facts.js?v=54"></script>
+<script src="npa.js?v=54"></script>
 <script>
 (() => {
 'use strict';
@@ -1501,7 +1502,7 @@ function render(opts) {
   $('#factsView').style.display = isFacts ? 'block' : 'none';
   if (isFacts) {
     $('#svg').style.display = 'none'; $('#rank').style.display = 'none';
-    $('#fit').style.display = 'none'; $('#exportSvg').disabled = true;
+    $('#fit').style.display = 'none'; $('#exportSvg').style.display = 'none';
     renderSidebarState();
     $('#legend').style.display = 'none'; $('#scen').style.display = 'none';
     $('#detail').classList.remove('on');
@@ -1513,7 +1514,7 @@ function render(opts) {
   $('#svg').style.display = isSvg ? 'block' : 'none';
   $('#rank').style.display = isSvg ? 'none' : 'block';
   $('#fit').style.display = isSvg ? '' : 'none';
-  $('#exportSvg').disabled = !isSvg;
+  $('#exportSvg').style.display = isSvg ? '' : 'none';
   if (isSvg) {
     setupSvg();
     if (S.view === 'cascade') drawLayered(false);
