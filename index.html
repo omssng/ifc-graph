@@ -92,7 +92,6 @@
   .fork a{color:var(--accent);font-size:11px;cursor:pointer;visibility:hidden}
   .fork:hover a{visibility:visible}
   .fork.lvl1{margin-left:18px}
-  #fit{position:absolute;top:12px;left:50%;transform:translateX(-50%);z-index:7}
   #openInsights{position:absolute;bottom:12px;left:50%;transform:translateX(-50%);z-index:7}
   /* описание вида и ссылки — по левому краю текста галочек «Показывать», тем же кеглем, что их пояснения */
   #viewDesc,#filtBtn,#exportSvg{margin-left:28px}
@@ -113,8 +112,8 @@
   #svg{width:100%;height:100%;display:block;cursor:grab}
   #svg:active{cursor:grabbing}
   #rank{position:absolute;inset:0;overflow:auto;padding:76px 24px 40px;display:none}
-  .topbar{position:absolute;left:12px;right:12px;top:12px;z-index:6;display:flex;gap:8px;flex-wrap:wrap;align-items:center;pointer-events:none}
-  .topbar>*{pointer-events:auto}
+  .topbar{position:absolute;left:50%;top:12px;z-index:6;display:flex;gap:12px;align-items:center;pointer-events:none;margin-left:calc(var(--fitw, 90px) / -2)}
+  .topbar>*,#views>*{pointer-events:auto;flex:0 0 auto;white-space:nowrap}
   .seg{display:flex;gap:3px;background:var(--panel);border:1px solid var(--line);border-radius:9px;padding:3px;box-shadow:var(--shadow)}
   .seg button{border:0;background:transparent;color:var(--muted);padding:6px 10px;border-radius:6px;cursor:pointer;font-size:12px;white-space:nowrap}
   .seg button.on{background:var(--bg);color:var(--ink);font-weight:600}
@@ -407,7 +406,8 @@
   <div id="rank"></div>
   <div id="factsView"></div>
   <div class="topbar">
-    <div id="views" style="display:flex;gap:12px;flex-wrap:wrap">
+    <button class="btn" id="fit">К центру</button>
+    <div id="views" style="display:flex;gap:12px">
     <div class="seg" role="group" aria-label="Основные виды">
       <button data-v="cascade" class="on">Каскад</button>
       <button data-v="lanes" hidden>Дорожки</button>
@@ -423,7 +423,6 @@
     </div>
     <div class="pill" id="counter" style="display:none"></div>
   </div>
-  <button class="btn" id="fit">К центру</button>
   <input type="color" id="colPick" style="position:absolute;right:320px;bottom:220px;width:1px;height:1px;opacity:0;border:0;padding:0" tabindex="-1" aria-hidden="true">
   <button class="btn" id="openInsights">Выводы анализа</button>
   <div id="legend"></div>
@@ -436,9 +435,9 @@
 <div id="modal"><div class="win"><header><div><h2 id="modalTitle">Выводы анализа</h2><small id="insSub"></small></div><span class="x" id="closeModal">×</span></header><div class="body" id="insBody"></div></div></div>
 
 <script src="vendor/d3.v7.min.js"></script>
-<script src="data.js?v=61"></script>
-<script src="facts.js?v=61"></script>
-<script src="npa.js?v=61"></script>
+<script src="data.js?v=62"></script>
+<script src="facts.js?v=62"></script>
+<script src="npa.js?v=62"></script>
 <script>
 (() => {
 'use strict';
@@ -1513,7 +1512,7 @@ function render(opts) {
   $('#factsView').style.display = isFacts ? 'block' : 'none';
   if (isFacts) {
     $('#svg').style.display = 'none'; $('#rank').style.display = 'none';
-    $('#fit').style.display = 'none'; $('#exportSvg').style.display = 'none';
+    $('#fit').style.visibility = 'hidden'; $('#exportSvg').style.display = 'none';
     renderSidebarState();
     $('#legend').style.display = 'none'; $('#scen').style.display = 'none';
     $('#detail').classList.remove('on');
@@ -1524,7 +1523,7 @@ function render(opts) {
   const isSvg = S.view !== 'rank';
   $('#svg').style.display = isSvg ? 'block' : 'none';
   $('#rank').style.display = isSvg ? 'none' : 'block';
-  $('#fit').style.display = isSvg ? '' : 'none';
+  $('#fit').style.visibility = isSvg ? '' : 'hidden';
   $('#exportSvg').style.display = isSvg ? '' : 'none';
   if (isSvg) {
     setupSvg();
@@ -2080,6 +2079,7 @@ function bind() {
     S.cnt = b.dataset.v; restyle(); renderSidebarState(); renderLegend(); writeHash();
   }));
   $('#fit').addEventListener('click', () => fit(true));
+  document.documentElement.style.setProperty('--fitw', $('#fit').offsetWidth + 'px');
   $('#filtBtn').addEventListener('click', () => {
     const box = $('#filtBox'), open = box.style.display === 'none';
     box.style.display = open ? '' : 'none';
