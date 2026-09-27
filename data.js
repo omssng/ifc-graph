@@ -6995,11 +6995,7 @@ window.IFC_GRAPH = {
   "copy": {
    "ps": "all",
    "ar": "all",
-   "bf": [
-    "file",
-    "geom",
-    "coord"
-   ]
+   "bf": "all"
   }
  }
 };
