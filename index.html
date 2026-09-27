@@ -186,7 +186,7 @@
   .node .cnt rect{fill:var(--chipbg);stroke:var(--chipbd);stroke-width:1}
   .node .cnt text{font:700 10.5px ui-monospace,"SF Mono",Menlo,Consolas,monospace;fill:var(--chipink);font-variant-numeric:tabular-nums}
   .node:hover .card{stroke:var(--accent)}
-  .node.sel .card{stroke:var(--hl);stroke-width:3;filter:drop-shadow(0 0 4px var(--hl))}
+  .node.sel .card{stroke:var(--hl);stroke-width:3}
   .node.anc .card,.node.desc .card{stroke:var(--hl);stroke-width:1.8}
   .node.match .card{stroke:var(--warn);stroke-width:3}
   .node.dim{opacity:.2}
@@ -430,9 +430,9 @@
 <div id="modal"><div class="win"><header><div><h2 id="modalTitle">Выводы анализа</h2><small id="insSub"></small></div><span class="x" id="closeModal">×</span></header><div class="body" id="insBody"></div></div></div>
 
 <script src="vendor/d3.v7.min.js"></script>
-<script src="data.js?v=55"></script>
-<script src="facts.js?v=55"></script>
-<script src="npa.js?v=55"></script>
+<script src="data.js?v=56"></script>
+<script src="facts.js?v=56"></script>
+<script src="npa.js?v=56"></script>
 <script>
 (() => {
 'use strict';
@@ -1711,10 +1711,10 @@ function renderViewDesc() {
 // ───────── подбор цветов плашек (отладка палитры): клик по плашке в легенде ─────────
 const TAG_VAR = { ar: '--s-ar', ps: '--s-ps', bf: '--t-bf', trm: '--t-trm', xml: '--t-xml', bcf: '--t-bcf', dwg: '--t-dwg' };
 const COLOR_KEY = 'ifc-graph-colors';
-let userColors = {};
-try { userColors = JSON.parse(localStorage.getItem(COLOR_KEY) || '{}') || {}; } catch (e) { userColors = {}; }
+let userColors = {};   // живут до перезагрузки страницы, не сохраняются
+try { localStorage.removeItem(COLOR_KEY); } catch (e) { }
 const applyColors = () => Object.entries(userColors).forEach(([v, c]) => document.documentElement.style.setProperty(v, c));
-const saveColors = () => { try { localStorage.setItem(COLOR_KEY, JSON.stringify(userColors)); } catch (e) { } };
+const saveColors = () => { };
 const toHex = c => { const m = String(c).trim().match(/^#([0-9a-f]{3}){1,2}$/i); if (m) return c.trim().toLowerCase(); const r = String(c).match(/\d+/g); return r ? '#' + r.slice(0, 3).map(x => (+x).toString(16).padStart(2, '0')).join('') : '#000000'; };
 applyColors();
 function pickColor(k) {
