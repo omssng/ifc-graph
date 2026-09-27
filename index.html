@@ -12,7 +12,7 @@
     --chipbg:#e7ebf3; --chipbd:#c2ccdd; --chipink:#3a465c;
     --anc:#2f6fed; --desc:#e0791a; --fail:#d64545; --ok:#2f9e58; --warn:#e3a51b;
     --lane1:rgba(120,130,150,.06); --lane2:rgba(120,130,150,.0);
-    --s-pkg:#3f4756; --s-all:#b3bac6; --s-ps:#1f9d8b; --s-ar:#e8364f; --s-both:linear-gradient(180deg, var(--s-ps) 50%, var(--s-ar) 50%);
+    --s-pkg:#2b3140; --s-all:#aeb6c4; --s-ps:#0fb37f; --s-ar:#f0233f; --on-pkg:#ffffff; --s-both:linear-gradient(180deg, var(--s-ps) 50%, var(--s-ar) 50%);
     --k-gate:#a33a3a; --k-logic:#e08a1e; --k-scope:#3d7fd6; --k-data:#7d8798; --k-rule:#8b5fd1; --k-agg:#9aa1ad;
     --r-parent:#e25555; --r-dep:#e0a82a; --r-lonely:#3f9ad6; --chg:#8b4fc6;
     --t-trm:#8a94a6; --t-xml:#b7862a; --t-bcf:#c2457e; --t-dwg:#5f7d8c; --t-bf:#5c6bc0;
@@ -23,7 +23,7 @@
       --chipbg:#293040; --chipbd:#3b4557; --chipink:#c3cde0;
       --anc:#5b8cff; --desc:#ff9d3d; --fail:#ff6b6b; --ok:#4cc27a; --warn:#f0b93a;
       --lane1:rgba(160,170,190,.06);
-      --s-pkg:#6e7789; --s-all:#d2d7df; --s-ps:#3cc0ac; --s-ar:#ff5c70; --s-both:linear-gradient(180deg, var(--s-ps) 50%, var(--s-ar) 50%);
+      --s-pkg:#8c95aa; --s-all:#e3e7ee; --s-ps:#22d69a; --s-ar:#ff4760; --on-pkg:#12151c; --s-both:linear-gradient(180deg, var(--s-ps) 50%, var(--s-ar) 50%);
       --k-gate:#e06b6b; --k-logic:#f0a04a; --k-scope:#5b8cff; --k-data:#8d97a8; --k-rule:#a586e8; --k-agg:#6d7686;
       --r-parent:#ff7a7a; --r-dep:#f0c050; --r-lonely:#6ab8f0; --chg:#c49bff;
       --t-trm:#7d8798; --t-xml:#e0b050; --t-bcf:#f07aaa; --t-dwg:#8fb0c0; --t-bf:#8e9cf0; }
@@ -222,6 +222,18 @@
   .npaedge.dim{opacity:.12}
   .lanelabel.sub{font-weight:400;font-size:10px}
   .stripe.copy{fill:none!important;stroke-width:1.6}
+  /* раздел ЦИМ — плашка перед входом проводов в карточку (цвет по разделу) */
+  .node .sectag{display:none}
+  svg.bysec .node .sectag{display:inline}
+  svg.bysec .node .stripe:not(.copy){display:none}
+  .sectag text{font:700 9.5px system-ui,-apple-system,"Segoe UI",sans-serif;letter-spacing:.02em;text-anchor:middle}
+  .sectag .t-ps rect{fill:var(--s-ps)} .sectag .t-ps text{fill:#fff}
+  .sectag .t-ar rect{fill:var(--s-ar)} .sectag .t-ar text{fill:#fff}
+  .sectag .t-pkg rect{fill:var(--s-pkg)} .sectag .t-pkg text{fill:var(--on-pkg)}
+  .sectag .t-all rect{fill:var(--panel);stroke:var(--s-all);stroke-width:1.4} .sectag .t-all text{fill:var(--muted)}
+  .lgtag{display:inline-block;min-width:34px;padding:0 6px;border-radius:8px;font:700 9.5px/15px system-ui,sans-serif;text-align:center;margin-right:8px}
+  .lgtag.t-ps{background:var(--s-ps);color:#fff} .lgtag.t-ar{background:var(--s-ar);color:#fff} .lgtag.t-pkg{background:var(--s-pkg);color:var(--on-pkg)}
+  .lgtag.t-all{border:1.4px solid var(--s-all);color:var(--muted);line-height:12px} .lgtag.t-bf{border:1.4px dashed var(--s-all);color:var(--muted);line-height:12px}
   .node.ctx{opacity:.55}
   .node.off{filter:grayscale(1);opacity:.25}
   .node.off.sel{opacity:.6}
@@ -434,9 +446,9 @@
 <div id="modal"><div class="win"><header><div><h2 id="modalTitle">Выводы анализа</h2><small id="insSub"></small></div><span class="x" id="closeModal">×</span></header><div class="body" id="insBody"></div></div></div>
 
 <script src="vendor/d3.v7.min.js"></script>
-<script src="data.js?v=34"></script>
-<script src="facts.js?v=34"></script>
-<script src="npa.js?v=34"></script>
+<script src="data.js?v=35"></script>
+<script src="facts.js?v=35"></script>
+<script src="npa.js?v=35"></script>
 <script>
 (() => {
 'use strict';
@@ -751,6 +763,21 @@ const edgePath = (a, b) => {
   const dx = Math.max(30, (x2 - x1) * 0.5);
   return `M${x1},${y1}C${x1 + dx},${y1} ${x2 - dx},${y2} ${x2},${y2}`;
 };
+// плашка раздела слева от карточки, там, куда сходятся входящие провода; у «ПС + АР» — две плашки столбиком
+const SEC_TAG = { pkg: 'компл.', all: 'любой', ps: 'ПС', ar: 'АР' };
+function secTag(g, h) {
+  const t = g.append('g').attr('class', 'sectag');
+  t.each(function (d) {
+    const sec = N[d.base || d.id].sec, parts = sec === 'both' ? ['ps', 'ar'] : [sec];
+    let y = h / 2 - (parts.length * 17 - 2) / 2;
+    parts.forEach(p => {
+      const w = 8 + SEC_TAG[p].length * 6.2, el = d3.select(this).append('g').attr('class', 't-' + p);
+      el.append('rect').attr('x', -w - 3).attr('y', y).attr('width', w).attr('height', 15).attr('rx', 7.5);
+      el.append('text').attr('x', -w / 2 - 3).attr('y', y + 11).text(SEC_TAG[p]);
+      y += 17;
+    });
+  });
+}
 const trunc = (s, n) => s.length > n ? s.slice(0, n - 1) + '…' : s;
 
 function nodeShape(g) {
@@ -758,6 +785,7 @@ function nodeShape(g) {
   g.append('title').text(d => { const n = N[d.base || d.id]; return n.label + ' — ' + n.n + (d.copyOf ? '\nкопия общей проверки в разделе «' + d.copyOf + '»' : '') + (d.inPath ? '\n' + d.inPath : '') + ('\nвес: ' + W_NAME[n.w]) + (n.amb ? '\n⚠ ' + n.amb : ''); });
   g.append('rect').attr('class', 'card').attr('width', NW).attr('height', NH).attr('rx', 8);
   g.append('rect').attr('class', d => 'stripe' + (d.copyOf ? ' copy' : '')).attr('width', 5).attr('height', NH - 10).attr('x', 0).attr('y', 5).attr('rx', 2.5);
+  secTag(g, NH);
   const idt = g.append('text').attr('class', 'id').attr('x', 14).attr('y', 18);
   idt.append('tspan').text(d => N[d.base || d.id].label);
   idt.filter(d => N[d.base || d.id].amb).append('tspan').attr('dx', 5).attr('class', 'amb').text('⚠');
@@ -1724,6 +1752,7 @@ function render(opts) {
 }
 
 function restyle() {
+  svg.classed('bysec', S.colorBy === 'sec');
   if (S.view === 'npa') { npaRestyle(); return; }
   if (S.view === 'branches') { brRestyle(); applyFileDisc(); return; }
   if (S.view === 'paths') { paRestyle(); return; }
@@ -1908,7 +1937,8 @@ function renderLegend() {
   }
   const dotRow = (svgInner, t) => `<div class="li"><svg width="16" height="12" viewBox="0 0 16 12">${svgInner}</svg><span>${t}</span></div>`;
   if (S.view !== 'matrix') {
-    if (S.colorBy === 'sec') h += '<h4>Раздел ЦИМ</h4>' + secKeys.map(k => `<div class="li"><span class="sw" style="background:var(--s-${k})"></span>${esc(G.sections[k])}</div>`).join('');
+    if (S.colorBy === 'sec') h += '<h4>Раздел ЦИМ · плашка у входа</h4>' + secKeys.map(k => `<div class="li">${k === 'both' ? '<span class="lgtag t-ps" style="min-width:0;margin-right:3px">ПС</span><span class="lgtag t-ar" style="min-width:0">АР</span>' : `<span class="lgtag t-${k}">${SEC_TAG[k]}</span>`}${esc(G.sections[k])}</div>`).join('')
+      + '<div class="li"><span class="lgtag t-bf">БФ</span><span>ЦИМ БФ — своих проверок нет: к файлу БФ применяются все «любой»</span></div>';
     else if (S.colorBy === 'st') h += '<h4>Цвет — статус</h4>' + stKeys.map(k => `<div class="li"><span class="sw" style="background:${{ code: 'var(--ok)', work: 'var(--warn)', spec: 'var(--s-all)', idea: 'var(--dim)' }[k]}"></span>${esc(G.statuses[k])}</div>`).join('');
     else if (S.colorBy === 'blast') h += '<h4>Цвет — потомков при провале</h4><div class="li"><span class="sw" style="background:linear-gradient(90deg,var(--line),var(--fail));width:60px"></span>меньше → больше</div>';
     else h += '<h4>Цвет — обратить внимание</h4><div class="li"><span class="sw" style="background:var(--desc)"></span>⚠ у родительской проверки</div><div class="li"><span class="sw" style="background:var(--warn)"></span>⚠ у конечной проверки</div><div class="li"><span class="sw" style="background:var(--line)"></span>без замечаний</div>';
@@ -2126,7 +2156,7 @@ function exportSvg() {
   node.setAttribute('viewBox', `${bb.x - 20} ${bb.y - 20} ${bb.width + 40} ${bb.height + 40}`);
   node.setAttribute('width', bb.width + 40); node.setAttribute('height', bb.height + 40);
   node.querySelector('g').removeAttribute('transform');
-  const vars = ['--bg', '--panel', '--ink', '--muted', '--dim', '--line', '--accent', '--anc', '--desc', '--fail', '--ok', '--warn', '--lane1', '--lane2', '--s-pkg', '--s-all', '--s-ps', '--s-ar', '--s-both', '--k-gate', '--k-logic', '--k-scope', '--k-data', '--k-rule', '--k-agg'];
+  const vars = ['--bg', '--panel', '--ink', '--muted', '--dim', '--line', '--accent', '--anc', '--desc', '--fail', '--ok', '--warn', '--lane1', '--lane2', '--s-pkg', '--s-all', '--s-ps', '--s-ar', '--s-both', '--on-pkg', '--k-gate', '--k-logic', '--k-scope', '--k-data', '--k-rule', '--k-agg'];
   const css = svg.node().ownerDocument.querySelector('style').textContent;
   const rules = css.split('/* ───── SVG ───── */')[1].split('/* ───── Рейтинг ───── */')[0];
   const st = document.createElementNS('http://www.w3.org/2000/svg', 'style');
