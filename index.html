@@ -452,9 +452,9 @@
 <div id="modal"><div class="win"><header><div><h2 id="modalTitle">Выводы анализа</h2><small id="insSub"></small></div><span class="x" id="closeModal">×</span></header><div class="body" id="insBody"></div></div></div>
 
 <script src="vendor/d3.v7.min.js"></script>
-<script src="data.js?v=37"></script>
-<script src="facts.js?v=37"></script>
-<script src="npa.js?v=37"></script>
+<script src="data.js?v=38"></script>
+<script src="facts.js?v=38"></script>
+<script src="npa.js?v=38"></script>
 <script>
 (() => {
 'use strict';
@@ -619,7 +619,7 @@ const ftOf = id => G.branches.assign[id].split('.')[0];
 // совместные проверки ПС и АР отдельного пункта в фильтре не имеют: видны, если отмечен ПС или АР
 // «Раздел ЦИМ» относится только к IFC; у XML / BCF / DWG / TRM — фильтр «Тип файла».
 // ПС / АР / БФ — какие IFC-файлы смотрим: карточка видна, если в её плашке есть хоть один выбранный раздел
-const FSEC = ['ps', 'ar', 'bf'];
+const FSEC = ['ar', 'ps', 'bf'];
 const FSEC_NAME = { ps: 'ЦИМ ПС', ar: 'ЦИМ АР', bf: 'ЦИМ БФ' };
 const secOn = n => {
   if (ftOf(n.id) !== 'ifc') return true;
@@ -787,7 +787,7 @@ function secTag(g, h) {
   const t = g.append('g').attr('class', 'sectag');
   t.each(function (d) {
     const base = d.base || d.id, sec = N[base].sec, ft = ftOf(base);
-    const parts = ft !== 'ifc' ? [ft] : sec === 'both' ? ['ps', 'ar'] : sec === 'all' ? ['ps', 'ar', 'bf'] : [sec];
+    const parts = ft !== 'ifc' ? [ft] : sec === 'both' ? ['ar', 'ps'] : sec === 'all' ? ['ar', 'ps', 'bf'] : [sec];   // сверху вниз: АР, ПС, БФ
     const ph = parts.length > 2 ? 13 : 15, pitch = ph + 2;   // три плашки — чуть ниже, чтобы уложиться в высоту карточки
     let y = h / 2 - (parts.length * pitch - 2) / 2;
     parts.forEach(p => {
@@ -1962,12 +1962,8 @@ function renderLegend() {
   if (S.view !== 'matrix') {
     if (S.colorBy === 'sec') {
       const tg = (k, t) => `<span class="lgtag t-${k}${EXT[k] ? ' ext' : ''}">${t || SEC_TAG[k]}</span>`;
-      const sm = k => `<span class="lgtag t-${k}" style="min-width:0;margin-right:3px;padding:0 5px">${SEC_TAG[k]}</span>`;
-      h += '<h4>Плашка у входа · IFC — разделы ЦИМ</h4>'
-        + `<div class="li">${tg('ps')}ЦИМ ПС</div><div class="li">${tg('ar')}ЦИМ АР</div>`
-        + `<div class="li">${sm('ps')}${sm('ar')}<span style="margin-left:5px">ЦИМ ПС и АР</span></div>`
-        + `<div class="li">${sm('ps')}${sm('ar')}${sm('bf')}<span style="margin-left:5px">все IFC-файлы, в т. ч. БФ</span></div>`
-        + '<div class="hint" style="margin:2px 0 4px">У БФ своих проверок нет — он проходит все проверки с плашкой БФ.</div>'
+      h += '<h4>Плашка у входа · IFC — раздел ЦИМ</h4>'
+        + [['ar', 'ЦИМ АР'], ['ps', 'ЦИМ ПС'], ['bf', 'ЦИМ БФ']].map(([k, t]) => `<div class="li">${tg(k)}${t}</div>`).join('')
         + '<h4>Не IFC — расширение файла</h4>'
         + FT_KEYS.filter(k => k !== 'ifc').map(k => `<div class="li">${tg(k)}${esc(G.branches.types[k].split(' — ')[1] || G.branches.types[k])}</div>`).join('');
     }
