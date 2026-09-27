@@ -93,6 +93,9 @@
   .fork:hover a{visibility:visible}
   .fork.lvl1{margin-left:18px}
   #fit{position:absolute;top:12px;left:50%;transform:translateX(-50%);z-index:7}
+  #openInsights{position:absolute;bottom:12px;left:50%;transform:translateX(-50%);z-index:7}
+  #legend .glos{display:inline-block;margin-top:8px;color:var(--accent);cursor:pointer;font-size:12px}
+  #legend .glos:hover{text-decoration:underline}
   .btn{border:1px solid var(--line);background:var(--panel);color:var(--ink);border-radius:8px;padding:7px 10px;cursor:pointer;font-size:12px;box-shadow:var(--shadow)}
   .btn:hover{border-color:var(--accent);color:var(--accent)}
   .btn.flat{box-shadow:none}
@@ -130,7 +133,7 @@
   #legend .li.kx:hover .ex{display:block}
   #legend .ex b{font-weight:600}
   #legend .ex .pr{color:var(--muted);margin-top:3px}
-  #scen{position:absolute;left:50%;bottom:14px;transform:translateX(-50%);z-index:7;background:var(--panel);border:1px solid var(--fail);border-radius:10px;
+  #scen{position:absolute;left:50%;bottom:56px;transform:translateX(-50%);z-index:7;background:var(--panel);border:1px solid var(--fail);border-radius:10px;
     box-shadow:var(--shadow);padding:8px 12px;display:none;align-items:center;gap:12px;max-width:70%}
   #scen.on{display:flex}
   #scen b{color:var(--fail)}
@@ -317,11 +320,6 @@
 
 
 
-    <fieldset id="brBox" style="display:none">
-      <legend>Детализация строк <span id="brLvlVal" style="text-transform:none;letter-spacing:0;color:var(--ink);font-weight:600"></span></legend>
-      <input type="range" id="brLvl" min="0" max="2" step="1" value="2" style="width:100%">
-      <div class="hint" style="margin-top:2px">Клик по названию дорожки — показать одну ветку целиком, от TRM до конца. <a id="brAll" style="color:var(--accent);cursor:pointer;display:none">Показать все ветки</a></div>
-    </fieldset>
 
     <fieldset id="npaBox" style="display:none">
       <legend>Порядок по пунктам в39</legend>
@@ -338,6 +336,11 @@
       <legend>Развёртка слоёв <span id="stepsVal" style="text-transform:none;letter-spacing:0;color:var(--ink);font-weight:600"></span></legend>
       <input type="range" id="stepsSlider" min="0" max="100" value="0" style="width:100%">
     </fieldset>
+    <fieldset id="brBox" style="display:none">
+      <legend>Детализация строк <span id="brLvlVal" style="text-transform:none;letter-spacing:0;color:var(--ink);font-weight:600"></span></legend>
+      <input type="range" id="brLvl" min="0" max="2" step="1" value="2" style="width:100%">
+      <div class="hint" style="margin-top:2px">Клик по названию дорожки — показать одну ветку целиком, от TRM до конца. <a id="brAll" style="color:var(--accent);cursor:pointer;display:none">Показать все ветки</a></div>
+    </fieldset>
 
 
     <fieldset>
@@ -347,12 +350,6 @@
       <label class="chk"><input type="checkbox" id="showImplied" checked><span>Связи в обход цепочки<small>настоящие зависимости любого вида, но порядок они не меняют: карточка и так стоит после родителя через другую цепочку, а линия лишь показывает, что она напрямую берёт у него данные</small></span></label>
     </fieldset>
 
-    <fieldset>
-      <legend>Сценарий отказа</legend>
-      <div class="hint" style="margin:0 0 6px">Выберите проверку и нажмите «Сымитировать провал» в панели справа: покажем, какие проверки не выполнятся.</div>
-      <div id="failedChips" class="chips"></div>
-      <div class="btns"><button class="btn flat" id="clearFail">Сбросить сценарий</button></div>
-    </fieldset>
 
     <button class="btn flat" id="filtBtn" style="width:100%;margin:6px 0 2px;text-align:left">Фильтры ▸</button>
     <div id="filtBox" style="display:none">
@@ -387,14 +384,8 @@
 
     <fieldset>
       <div class="btns">
-        <button class="btn flat" id="openInsights">Выводы анализа</button>
-        <button class="btn flat" id="openGlossary">Словарь терминов</button>
         <button class="btn flat" id="exportSvg">Скачать SVG</button>
       </div>
-      <div class="btns">
-        <button class="btn flat" id="copyTable">Скопировать в буфер: номер + слой</button>
-      </div>
-      <div class="hint" id="copyHint">Копирует 2 колонки (номер проверки, слой — с учётом текущих фильтров) — вставить как есть в свободный столбец общей таблицы и фильтровать по нему.</div>
       <div class="hint">Слева направо — от родительских проверок к дочерним: чем правее, тем больше проверок должно быть выполнено раньше. Пунктирная рамка и штрих — логика проверки ещё не написана, связи предположены.</div>
     </fieldset>
   </div>
@@ -422,6 +413,7 @@
     <div class="pill" id="counter" style="display:none"></div>
   </div>
   <button class="btn" id="fit">К центру</button>
+  <button class="btn" id="openInsights">Выводы анализа</button>
   <div id="legend"></div>
   <div id="scen"></div>
 </main>
@@ -432,9 +424,9 @@
 <div id="modal"><div class="win"><header><div><h2 id="modalTitle">Выводы анализа</h2><small id="insSub"></small></div><span class="x" id="closeModal">×</span></header><div class="body" id="insBody"></div></div></div>
 
 <script src="vendor/d3.v7.min.js"></script>
-<script src="data.js?v=52"></script>
-<script src="facts.js?v=52"></script>
-<script src="npa.js?v=52"></script>
+<script src="data.js?v=53"></script>
+<script src="facts.js?v=53"></script>
+<script src="npa.js?v=53"></script>
 <script>
 (() => {
 'use strict';
@@ -1500,8 +1492,8 @@ let epoch = 0;
 function render(opts) {
   opts = opts || {};
   const isFacts = S.view === 'facts', isNpa = S.view === 'npa';
-  ['#stepsBox', '#copyTable', '#copyHint'].forEach(s => { if ($(s)) $(s).style.display = isFacts || isNpa ? 'none' : ''; });
-  ['#showGate', '#clearFail'].forEach(s => { const box = $(s).closest('fieldset'); if (box) box.style.display = isFacts || isNpa ? 'none' : ''; });
+  ['#stepsBox'].forEach(s => { if ($(s)) $(s).style.display = isFacts || isNpa ? 'none' : ''; });
+  ['#showGate'].forEach(s => { const box = $(s).closest('fieldset'); if (box) box.style.display = isFacts || isNpa ? 'none' : ''; });
   ['#fFt', '#fSec', '#fFam', '#fSt'].forEach(s => { const box = $(s).closest('fieldset'); if (box) box.style.display = isNpa ? 'none' : ''; });
   $('#npaBox').style.display = isNpa ? '' : 'none';
   $('#brBox').style.display = S.view === 'branches' ? '' : 'none';
@@ -1664,9 +1656,6 @@ function renderSidebarState() {
   if (S.view === 'branches' && brG) $('#counter').textContent = S.brOn
     ? 'ветки: ' + [...S.brOn].map(brForkName).join(', ') + ' · ' + brG.core.size + ' карточек + ' + (brG.vis.size - brG.core.size) + ' на пути'
     : vis.length + ' из ' + G.nodes.length + ' проверок' + (brG.dup ? ' · карточек с копиями: ' + brG.VN.length : '');
-  const fc = $('#failedChips');
-  fc.innerHTML = S.failed.size ? [...S.failed].map(id => `<a class="chip f" data-id="${id}" title="убрать из сценария">${esc(N[id].label)} ×</a>`).join('') : '<span class="hint" style="margin:0">сценарий пуст</span>';
-  fc.querySelectorAll('a').forEach(a => a.addEventListener('click', () => { S.failed.delete(a.dataset.id); render(); }));
   ['#fFt', '#fSec', '#fFam', '#fSt'].forEach(sel => {
     $(sel).querySelectorAll('.row').forEach(r => r.classList.toggle('off', !S[r.dataset.g].has(r.dataset.k)));
   });
@@ -1691,6 +1680,7 @@ function buildFilters() {
 }
 
 // ───────── легенда ─────────
+const GLOS_LINK = '<a class="glos">Словарь терминов</a>';
 function renderLegend() {
   const el = $('#legend');
   if (S.view === 'rank') { el.style.display = 'none'; return; }
@@ -1717,7 +1707,7 @@ function renderLegend() {
         + `<div class="hint" style="margin-top:2px">По порядку пунктов — ${n('fwd')}. Наведите на линию — что передаётся.</div>`;
     }
     if (S.npaSel) h += '<h4>Выбор</h4><div class="li"><span class="sw" style="background:var(--anc)"></span>раньше по цепочке</div><div class="li"><span class="sw" style="background:var(--desc)"></span>ждут её</div>';
-    el.innerHTML = h;
+    el.innerHTML = h + GLOS_LINK;
     return;
   }
   const dotRow = (svgInner, t) => `<div class="li"><svg width="16" height="12" viewBox="0 0 16 12">${svgInner}</svg><span>${t}</span></div>`;
@@ -1745,7 +1735,7 @@ function renderLegend() {
     ? '→ N — сколько проверок ждут эту напрямую, на следующем шаге цепочки (по стрелкам, видимым на схеме).'
     : 'Σ N — сколько проверок всего стоят после этой до конца цепочки.') + ' 0 не показывается.</div>'
     + `<div class="li" style="margin-top:4px"><span class="sw" style="flex:0 0 70px;height:6px;background:linear-gradient(90deg,${d3.range(0, 1.01, 0.25).map(heat).join(',')})"></span>контур: меньше → больше, жёлтый — 3</div>`;
-  el.innerHTML = h;
+  el.innerHTML = h + GLOS_LINK;
 }
 
 function renderScenario() {
@@ -2058,11 +2048,9 @@ function bind() {
   $('#showGate').addEventListener('change', e => { S.showGate = e.target.checked; render({ fit: false, relayout: true }); });
   $('#showAgg').addEventListener('change', e => { S.showAgg = e.target.checked; render({ fit: false, relayout: true }); });
   $('#showImplied').addEventListener('change', e => { S.showImplied = e.target.checked; render({ fit: false, relayout: true }); });
-  $('#clearFail').addEventListener('click', () => { S.failed.clear(); render(); });
   $('#openInsights').addEventListener('click', openInsights);
-  $('#openGlossary').addEventListener('click', openGlossary);
+  $('#legend').addEventListener('click', ev => { if (ev.target.closest('.glos')) openGlossary(); });
   $('#exportSvg').addEventListener('click', exportSvg);
-  $('#copyTable').addEventListener('click', copyTable);
   $('#closeModal').addEventListener('click', () => $('#modal').classList.remove('on'));
   $('#modal').addEventListener('click', e => { if (e.target.id === 'modal') $('#modal').classList.remove('on'); });
   document.addEventListener('keydown', e => { if (e.key === 'Escape') { if ($('#filePick').classList.contains('open')) $('#filePick').classList.remove('open'); else if ($('#modal').classList.contains('on')) $('#modal').classList.remove('on'); else select(null); } });
