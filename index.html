@@ -12,7 +12,7 @@
     --chipbg:#e7ebf3; --chipbd:#c2ccdd; --chipink:#3a465c;
     --anc:#2f6fed; --desc:#e0791a; --fail:#d64545; --ok:#2f9e58; --warn:#e3a51b;
     --lane1:rgba(120,130,150,.06); --lane2:rgba(120,130,150,.0);
-    --s-pkg:#2f3646; --s-all:#aeb6c4; --s-ps:#12a57a; --s-ar:#e5334f; --on-pkg:#ffffff; --on-tag:#ffffff; --s-both:linear-gradient(180deg, var(--s-ps) 50%, var(--s-ar) 50%);
+    --s-pkg:#2f3646; --s-all:#aeb6c4; --s-ps:#12a57a; --s-ar:#e5334f; --on-pkg:#ffffff; --on-tag:#ffffff; --hl:#aab1bd; --s-both:linear-gradient(180deg, var(--s-ps) 50%, var(--s-ar) 50%);
     --k-gate:#a33a3a; --k-logic:#e08a1e; --k-scope:#3d7fd6; --k-data:#7d8798; --k-rule:#8b5fd1; --k-agg:#9aa1ad;
     --r-parent:#e25555; --r-dep:#e0a82a; --r-lonely:#3f9ad6; --chg:#8b4fc6;
     --t-trm:#6b778c; --t-xml:#d08a12; --t-bcf:#a855c8; --t-dwg:#1f8fc4; --t-bf:#5b5fd6;
@@ -23,7 +23,7 @@
       --chipbg:#293040; --chipbd:#3b4557; --chipink:#c3cde0;
       --anc:#5b8cff; --desc:#ff9d3d; --fail:#ff6b6b; --ok:#4cc27a; --warn:#f0b93a;
       --lane1:rgba(160,170,190,.06);
-      --s-pkg:#8c95aa; --s-all:#e3e7ee; --s-ps:#34d19f; --s-ar:#ff5a72; --on-pkg:#12151c; --on-tag:#10131a; --s-both:linear-gradient(180deg, var(--s-ps) 50%, var(--s-ar) 50%);
+      --s-pkg:#8c95aa; --s-all:#e3e7ee; --s-ps:#34d19f; --s-ar:#ff5a72; --on-pkg:#12151c; --on-tag:#10131a; --hl:#d5dae2; --s-both:linear-gradient(180deg, var(--s-ps) 50%, var(--s-ar) 50%);
       --k-gate:#e06b6b; --k-logic:#f0a04a; --k-scope:#5b8cff; --k-data:#8d97a8; --k-rule:#a586e8; --k-agg:#6d7686;
       --r-parent:#ff7a7a; --r-dep:#f0c050; --r-lonely:#6ab8f0; --chg:#c49bff;
       --t-trm:#9aa5b8; --t-xml:#f2b544; --t-bcf:#cf8cf0; --t-dwg:#56bdf0; --t-bf:#9395ff; }
@@ -92,6 +92,7 @@
   .fork a{color:var(--accent);font-size:11px;cursor:pointer;visibility:hidden}
   .fork:hover a{visibility:visible}
   .fork.lvl1{margin-left:18px}
+  #fit{position:absolute;top:12px;left:50%;transform:translateX(-50%);z-index:7}
   .btn{border:1px solid var(--line);background:var(--panel);color:var(--ink);border-radius:8px;padding:7px 10px;cursor:pointer;font-size:12px;box-shadow:var(--shadow)}
   .btn:hover{border-color:var(--accent);color:var(--accent)}
   .btn.flat{box-shadow:none}
@@ -178,9 +179,8 @@
   .node .cnt rect{fill:var(--chipbg);stroke:var(--chipbd);stroke-width:1}
   .node .cnt text{font:700 10.5px ui-monospace,"SF Mono",Menlo,Consolas,monospace;fill:var(--chipink);font-variant-numeric:tabular-nums}
   .node:hover .card{stroke:var(--accent)}
-  .node.sel .card{stroke:var(--accent);stroke-width:2.6}
-  .node.anc .card{stroke:var(--anc);stroke-width:2}
-  .node.desc .card{stroke:var(--desc);stroke-width:2}
+  .node.sel .card{stroke:var(--hl);stroke-width:3}
+  .node.anc .card,.node.desc .card{stroke:var(--hl);stroke-width:1.8}
   .node.match .card{stroke:var(--warn);stroke-width:3}
   .node.dim{opacity:.2}
   .node.failed .card{stroke:var(--fail);stroke-width:2.8;fill:rgba(214,69,69,.10)}
@@ -210,8 +210,8 @@
   #etip .cons{color:var(--muted);font-size:11px;margin-top:4px}
   #etip hr{border:0;border-top:1px solid var(--line);margin:7px 0}
   .edge.dim{opacity:.06}
-  .edge.on-anc{stroke:var(--anc)!important;opacity:1;stroke-width:2.2}
-  .edge.on-desc{stroke:var(--desc)!important;opacity:1;stroke-width:2.2}
+  .edge.on-anc,.edge.on-desc{opacity:.95;stroke-width:2.4}
+  .ehit.off{pointer-events:none}
   .edge.cut{opacity:.16}
   .colhead{font-size:10.5px;fill:var(--muted)}
   .lanelabel{font-size:11px;fill:var(--muted);font-weight:600}
@@ -339,6 +339,23 @@
       <input type="range" id="stepsSlider" min="0" max="100" value="0" style="width:100%">
     </fieldset>
 
+
+    <fieldset>
+      <legend>Показывать связи</legend>
+      <label class="chk"><input type="checkbox" id="showGate" checked><span>Допуск IFC-01 ко всем проверкам<small>«файл должен читаться». Где IFC-01 — единственный родитель, линия видна всегда; остальные допуски повторяют цепочку и по умолчанию скрыты</small></span></label>
+      <label class="chk"><input type="checkbox" id="showAgg" checked><span>Своды<small>точечные линии к IFC-21 и IFC-44: собирают итоги «прошла / не прошла» других проверок, сами ничего не проверяют и не блокируют</small></span></label>
+      <label class="chk"><input type="checkbox" id="showImplied" checked><span>Связи в обход цепочки<small>настоящие зависимости любого вида, но порядок они не меняют: карточка и так стоит после родителя через другую цепочку, а линия лишь показывает, что она напрямую берёт у него данные</small></span></label>
+    </fieldset>
+
+    <fieldset>
+      <legend>Сценарий отказа</legend>
+      <div class="hint" style="margin:0 0 6px">Выберите проверку и нажмите «Сымитировать провал» в панели справа: покажем, какие проверки не выполнятся.</div>
+      <div id="failedChips" class="chips"></div>
+      <div class="btns"><button class="btn flat" id="clearFail">Сбросить сценарий</button></div>
+    </fieldset>
+
+    <button class="btn flat" id="filtBtn" style="width:100%;margin:6px 0 2px;text-align:left">Фильтры ▸</button>
+    <div id="filtBox" style="display:none">
     <fieldset id="cntBox">
       <legend>Число на карточке</legend>
       <div class="seg" id="cntSeg" role="group" aria-label="Число на карточках" style="box-shadow:none">
@@ -366,20 +383,7 @@
       <legend>Статус <a id="allst">все</a></legend>
       <div id="fSt"></div>
     </fieldset>
-
-    <fieldset>
-      <legend>Показывать связи</legend>
-      <label class="chk"><input type="checkbox" id="showGate" checked><span>Допуск IFC-01 ко всем проверкам<small>«файл должен читаться». Где IFC-01 — единственный родитель, линия видна всегда; остальные допуски повторяют цепочку и по умолчанию скрыты</small></span></label>
-      <label class="chk"><input type="checkbox" id="showAgg" checked><span>Своды<small>точечные линии к IFC-21 и IFC-44: собирают итоги «прошла / не прошла» других проверок, сами ничего не проверяют и не блокируют</small></span></label>
-      <label class="chk"><input type="checkbox" id="showImplied" checked><span>Связи в обход цепочки<small>настоящие зависимости любого вида, но порядок они не меняют: карточка и так стоит после родителя через другую цепочку, а линия лишь показывает, что она напрямую берёт у него данные</small></span></label>
-    </fieldset>
-
-    <fieldset>
-      <legend>Сценарий отказа</legend>
-      <div class="hint" style="margin:0 0 6px">Выберите проверку и нажмите «Сымитировать провал» в панели справа: покажем, какие проверки не выполнятся при выбранном правиле.</div>
-      <div id="failedChips" class="chips"></div>
-      <div class="btns"><button class="btn flat" id="clearFail">Сбросить сценарий</button></div>
-    </fieldset>
+    </div>
 
     <fieldset>
       <div class="btns">
@@ -415,9 +419,9 @@
       <button data-v="npa" title="Проверки строго в порядке пунктов требований в39: колонки — разделы документа">По пунктам в39</button>
     </div>
     </div>
-    <button class="btn" id="fit">К центру</button>
     <div class="pill" id="counter" style="display:none"></div>
   </div>
+  <button class="btn" id="fit">К центру</button>
   <div id="legend"></div>
   <div id="scen"></div>
 </main>
@@ -428,9 +432,9 @@
 <div id="modal"><div class="win"><header><div><h2 id="modalTitle">Выводы анализа</h2><small id="insSub"></small></div><span class="x" id="closeModal">×</span></header><div class="body" id="insBody"></div></div></div>
 
 <script src="vendor/d3.v7.min.js"></script>
-<script src="data.js?v=51"></script>
-<script src="facts.js?v=51"></script>
-<script src="npa.js?v=51"></script>
+<script src="data.js?v=52"></script>
+<script src="facts.js?v=52"></script>
+<script src="npa.js?v=52"></script>
 <script>
 (() => {
 'use strict';
@@ -550,12 +554,15 @@ function moveTip(ev) {
 }
 const hideTip = () => { const el = $('#etip'); if (el) el.style.display = 'none'; };
 // Поверх видимых линий — прозрачные «толстые» дорожки для наведения (сами линии тонкие и не ловят мышь)
+function syncHits() {
+  d3.selectAll('.ehit').classed('off', function () { return !!this.__vis && this.__vis.classList.contains('dim'); });
+}
 function bindEdgeHover(sel, edgesOf, endsOf) {
   if (!sel || sel.empty()) return;
   const hits = d3.select(sel.node().parentNode).append('g').attr('class', 'ehits');
   sel.each(function (d) {
     const vis = this;
-    hits.append('path').attr('class', 'ehit').attr('d', vis.getAttribute('d'))
+    hits.append('path').attr('class', 'ehit').property('__vis', vis).attr('d', vis.getAttribute('d'))
       .on('mouseenter', ev => {
         d3.select(vis).classed('hov', true);
         const [f, t] = endsOf(d);
@@ -1182,7 +1189,8 @@ function brRestyle() {
     edgeSel.attr('stroke-dasharray', x => edgeDash(x.e))
       .classed('on-anc', inA).classed('on-desc', inD)
       .classed('dim', x => !!sel && !inA(x) && !inD(x))
-      .attr('marker-end', x => inA(x) ? 'url(#ar-anc)' : inD(x) ? 'url(#ar-desc)' : 'url(#ar-' + x.k + ')');
+      .attr('marker-end', x => 'url(#ar-' + x.k + ')');
+    syncHits();
   }
 }
 // реальный id → вершина вида (в режиме копий — копия того же раздела, что и текущий выбор)
@@ -1577,12 +1585,8 @@ function restyle() {
       .classed('on-anc', d => inAnc(ee(d)))
       .classed('on-desc', d => inDesc(ee(d)))
       .classed('dim', d => !!chain && !inAnc(ee(d)) && !inDesc(ee(d)))
-      .attr('marker-end', d => {
-        const e = ee(d);
-        if (inAnc(e)) return 'url(#ar-anc)';
-        if (inDesc(e)) return 'url(#ar-desc)';
-        return 'url(#ar-' + e.k + ')';
-      });
+      .attr('marker-end', d => 'url(#ar-' + ee(d).k + ')');
+    syncHits();
   }
   if (cellSel) {
     cellSel.each(function (e) {
@@ -1741,7 +1745,6 @@ function renderLegend() {
     ? '→ N — сколько проверок ждут эту напрямую, на следующем шаге цепочки (по стрелкам, видимым на схеме).'
     : 'Σ N — сколько проверок всего стоят после этой до конца цепочки.') + ' 0 не показывается.</div>'
     + `<div class="li" style="margin-top:4px"><span class="sw" style="flex:0 0 70px;height:6px;background:linear-gradient(90deg,${d3.range(0, 1.01, 0.25).map(heat).join(',')})"></span>контур: меньше → больше, жёлтый — 3</div>`;
-  if (S.sel) h += '<h4>Выбор</h4><div class="li"><span class="sw" style="background:var(--anc)"></span>предки (слева)</div><div class="li"><span class="sw" style="background:var(--desc)"></span>потомки (справа)</div>';
   el.innerHTML = h;
 }
 
@@ -2046,6 +2049,11 @@ function bind() {
     S.cnt = b.dataset.v; restyle(); renderSidebarState(); renderLegend(); writeHash();
   }));
   $('#fit').addEventListener('click', () => fit(true));
+  $('#filtBtn').addEventListener('click', () => {
+    const box = $('#filtBox'), open = box.style.display === 'none';
+    box.style.display = open ? '' : 'none';
+    $('#filtBtn').textContent = open ? 'Фильтры ▾' : 'Фильтры ▸';
+  });
   $('#stepsSlider').addEventListener('input', e => { S.cols = +e.target.value; render({ fit: true, relayout: true }); });
   $('#showGate').addEventListener('change', e => { S.showGate = e.target.checked; render({ fit: false, relayout: true }); });
   $('#showAgg').addEventListener('change', e => { S.showAgg = e.target.checked; render({ fit: false, relayout: true }); });
