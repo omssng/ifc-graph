@@ -12,10 +12,10 @@
     --chipbg:#e7ebf3; --chipbd:#c2ccdd; --chipink:#3a465c;
     --anc:#2f6fed; --desc:#e0791a; --fail:#d64545; --ok:#2f9e58; --warn:#e3a51b;
     --lane1:rgba(120,130,150,.06); --lane2:rgba(120,130,150,.0);
-    --s-pkg:#2b3140; --s-all:#aeb6c4; --s-ps:#0fb37f; --s-ar:#f0233f; --on-pkg:#ffffff; --s-both:linear-gradient(180deg, var(--s-ps) 50%, var(--s-ar) 50%);
+    --s-pkg:#2f3646; --s-all:#aeb6c4; --s-ps:#12a57a; --s-ar:#e5334f; --on-pkg:#ffffff; --on-tag:#ffffff; --s-both:linear-gradient(180deg, var(--s-ps) 50%, var(--s-ar) 50%);
     --k-gate:#a33a3a; --k-logic:#e08a1e; --k-scope:#3d7fd6; --k-data:#7d8798; --k-rule:#8b5fd1; --k-agg:#9aa1ad;
     --r-parent:#e25555; --r-dep:#e0a82a; --r-lonely:#3f9ad6; --chg:#8b4fc6;
-    --t-trm:#8a94a6; --t-xml:#b7862a; --t-bcf:#c2457e; --t-dwg:#5f7d8c; --t-bf:#5c6bc0;
+    --t-trm:#6b778c; --t-xml:#d08a12; --t-bcf:#a855c8; --t-dwg:#1f8fc4; --t-bf:#5b5fd6;
   }
   @media (prefers-color-scheme:dark){
     :root{ --bg:#12151c; --panel:#1a1f29; --ink:#e6e9ef; --muted:#9aa3b2; --dim:#666f7e; --line:#2b323f;
@@ -23,10 +23,10 @@
       --chipbg:#293040; --chipbd:#3b4557; --chipink:#c3cde0;
       --anc:#5b8cff; --desc:#ff9d3d; --fail:#ff6b6b; --ok:#4cc27a; --warn:#f0b93a;
       --lane1:rgba(160,170,190,.06);
-      --s-pkg:#8c95aa; --s-all:#e3e7ee; --s-ps:#22d69a; --s-ar:#ff4760; --on-pkg:#12151c; --s-both:linear-gradient(180deg, var(--s-ps) 50%, var(--s-ar) 50%);
+      --s-pkg:#8c95aa; --s-all:#e3e7ee; --s-ps:#34d19f; --s-ar:#ff5a72; --on-pkg:#12151c; --on-tag:#10131a; --s-both:linear-gradient(180deg, var(--s-ps) 50%, var(--s-ar) 50%);
       --k-gate:#e06b6b; --k-logic:#f0a04a; --k-scope:#5b8cff; --k-data:#8d97a8; --k-rule:#a586e8; --k-agg:#6d7686;
       --r-parent:#ff7a7a; --r-dep:#f0c050; --r-lonely:#6ab8f0; --chg:#c49bff;
-      --t-trm:#7d8798; --t-xml:#e0b050; --t-bcf:#f07aaa; --t-dwg:#8fb0c0; --t-bf:#8e9cf0; }
+      --t-trm:#9aa5b8; --t-xml:#f2b544; --t-bcf:#cf8cf0; --t-dwg:#56bdf0; --t-bf:#9395ff; }
   }
   *{box-sizing:border-box}
   html,body{margin:0;height:100%}
@@ -227,13 +227,17 @@
   svg.bysec .node .sectag{display:inline}
   svg.bysec .node .stripe:not(.copy){display:none}
   .sectag text{font:700 9.5px system-ui,-apple-system,"Segoe UI",sans-serif;letter-spacing:.02em;text-anchor:middle}
-  .sectag .t-ps rect{fill:var(--s-ps)} .sectag .t-ps text{fill:#fff}
-  .sectag .t-ar rect{fill:var(--s-ar)} .sectag .t-ar text{fill:#fff}
+  .sectag text{fill:var(--on-tag)}
+  .sectag .t-ps rect{fill:var(--s-ps)} .sectag .t-ar rect{fill:var(--s-ar)}
   .sectag .t-pkg rect{fill:var(--s-pkg)} .sectag .t-pkg text{fill:var(--on-pkg)}
   .sectag .t-all rect{fill:var(--panel);stroke:var(--s-all);stroke-width:1.4} .sectag .t-all text{fill:var(--muted)}
-  .lgtag{display:inline-block;min-width:34px;padding:0 6px;border-radius:8px;font:700 9.5px/15px system-ui,sans-serif;text-align:center;margin-right:8px}
-  .lgtag.t-ps{background:var(--s-ps);color:#fff} .lgtag.t-ar{background:var(--s-ar);color:#fff} .lgtag.t-pkg{background:var(--s-pkg);color:var(--on-pkg)}
-  .lgtag.t-all{border:1.4px solid var(--s-all);color:var(--muted);line-height:12px} .lgtag.t-bf{border:1.4px dashed var(--s-all);color:var(--muted);line-height:12px}
+  .sectag .t-trm rect{fill:var(--t-trm)} .sectag .t-xml rect{fill:var(--t-xml)} .sectag .t-bcf rect{fill:var(--t-bcf)} .sectag .t-dwg rect{fill:var(--t-dwg)}
+  .sectag .ext text{font-family:ui-monospace,"SF Mono",Menlo,Consolas,monospace;letter-spacing:0}
+  .lgtag{display:inline-block;min-width:38px;padding:0 6px;border-radius:8px;font:700 9.5px/15px system-ui,sans-serif;text-align:center;margin-right:8px;color:var(--on-tag)}
+  .lgtag.ext{font-family:ui-monospace,"SF Mono",Menlo,Consolas,monospace}
+  .lgtag.t-ps{background:var(--s-ps)} .lgtag.t-ar{background:var(--s-ar)} .lgtag.t-bf{background:var(--t-bf)} .lgtag.t-pkg{background:var(--s-pkg);color:var(--on-pkg)}
+  .lgtag.t-trm{background:var(--t-trm)} .lgtag.t-xml{background:var(--t-xml)} .lgtag.t-bcf{background:var(--t-bcf)} .lgtag.t-dwg{background:var(--t-dwg)}
+  .lgtag.t-all{border:1.4px solid var(--s-all);color:var(--muted);line-height:12px}
   .node.ctx{opacity:.55}
   .node.off{filter:grayscale(1);opacity:.25}
   .node.off.sel{opacity:.6}
@@ -349,8 +353,9 @@
       <div class="hint" style="margin-top:2px">Простой фильтр для всех видов. Чтобы проследить путь файла от контейнера TRM до конца — вид «Ветки по файлам», кнопка «только».</div>
     </fieldset>
     <fieldset>
-      <legend>Раздел ЦИМ <a id="allsec">все</a></legend>
+      <legend>Раздел ЦИМ (IFC) <a id="allsec">все</a></legend>
       <div id="fSec"></div>
+      <div class="hint" style="margin-top:2px">Только для IFC. ПС / АР / БФ — какие файлы смотрим (в счёте — вместе с «любой»); «любой файл» виден, если выбран хоть один из них. XML, BCF, DWG и TRM — в «Типе файла».</div>
     </fieldset>
     <fieldset>
       <legend>Семейство <a id="allfam">все</a></legend>
@@ -446,9 +451,9 @@
 <div id="modal"><div class="win"><header><div><h2 id="modalTitle">Выводы анализа</h2><small id="insSub"></small></div><span class="x" id="closeModal">×</span></header><div class="body" id="insBody"></div></div></div>
 
 <script src="vendor/d3.v7.min.js"></script>
-<script src="data.js?v=35"></script>
-<script src="facts.js?v=35"></script>
-<script src="npa.js?v=35"></script>
+<script src="data.js?v=36"></script>
+<script src="facts.js?v=36"></script>
+<script src="npa.js?v=36"></script>
 <script>
 (() => {
 'use strict';
@@ -600,7 +605,7 @@ const S = {
   brDisc: true, brSub: true, brDup: false, brSel: null, brOn: null, brAnc: true, brDesc: true,
   files: new Set(),   // выбор файла на IFC-01: пусто — все; иначе подмножество ps / ar / bf
   paOff: new Set(), paSel: null,
-  sec: new Set(secKeys), fam: new Set(famKeys), st: new Set(stKeys), ft: new Set(Object.keys(window.IFC_GRAPH.branches.types)),
+  sec: new Set([...secKeys, 'bf']), fam: new Set(famKeys), st: new Set(stKeys), ft: new Set(Object.keys(window.IFC_GRAPH.branches.types)),
   showGate: false, showImplied: false,
   q: '', sel: null, failed: new Set(), rankSort: 'desc', rankDir: -1, cnt: '', cntMid: 40,
 };
@@ -610,7 +615,16 @@ const blocks = e => S.variant === 'A' ? e.k !== 'agg' : e.need === 'verdict';
 const FT_KEYS = Object.keys(G.branches.types);
 const ftOf = id => G.branches.assign[id].split('.')[0];
 // совместные проверки ПС и АР отдельного пункта в фильтре не имеют: видны, если отмечен ПС или АР
-const secOn = n => n.sec === 'both' ? S.sec.has('ps') || S.sec.has('ar') : S.sec.has(n.sec);
+// «Раздел ЦИМ» относится только к IFC; у XML / BCF / DWG / TRM — фильтр «Тип файла».
+// ПС / АР / БФ — какие IFC-файлы смотрим: «ПС + АР» видна при ПС или АР, «любой» — при любом из трёх
+const FSEC = ['pkg', 'all', 'ps', 'ar', 'bf'];
+const FSEC_NAME = { pkg: 'Комплект — все IFC вместе', all: 'Любой файл', ps: 'ЦИМ ПС', ar: 'ЦИМ АР', bf: 'ЦИМ БФ' };
+const secOn = n => {
+  if (ftOf(n.id) !== 'ifc') return true;
+  if (n.sec === 'both') return S.sec.has('ps') || S.sec.has('ar');
+  if (n.sec === 'all') return S.sec.has('all') && (S.sec.has('ps') || S.sec.has('ar') || S.sec.has('bf'));
+  return S.sec.has(n.sec);
+};
 const isVisible = n => S.ft.has(ftOf(n.id)) && secOn(n) && S.fam.has(n.fam) && S.st.has(n.st);
 const visNodes = () => G.nodes.filter(isVisible);
 function edgeShown(e, ids) {
@@ -764,14 +778,17 @@ const edgePath = (a, b) => {
   return `M${x1},${y1}C${x1 + dx},${y1} ${x2 - dx},${y2} ${x2},${y2}`;
 };
 // плашка раздела слева от карточки, там, куда сходятся входящие провода; у «ПС + АР» — две плашки столбиком
-const SEC_TAG = { pkg: 'компл.', all: 'любой', ps: 'ПС', ar: 'АР' };
+// IFC — пишем раздел ЦИМ; не IFC — расширение файла, из которого берутся данные
+const EXT = { trm: 'TRM', xml: 'XML', bcf: 'BCF', dwg: 'DWG' };
+const SEC_TAG = { pkg: 'компл.', all: 'любой', ps: 'ПС', ar: 'АР', bf: 'БФ', ...EXT };
 function secTag(g, h) {
   const t = g.append('g').attr('class', 'sectag');
   t.each(function (d) {
-    const sec = N[d.base || d.id].sec, parts = sec === 'both' ? ['ps', 'ar'] : [sec];
+    const base = d.base || d.id, sec = N[base].sec, ft = ftOf(base);
+    const parts = ft !== 'ifc' ? [ft] : sec === 'both' ? ['ps', 'ar'] : [sec];
     let y = h / 2 - (parts.length * 17 - 2) / 2;
     parts.forEach(p => {
-      const w = 8 + SEC_TAG[p].length * 6.2, el = d3.select(this).append('g').attr('class', 't-' + p);
+      const w = 8 + SEC_TAG[p].length * 6.2, el = d3.select(this).append('g').attr('class', 't-' + p + (EXT[p] ? ' ext' : ''));
       el.append('rect').attr('x', -w - 3).attr('y', y).attr('width', w).attr('height', 15).attr('rx', 7.5);
       el.append('text').attr('x', -w / 2 - 3).attr('y', y + 11).text(SEC_TAG[p]);
       y += 17;
@@ -1897,12 +1914,15 @@ function buildFilters() {
     }));
   };
   mk('#fFt', 'ft', FT_KEYS.map(k => [k, G.branches.types[k]]), k => G.nodes.filter(n => ftOf(n.id) === k).length, k => `background:var(${k === 'ifc' ? '--s-all' : '--t-' + k})`);
-  mk('#fSec', 'sec', secKeys.filter(k => k !== 'both').map(k => [k, G.sections[k]]), k => G.nodes.filter(n => n.sec === k || (n.sec === 'both' && (k === 'ps' || k === 'ar'))).length, k => `background:var(--s-${k})`);
+  const ifcN = G.nodes.filter(n => ftOf(n.id) === 'ifc');
+  mk('#fSec', 'sec', FSEC.map(k => [k, FSEC_NAME[k]]),
+    k => ifcN.filter(n => n.sec === k || (n.sec === 'both' && (k === 'ps' || k === 'ar')) || (n.sec === 'all' && ['ps', 'ar', 'bf'].includes(k))).length,
+    k => `background:var(${k === 'bf' ? '--t-bf' : '--s-' + k})`);
   mk('#fFam', 'fam', famKeys.map(k => [k, G.families[k]]), k => G.nodes.filter(n => n.fam === k).length, () => 'background:var(--chipbd)');
   mk('#fSt', 'st', stKeys.map(k => [k, G.statuses[k]]), k => G.nodes.filter(n => n.st === k).length,
     k => ({ code: 'background:var(--ok)', work: 'background:var(--warn)', spec: 'border:2px solid var(--ink);border-radius:50%', idea: 'border:2px dashed var(--dim);border-radius:50%' }[k]));
   const all = (btn, group, keys) => $(btn).addEventListener('click', () => { keys.forEach(k => S[group].add(k)); render({ fit: true, relayout: true }); });
-  all('#allsec', 'sec', secKeys); all('#allft', 'ft', FT_KEYS); all('#allfam', 'fam', famKeys); all('#allst', 'st', stKeys);
+  all('#allsec', 'sec', [...secKeys, 'bf']); all('#allft', 'ft', FT_KEYS); all('#allfam', 'fam', famKeys); all('#allst', 'st', stKeys);
 }
 
 // ───────── легенда ─────────
@@ -1937,8 +1957,15 @@ function renderLegend() {
   }
   const dotRow = (svgInner, t) => `<div class="li"><svg width="16" height="12" viewBox="0 0 16 12">${svgInner}</svg><span>${t}</span></div>`;
   if (S.view !== 'matrix') {
-    if (S.colorBy === 'sec') h += '<h4>Раздел ЦИМ · плашка у входа</h4>' + secKeys.map(k => `<div class="li">${k === 'both' ? '<span class="lgtag t-ps" style="min-width:0;margin-right:3px">ПС</span><span class="lgtag t-ar" style="min-width:0">АР</span>' : `<span class="lgtag t-${k}">${SEC_TAG[k]}</span>`}${esc(G.sections[k])}</div>`).join('')
-      + '<div class="li"><span class="lgtag t-bf">БФ</span><span>ЦИМ БФ — своих проверок нет: к файлу БФ применяются все «любой»</span></div>';
+    if (S.colorBy === 'sec') {
+      const tg = (k, t) => `<span class="lgtag t-${k}${EXT[k] ? ' ext' : ''}">${t || SEC_TAG[k]}</span>`;
+      h += '<h4>Плашка у входа · IFC — раздел ЦИМ</h4>'
+        + [['pkg', 'все IFC вместе, один раз на комплект'], ['all', 'каждый IFC-файл: ПС, АР и БФ'], ['ps', 'ЦИМ ПС'], ['ar', 'ЦИМ АР']].map(([k, t]) => `<div class="li">${tg(k)}${t}</div>`).join('')
+        + `<div class="li"><span class="lgtag t-ps" style="min-width:0;margin-right:3px">ПС</span><span class="lgtag t-ar" style="min-width:0">АР</span>ЦИМ ПС и ЦИМ АР</div>`
+        + `<div class="li">${tg('bf')}ЦИМ БФ — своих проверок нет, проходит все «любой»</div>`
+        + '<h4>Не IFC — расширение файла</h4>'
+        + FT_KEYS.filter(k => k !== 'ifc').map(k => `<div class="li">${tg(k)}${esc(G.branches.types[k].split(' — ')[1] || G.branches.types[k])}</div>`).join('');
+    }
     else if (S.colorBy === 'st') h += '<h4>Цвет — статус</h4>' + stKeys.map(k => `<div class="li"><span class="sw" style="background:${{ code: 'var(--ok)', work: 'var(--warn)', spec: 'var(--s-all)', idea: 'var(--dim)' }[k]}"></span>${esc(G.statuses[k])}</div>`).join('');
     else if (S.colorBy === 'blast') h += '<h4>Цвет — потомков при провале</h4><div class="li"><span class="sw" style="background:linear-gradient(90deg,var(--line),var(--fail));width:60px"></span>меньше → больше</div>';
     else h += '<h4>Цвет — обратить внимание</h4><div class="li"><span class="sw" style="background:var(--desc)"></span>⚠ у родительской проверки</div><div class="li"><span class="sw" style="background:var(--warn)"></span>⚠ у конечной проверки</div><div class="li"><span class="sw" style="background:var(--line)"></span>без замечаний</div>';
