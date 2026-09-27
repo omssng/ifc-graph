@@ -195,7 +195,9 @@
   .node .qf.first{fill:var(--ok)}
   .node .qf.last{fill:var(--warn)}
   .lbrk{stroke:var(--line);stroke-width:1.2}
-  .colhead.subc{font-size:10px;fill:var(--accent);font-weight:600}
+  .colhead.subc{font-size:10px;fill:var(--dim);font-weight:600}
+  .colhead.lhead .lcnt{font-weight:400;font-size:10.5px;fill:var(--muted);opacity:.35;transition:opacity .15s}
+  .colhead.lhead:hover .lcnt{opacity:1}
   #etip{position:fixed;z-index:40;display:none;max-width:360px;background:var(--panel);border:1px solid var(--line);border-left:3px solid var(--kc,var(--accent));
     border-radius:8px;box-shadow:var(--shadow);padding:8px 11px;font-size:12px;line-height:1.45;color:var(--ink);pointer-events:none}
   #etip .hd{font-weight:600;margin-bottom:2px;display:flex;gap:8px;align-items:baseline;flex-wrap:wrap}
@@ -363,8 +365,8 @@
 
     <fieldset>
       <legend>Показывать связи</legend>
-      <label class="chk"><input type="checkbox" id="showGate"><span>Допуск IFC-01 ко всем проверкам<small>«файл должен читаться». Где IFC-01 — единственный родитель, линия видна всегда; остальные допуски повторяют цепочку и по умолчанию скрыты</small></span></label>
-      <label class="chk"><input type="checkbox" id="showImplied"><span>Запрос данных<small>связи, которые не меняют порядок выполнения: карточка напрямую запрашивает данные у более ранней (порядок уже задан цепочкой), и своды IFC-21, IFC-44 — собирают итоги других проверок, в каскаде не участвуют</small></span></label>
+      <label class="chk"><input type="checkbox" id="showGate" checked><span>Допуск IFC-01 ко всем проверкам<small>«файл должен читаться». Где IFC-01 — единственный родитель, линия видна всегда; остальные допуски повторяют цепочку и по умолчанию скрыты</small></span></label>
+      <label class="chk"><input type="checkbox" id="showImplied"><span>Сводные данные<small>связи, которые не меняют порядок выполнения: карточка напрямую запрашивает данные у более ранней (порядок уже задан цепочкой), и своды IFC-21, IFC-44 — собирают итоги других проверок, в каскаде не участвуют</small></span></label>
     </fieldset>
 
     <fieldset>
@@ -442,9 +444,9 @@
 <div id="modal"><div class="win"><header><div><h2 id="modalTitle">Выводы анализа</h2><small id="insSub"></small></div><span class="x" id="closeModal">×</span></header><div class="body" id="insBody"></div></div></div>
 
 <script src="vendor/d3.v7.min.js"></script>
-<script src="data.js?v=41"></script>
-<script src="facts.js?v=41"></script>
-<script src="npa.js?v=41"></script>
+<script src="data.js?v=42"></script>
+<script src="facts.js?v=42"></script>
+<script src="npa.js?v=42"></script>
 <script>
 (() => {
 'use strict';
@@ -535,11 +537,12 @@ function plural(n, f) { const m10 = n % 10, m100 = n % 100; return f[m10 === 1 &
 function drawColHeads(depths, xs, cols, UF) {
   depths.forEach((d, r) => {
     const x = xs[r], c = UF.nsub[r], n = cols[r].length;
-    gRoot.append('text').attr('class', 'colhead big').attr('x', x).attr('y', 14).text('Слой ' + d);
-    gRoot.append('text').attr('class', 'colhead sub').attr('x', x).attr('y', 28).text(n + ' ' + plural(n, ['проверка', 'проверки', 'проверок']));
+    const t = gRoot.append('text').attr('class', 'colhead big lhead').attr('x', x).attr('y', 22);
+    t.append('tspan').text('Слой ' + d);
+    t.append('tspan').attr('class', 'lcnt').attr('dx', 8).text(n + ' ' + plural(n, ['проверка', 'проверки', 'проверок']));
     if (c < 2) return;
-    gRoot.append('line').attr('class', 'lbrk').attr('x1', x).attr('x2', x + (c - 1) * SUB_PITCH + NW_).attr('y1', 35).attr('y2', 35);
-    for (let j = 0; j < c; j++) gRoot.append('text').attr('class', 'colhead subc').attr('x', x + j * SUB_PITCH).attr('y', 50).text(d + SUBL[j]);
+    gRoot.append('line').attr('class', 'lbrk').attr('x1', x).attr('x2', x + (c - 1) * SUB_PITCH + NW_).attr('y1', 31).attr('y2', 31);
+    for (let j = 0; j < c; j++) gRoot.append('text').attr('class', 'colhead subc').attr('x', x + j * SUB_PITCH).attr('y', 46).text(d + SUBL[j]);
   });
 }
 
@@ -552,7 +555,7 @@ function edgeTipHtml(e) {
   return `<div class="hd">${esc(a.label)} → ${esc(b.label)}<span class="kc" style="color:var(--k-${e.k})">${esc(G.meta.kindName[e.k])}</span></div>`
     + `<div><span class="lb">Передаёт:</span> ${esc(e.via)}</div>`
     + `<div><span class="lb">Зачем:</span> ${esc(why)}</div>`
-    + `<div class="cons">${esc(cons)}${e.implied ? ' Запрос данных: порядок уже задан цепочкой, связь показывает, у какой карточки дочерняя берёт данные.' : ''}${e.b === 'infer' ? ' Связь предположена: логика дочерней проверки ещё не написана.' : ''}</div>`;
+    + `<div class="cons">${esc(cons)}${e.implied ? ' Сводные данные: порядок уже задан цепочкой, связь показывает, у какой карточки дочерняя берёт данные.' : ''}${e.b === 'infer' ? ' Связь предположена: логика дочерней проверки ещё не написана.' : ''}</div>`;
 }
 function moveTip(ev) {
   const el = $('#etip'), w = el.offsetWidth, h = el.offsetHeight;
@@ -598,7 +601,7 @@ const S = {
   paOff: new Set(), paSel: null,
   // sec: pkg / all / both в фильтре не показываются, но должны оставаться включёнными
   sec: new Set([...secKeys, 'bf']), fam: new Set(famKeys), st: new Set(stKeys), ft: new Set(Object.keys(window.IFC_GRAPH.branches.types)),
-  showGate: false, showImplied: false,
+  showGate: true, showImplied: false,
   q: '', sel: null, failed: new Set(), rankSort: 'desc', rankDir: -1, cnt: '', cntMid: 40,
 };
 
@@ -622,7 +625,7 @@ const isVisible = n => S.ft.has(ftOf(n.id)) && secOn(n) && S.fam.has(n.fam) && S
 const visNodes = () => G.nodes.filter(isVisible);
 function edgeShown(e, ids) {
   if (!ids.has(e.from) || !ids.has(e.to)) return false;
-  if (e.k === 'agg') return S.showImplied;   // своды — в той же группе «Запрос данных»
+  if (e.k === 'agg') return S.showImplied;   // своды — в той же группе «Сводные данные»
   if (e.implicit) return S.showGate || e.sole;
   if (e.implied) return S.showImplied;
   return true;
@@ -1989,7 +1992,7 @@ function linkRow(e, dir) {
   const id = dir === 'in' ? e.from : e.to, n = N[id];
   const blk = blocks(e);
   return `<div class="lnk" data-id="${id}"><span class="cd">${esc(n.label)}</span><span class="rest"><span class="nm">${esc(n.n)}</span>
-    <span class="via"><span class="kchip" style="color:var(--k-${e.k})">${esc(KIND_SHORT[e.k])}</span>${e.k === 'agg' ? '' : `<span class="bchip">${blk ? 'блокирует' : 'данные'}</span>`}<span class="bchip ${e.b === 'infer' ? 'infer' : ''}">${esc(BASIS[e.b])}</span>${esc(e.via)}${e.implied ? ' · <i>запрос данных</i>' : ''}</span>${e.z ? `<span class="why">${esc(e.z)}</span>` : ''}</span></div>`;
+    <span class="via"><span class="kchip" style="color:var(--k-${e.k})">${esc(KIND_SHORT[e.k])}</span>${e.k === 'agg' ? '' : `<span class="bchip">${blk ? 'блокирует' : 'данные'}</span>`}<span class="bchip ${e.b === 'infer' ? 'infer' : ''}">${esc(BASIS[e.b])}</span>${esc(e.via)}${e.implied ? ' · <i>сводные данные</i>' : ''}</span>${e.z ? `<span class="why">${esc(e.z)}</span>` : ''}</span></div>`;
 }
 function renderDetail() {
   const box = $('#detail');
@@ -2140,7 +2143,7 @@ function glossary() {
     { t: 'Выбор файла на узле IFC-01', p: 'У карточки IFC-01 (проверка формата — с неё начинается путь любого IFC-файла) над карточкой есть плашка «файл: все ▼» — по клику раскрывается список (все файлы, ЦИМ ПС, ЦИМ АР, ЦИМ БФ — можно отметить несколько, например ПС и АР вместе) — какой IFC-файл сейчас проходит проверки. Граф при этом не перестраивается: насыщенными остаются проверки, которые этот файл проходит (контейнер TRM, общие проверки ПС, АР и БФ, проверки своего раздела и совместные проверки ПС и АР), остальные становятся серыми. Работает в «Каскаде», «Дорожках» и «Ветках по файлам»; в режиме копий общих проверок насыщенными остаются только копии выбранного раздела.' },
     { t: 'Вид «Ветки по файлам»', p: 'Те же проверки и связи, что в «Каскаде», но разложенные по дорожкам: сначала контейнер TRM, затем параллельные треки по типам файлов — IFC-файлы, XML (ведомость и ТЭП), аннотации BCF, 2D-документация. Трек IFC делится по разделам ЦИМ (общие для ПС, АР и БФ; ПС; АР; ПС и АР вместе; необязательный БФ), разделы — на подветки (например, в ПС: участок, парковки, пожарные проезды, зонирование). Деление по разделам и подветки включаются галочками.<br><br>Общие проверки, применимые ко всем разделам, показываются двумя способами. <b>Одной веткой</b> — дорожка «ЦИМ ПС, АР и БФ — общие», от которой зависят все разделы. <b>Копией в каждом разделе</b> — у ПС, АР и БФ своя копия общих проверок (полоса на карточке копии — контуром), связи копии не выходят за свой раздел, поэтому каждая ветка читается как самостоятельная цепочка, а число на карточке считает только свою ветку.<br><br>Блок «Какие ветки показать» включает и выключает ветки-форки: от контейнера TRM — XML, аннотации, 2D-документация и IFC; внутри IFC — общие проверки, ПС, АР, ПС и АР вместе, БФ. «Только» (или клик по названию дорожки на схеме) показывает одну ветку целиком: от TRM через всё, что должно пройти раньше, до последнего узла, к которому она ведёт. Карточки из других веток, попавшие на этот путь, — бледные с пунктирной рамкой. Метка ↤N слева на карточке — проверке нужны ещё N проверок из скрытых веток (например, ТЭП ждёт и ПС, и АР); N↦ справа — её результат уходит в скрытые ветки. Наведите на метку — будет список.' },
     { t: 'Вид «По пунктам в39»', p: 'Отдельная схема, не связанная со связями остальных видов (их собирали по смыслу проверок). Здесь проверки стоят строго в порядке требований в39: колонки — разделы документа (4.1 форматы, 4.3 имена файлов, 4.6 координация … 7 ТЭП), внутри колонки — проверки по возрастанию номеров пунктов. Источник — лист «IFC к 16.10» рабочей таблицы; раздел проверки определяется по первому указанному в таблице пункту.<br><br>Правило цепочки: проверки следующего раздела запускаются, только если прошли все проверки предыдущих разделов; внутри одного раздела проверки независимы. Пустые колонки — разделы в39, по которым в таблице нет ни одной проверки.<br><br>Две галочки меняют цепочку: «ЦИМ ПС и ЦИМ АР — параллельно» (разделы 5.2 и 5.3 не ждут друг друга) и «Ведомость и аннотации — отдельная ветка» (не зависят от IFC-файлов). Число на карточке: → — сколько проверок в следующем разделе ждут эту; Σ — сколько всего стоят после неё.<br><br>Флажок «Связи между карточками» дорисовывает поверх разделов связи из модели связей (как в «Каскаде»): какая проверка что берёт у какой, цвет — вид связи, при наведении — что передаётся. Красный пунктир — связь против порядка пунктов (проверка по в39 идёт раньше той, от которой зависит по смыслу), точечная дуга — связь внутри одного раздела, который по правилу цепочки считается независимым. Это места, где логика проверок и порядок требований расходятся — их стоит обсудить.' },
-    { t: 'Запрос данных', p: 'Связи, которые не меняют порядок выполнения, поэтому по умолчанию скрыты и включаются одной галочкой «Запрос данных». Два случая. Первый: дочерняя напрямую запрашивает данные у более ранней проверки, хотя порядок уже задан цепочкой: IFC-02 → IFC-59 → IFC-102 — цепочка, а IFC-02 → IFC-102 — запрос данных (IFC-102 берёт у IFC-02 список элементов без строки в приложении 2). Второй — своды IFC-21 и IFC-44: собирают итоги «прошла / не прошла» других проверок в общую сводку, ничего не пересчитывают и ничего не блокируют.' },
+    { t: 'Сводные данные', p: 'Связи, которые не меняют порядок выполнения, поэтому по умолчанию скрыты и включаются одной галочкой «Сводные данные». Два случая. Первый: дочерняя напрямую запрашивает данные у более ранней проверки, хотя порядок уже задан цепочкой: IFC-02 → IFC-59 → IFC-102 — цепочка, а IFC-02 → IFC-102 — сводные данные (IFC-102 берёт у IFC-02 список элементов без строки в приложении 2). Второй — своды IFC-21 и IFC-44: собирают итоги «прошла / не прошла» других проверок в общую сводку, ничего не пересчитывают и ничего не блокируют.' },
   ];
 }
 function openGlossary() {
