@@ -440,9 +440,9 @@
 <div id="modal"><div class="win"><header><div><h2 id="modalTitle">Выводы анализа</h2><small id="insSub"></small></div><span class="x" id="closeModal">×</span></header><div class="body" id="insBody"></div></div></div>
 
 <script src="vendor/d3.v7.min.js"></script>
-<script src="data.js?v=29"></script>
-<script src="facts.js?v=29"></script>
-<script src="npa.js?v=29"></script>
+<script src="data.js?v=30"></script>
+<script src="facts.js?v=30"></script>
+<script src="npa.js?v=30"></script>
 <script>
 (() => {
 'use strict';
@@ -474,8 +474,9 @@ const NW_ = 186;
 const stepOf = n => n.depth;
 // Очередь выполнения внутри слоя (проверки одного слоя друг от друга не зависят):
 // ▲ входные фильтры → у кого больше зависимых проверок (Σ после) → больше прямых дочерних → ▼ тяжёлые.
-const Q_GRP = { first: 0, '': 1, last: 2 };
-const qGrp = id => Q_GRP[N[id].q || ''];
+// вес: 0 — лёгкая (заголовок, имена, значения), 1 — средняя (обход элементов, таблицы), 2 — тяжёлая (геометрия, 3D)
+const qGrp = id => N[id].w;
+const W_NAME = ['лёгкая', 'средняя', 'тяжёлая'];
 const kidsN = id => OUT[id].filter(e => !e.implicit && e.k !== 'agg').length;
 const qCmp = (a, b) => qGrp(a) - qGrp(b) || N[b].A.desc.length - N[a].A.desc.length || kidsN(b) - kidsN(a) || N[a].topo - N[b].topo;
 const QRANK = {};
@@ -483,7 +484,7 @@ const QRANK = {};
   const ids = G.nodes.filter(n => n.depth === d).map(n => n.id).sort(qCmp);
   ids.forEach((id, i) => { QRANK[id] = { i, n: ids.length }; });
 });
-const Q_MARK = { first: '▲ первой', last: '▼ в конце' };
+
 // Развёртка: слой из s проверок раскладывается на c ≤ s столбцов подряд по очереди. Дополнительные
 // столбцы делятся между слоями пропорционально (s − 1). Внутри слоя сначала режем на смене группы
 // очереди (▲ | обычные | ▼), потом пополам самый длинный кусок. Порядок разрезов не зависит от c —
@@ -502,7 +503,8 @@ function cutOrder(a, grpOf) {
 }
 function unfold(layers, grpOf) {
   const L = layers.length, total = layers.reduce((x, a) => x + a.length, 0);
-  const U = Math.round(L + S.unf / 100 * (total - L));
+  const U = Math.max(L, Math.min(total, S.cols));
+  const sl = $('#stepsSlider'); sl.min = L; sl.max = total; sl.value = U;
   const cap = layers.map(a => a.length - 1), sum = cap.reduce((x, c) => x + c, 0), extra = U - L;
   const alloc = cap.map(c => sum ? Math.floor(extra * c / sum) : 0);
   let rest = extra - alloc.reduce((x, c) => x + c, 0);
@@ -587,7 +589,7 @@ const cssv = n => getComputedStyle(document.documentElement).getPropertyValue(n)
 
 // ───────── состояние ─────────
 const S = {
-  view: 'cascade', variant: 'A', colorBy: 'sec', unf: 0,
+  view: 'cascade', variant: 'A', colorBy: 'sec', cols: 20,
   npaPsAr: false, npaVed: false, npaEmpty: true, npaLinks: false, npaSel: null,
   brDisc: true, brSub: true, brDup: false, brSel: null, brOn: null, brAnc: true, brDesc: true,
   files: new Set(),   // выбор файла на IFC-01: пусто — все; иначе подмножество ps / ar / bf
@@ -755,12 +757,12 @@ const trunc = (s, n) => s.length > n ? s.slice(0, n - 1) + '…' : s;
 
 function nodeShape(g) {
   g.attr('class', d => 'node ' + N[d.base || d.id].st).attr('data-id', d => d.id);
-  g.append('title').text(d => { const n = N[d.base || d.id]; return n.label + ' — ' + n.n + (d.copyOf ? '\nкопия общей проверки в разделе «' + d.copyOf + '»' : '') + (d.inPath ? '\n' + d.inPath : '') + (n.q ? '\n' + Q_MARK[n.q] + ' в слое: ' + n.qw : '') + (n.amb ? '\n⚠ ' + n.amb : ''); });
+  g.append('title').text(d => { const n = N[d.base || d.id]; return n.label + ' — ' + n.n + (d.copyOf ? '\nкопия общей проверки в разделе «' + d.copyOf + '»' : '') + (d.inPath ? '\n' + d.inPath : '') + ('\nвес: ' + W_NAME[n.w]) + (n.amb ? '\n⚠ ' + n.amb : ''); });
   g.append('rect').attr('class', 'card').attr('width', NW).attr('height', NH).attr('rx', 8);
   g.append('rect').attr('class', d => 'stripe' + (d.copyOf ? ' copy' : '')).attr('width', 5).attr('height', NH - 10).attr('x', 0).attr('y', 5).attr('rx', 2.5);
   const idt = g.append('text').attr('class', 'id').attr('x', 14).attr('y', 18);
   idt.append('tspan').text(d => N[d.base || d.id].label);
-  idt.filter(d => N[d.base || d.id].q).append('tspan').attr('dx', 7).attr('class', d => 'qf ' + N[d.base || d.id].q).text(d => Q_MARK[N[d.base || d.id].q]);
+  idt.filter(d => N[d.base || d.id].w === 2).append('tspan').attr('dx', 7).attr('class', 'qf last').text('◆ тяжёлая');
   g.append('text').attr('class', 'nm').attr('x', 14).attr('y', 34).text(d => trunc(N[d.base || d.id].n, 27));
   // статус
   const st = g.append('g').attr('transform', `translate(${NW - 14},14)`);
@@ -1846,7 +1848,6 @@ function renderSidebarState() {
     ? NPA.checks.length + ' проверок из таблицы · ' + (npaM ? npaM.steps : '') + ' ступеней'
     : vis.length + ' из ' + G.nodes.length + ' проверок';
   $('#npaPsAr').checked = S.npaPsAr; $('#npaVed').checked = S.npaVed; $('#npaEmpty').checked = S.npaEmpty; $('#npaLinks').checked = S.npaLinks;
-  $('#stepsSlider').value = S.unf;
   $('#stepsBox').style.opacity = ['cascade', 'lanes', 'branches'].includes(S.view) ? '1' : '.45';
   $('#brDisc').checked = S.brDisc; $('#brSub').checked = S.brSub; $('#brDup').checked = S.brDup;
   $('#brSub').disabled = !S.brDisc; $('#brDup').disabled = !S.brDisc;
@@ -1922,7 +1923,7 @@ function renderLegend() {
   }
   h += '<h4>Связи <span style="text-transform:none;letter-spacing:0;font-weight:400">· наведите — пример</span></h4>' + KIND_ORDER.map(k => kindRow(k, `<svg width="26" height="8"><line x1="0" y1="4" x2="24" y2="4" stroke="var(--k-${k})" stroke-width="2.2" ${k === 'agg' ? 'stroke-dasharray="2 4"' : ''}/></svg>`)).join('');
   h += '<div class="hint" style="margin-top:4px">' + (S.variant === 'A' ? 'Все линии, кроме свода, блокируют.' : 'Сплошная — блокирует, пунктир — только данные.') + ' <b>Наведите на линию</b> — что передаёт связь и зачем она.</div>';
-  if (['cascade', 'lanes', 'branches'].includes(S.view)) h += '<h4>Очередь в слое</h4><div class="hint" style="margin-top:0">Сверху вниз — порядок выполнения внутри слоя: <b style="color:var(--ok)">▲ первой</b> — входной фильтр, дальше — у кого больше зависимых проверок, <b style="color:var(--warn)">▼ в конце</b> — тяжёлая.' + (S.unf ? ' Подстолбцы 3а, 3б… — та же очередь, разложенная вправо; проверки одного слоя друг от друга не зависят.' : '') + '</div>';
+  if (['cascade', 'lanes', 'branches'].includes(S.view)) h += '<h4>Очередь в слое</h4><div class="hint" style="margin-top:0">Сверху вниз (при развёртке — слева направо) — порядок выполнения внутри слоя: сначала лёгкие проверки (заголовок, имена, значения атрибутов), потом средние (обход элементов, сопоставление с таблицами), <b style="color:var(--warn)">◆ тяжёлые</b> — в конце (геометрия, 3D-пересечения). Внутри веса — у кого больше зависимых проверок.</div>';
   if (S.view === 'paths') h += '<h4>Все пути</h4><div class="hint" style="margin-top:0">Слева — общий контейнер TRM, от него веером полосы: каждая — полный путь одного файла от первой проверки до последней. Одна и та же проверка повторяется в каждой полосе, где её проходит файл. <b style="color:var(--fail)">↤N</b> — нужны ещё проверки из других путей, <b style="color:var(--fail)">N↦</b> — результат нужен в других путях.</div>';
   if (S.view === 'branches') h += '<h4>Ветки по файлам</h4><div class="hint" style="margin-top:0">Дорожка — тип файла → раздел ЦИМ → подветка; цветная полоса слева — тип файла или раздел.'
     + (S.brDisc && S.brDup ? ' Общие проверки скопированы в каждый раздел: у копии полоса на карточке — контуром, связи копии не выходят за свой раздел.' : '') + '</div>'
@@ -1970,12 +1971,11 @@ function renderDetail() {
   if (sk.has(n.id)) h += `<div class="box danger">В текущем сценарии эта проверка <b>не выполнится</b>: один из её предков не прошёл.</div>`;
   h += `<div class="sub">Каскад</div><div class="kv">
     <span>Слой (порядок выполнения)</span><b>${n.depth}</b>
-    <span>Место в очереди слоя</span><b>${QRANK[n.id].i + 1} из ${QRANK[n.id].n}${n.q ? ` <span style="color:var(--${n.q === 'first' ? 'ok' : 'warn'})">${Q_MARK[n.q]}</span>` : ''}</b>
+    <span>Место в очереди слоя</span><b>${QRANK[n.id].i + 1} из ${QRANK[n.id].n} · ${W_NAME[n.w]}</b>
     <span>Должны пройти раньше (предков)${S.variant === 'A' ? ' ◀' : ''}: жёстко</span><b>${n.A.anc.length}</b>
     <span>Должны пройти раньше (предков)${S.variant === 'B' ? ' ◀' : ''}: смягчённо</span><b>${n.B.anc.length}</b>
     <span>Не выполнится при провале: жёстко</span><b style="color:${dA ? 'var(--fail)' : 'inherit'}">${dA}</b>
     <span>Не выполнится при провале: смягчённо</span><b>${dB}</b></div>`;
-  if (n.q) h += `<div class="box note"><b>${n.q === 'first' ? '▲ Первой в слое.' : '▼ В конце слоя.'}</b> ${esc(n.qw)}</div>`;
   if (n.amb) h += `<div class="box amb"><b>⚠ Неоднозначный исход.</b> ${esc(n.amb)}${m.desc.length ? `<br><br>Проверка родительская: если при сомнении она вернёт false, каскадом не выполнятся ещё <b>${m.desc.length}</b> дочерних (при выбранном правиле).` : ''}</div>`;
   if (n.logic) h += `<div class="box logic"><b>Предполагаемая логика.</b> ${esc(n.logic)}</div>`;
   if (n.note) h += `<div class="box note">${esc(n.note)}</div>`;
@@ -2095,7 +2095,7 @@ function glossary() {
   return [
     { t: 'Подпись связи', p: 'Если навести мышь на любую линию, появится подпись: какие проверки она соединяет, что передаёт родитель дочерней, зачем эта связь нужна и что будет с дочерней, если родитель не прошёл.' },
     { t: 'Слой', p: 'Столбец на схеме «Каскад» и «Дорожки». Слой проверки — это длина самой длинной цепочки её родителей: чем правее проверка, тем больше проверок в принципе должно быть выполнено до неё. Слой 0 — проверки совсем без родителей.' },
-    { t: 'Развёртка слоёв и очередь в слое', p: 'Внутри одного слоя проверки друг от друга не зависят, но порядок всё равно есть: сверху вниз — очередь выполнения. Первыми идут входные фильтры (▲ первой): дешёвые проверки, которые отсеивают кривую модель до тяжёлых — имя файла, уникальность GlobalId, топология, дубли элементов и атрибутов. Дальше — проверки, от которых зависит больше остальных. В конце (▼ в конце) — тяжёлые, например сопоставление каждого элемента с таблицами приложений. Ползунок «Развёртка слоёв» раскладывает эту очередь вправо: слой 3 становится столбцами 3а, 3б, 3в…, а до конца вправо весь граф вытягивается в одну линию — каждая проверка в своём столбце. Стрелок назад при этом не появляется.' },
+    { t: 'Развёртка слоёв и очередь в слое', p: 'Внутри одного слоя проверки друг от друга не зависят, но порядок всё равно есть: сверху вниз — очередь выполнения. Сначала лёгкие проверки (заголовок файла, имена, значения атрибутов, система координат, отметки), потом средние (обход элементов, сопоставление с таблицами приложений), в конце тяжёлые, помеченные ◆ (геометрия, топология, 3D-пересечения, расчёты по телам): если не прошла лёгкая проверка, тяжёлую нет смысла запускать и нагружать сервис. Внутри одного веса — сначала те, от которых зависит больше проверок. Ползунок «Развёртка слоёв» (по умолчанию 20 столбцов) раскладывает эту очередь вправо: слой 3 становится столбцами 3а, 3б, 3в…, до конца вправо весь граф вытягивается в одну линию. Стрелок назад при этом не появляется.' },
     { t: 'Правило каскада: «жёстко» и «смягчённо»', p: 'Переключатель наверху страницы. Он не меняет граф, а меняет только то, что считается блокирующей связью для сценария отказа и для колонок «потомков / предков» в карточке и рейтинге.<br><br><b>Жёстко</b> — как сейчас принято для первого выпуска сервиса: любая родительская проверка, которая не прошла, блокирует все дочерние, какая бы ни была связь между ними.<br><br><b>Смягчённо</b> — блокируют только связи «допуск» и «смысловая предпосылка», то есть там, где дочерней проверке правда нужен вердикт родителя. Связи «данные», «выбор файлов по разделу» и «правило» не блокируют: считается, что дочерняя сама вернёт отрицательный результат с понятной причиной, если нужных ей данных не нашлось.' },
     { t: 'Виды связей между проверками', p: 'Стрелка на схеме — не просто «после», а конкретная зависимость одного из шести видов:', h: `<div style="margin-top:4px">${kindLi}</div>` },
     { t: 'Неоднозначный исход', p: 'Помечен значком ⚠ у проверки и жёлтой рамкой в карточке. Значит: у этой проверки есть ситуации, где по имеющимся данным нельзя однозначно сказать «пройдено» или «не пройдено» — например, что-то в модели можно понять двумя способами, нормативный порог не задан явно, или нужного признака в модели просто нет. Пример — открытый вопрос в самой карточке. Если такая проверка ещё и родительская, при жёстком правиле неоднозначность каскадом гасит все её дочерние проверки — сколько именно, видно в самой карточке.' },
@@ -2174,7 +2174,7 @@ function writeHash() {
   try {
     const p = new URLSearchParams();
     p.set('view', S.view); p.set('rule', S.variant);
-    if (S.unf) p.set('unf', S.unf);
+    if (S.cols !== 20) p.set('cols', S.cols);
     if (S.cnt) p.set('cnt', S.cnt);
     if (S.cnt && S.cntMid !== 40) p.set('mid', S.cntMid);
     if (S.sel) p.set('sel', S.sel);
@@ -2221,8 +2221,7 @@ function readHash() {
   S.files = new Set((p.get('file') || '').replace('psar', 'ps,ar').split(',').filter(k => FILE_KEYS.includes(k)));
   const midN = +p.get('mid');
   if (midN >= 5 && midN <= 90) S.cntMid = midN;
-  const unfN = +p.get('unf');
-  if (unfN > 0 && unfN <= 100) S.unf = Math.round(unfN);
+  if (p.get('cols')) S.cols = Math.max(1, Math.round(+p.get('cols')) || 20);
   if (p.get('sel') && N[p.get('sel')]) S.sel = p.get('sel');
   if (p.get('fail')) p.get('fail').split(',').forEach(id => { if (N[id]) S.failed.add(id); });
 }
@@ -2263,7 +2262,7 @@ function bind() {
   $('#fit').addEventListener('click', () => fit(true));
   $('#colorBy').addEventListener('change', e => { S.colorBy = e.target.value; render({ relayout: false }); });
   $('#onlyAmb').addEventListener('change', e => { S.onlyAmb = e.target.checked; render({ fit: true, relayout: true }); });
-  $('#stepsSlider').addEventListener('input', e => { S.unf = +e.target.value; render({ fit: true, relayout: true }); });
+  $('#stepsSlider').addEventListener('input', e => { S.cols = +e.target.value; render({ fit: true, relayout: true }); });
   $('#showGate').addEventListener('change', e => { S.showGate = e.target.checked; render({ fit: false, relayout: true }); });
   $('#showImplied').addEventListener('change', e => { S.showImplied = e.target.checked; render({ fit: false, relayout: true }); });
   $('#showAgg').addEventListener('change', e => { S.showAgg = e.target.checked; render({ fit: false, relayout: true }); });
