@@ -376,16 +376,6 @@
     </fieldset>
 
     <fieldset>
-      <legend>Цвет карточек</legend>
-      <select id="colorBy">
-        <option value="sec">Раздел ЦИМ</option>
-        <option value="st">Статус реализации</option>
-        <option value="blast">Радиус каскада (потомков)</option>
-        <option value="risk">Обратить внимание</option>
-      </select>
-    </fieldset>
-
-    <fieldset>
       <legend>Сценарий отказа</legend>
       <div class="hint" style="margin:0 0 6px">Выберите проверку и нажмите «Сымитировать провал» в панели справа: покажем, какие проверки не выполнятся при выбранном правиле.</div>
       <div id="failedChips" class="chips"></div>
@@ -450,9 +440,9 @@
 <div id="modal"><div class="win"><header><div><h2 id="modalTitle">Выводы анализа</h2><small id="insSub"></small></div><span class="x" id="closeModal">×</span></header><div class="body" id="insBody"></div></div></div>
 
 <script src="vendor/d3.v7.min.js"></script>
-<script src="data.js?v=45"></script>
-<script src="facts.js?v=45"></script>
-<script src="npa.js?v=45"></script>
+<script src="data.js?v=46"></script>
+<script src="facts.js?v=46"></script>
+<script src="npa.js?v=46"></script>
 <script>
 (() => {
 'use strict';
@@ -1725,7 +1715,7 @@ function render(opts) {
   opts = opts || {};
   const isFacts = S.view === 'facts', isNpa = S.view === 'npa';
   ['#stepsBox', '#copyTable', '#copyHint'].forEach(s => { if ($(s)) $(s).style.display = isFacts || isNpa ? 'none' : ''; });
-  ['#showGate', '#colorBy', '#clearFail'].forEach(s => { const box = $(s).closest('fieldset'); if (box) box.style.display = isFacts || isNpa ? 'none' : ''; });
+  ['#showGate', '#clearFail'].forEach(s => { const box = $(s).closest('fieldset'); if (box) box.style.display = isFacts || isNpa ? 'none' : ''; });
   ['#fFt', '#fSec', '#fFam', '#fSt'].forEach(s => { const box = $(s).closest('fieldset'); if (box) box.style.display = isNpa ? 'none' : ''; });
   $('#npaBox').style.display = isNpa ? '' : 'none';
   $('#brBox').style.display = S.view === 'branches' ? '' : 'none';
@@ -1954,16 +1944,13 @@ function renderLegend() {
   }
   const dotRow = (svgInner, t) => `<div class="li"><svg width="16" height="12" viewBox="0 0 16 12">${svgInner}</svg><span>${t}</span></div>`;
   if (S.view !== 'matrix') {
-    if (S.colorBy === 'sec') {
+    {   // цвет карточек — всегда по разделу ЦИМ (переключатель убран 28.09)
       const tg = (k, t) => `<span class="lgtag t-${k}${EXT[k] ? ' ext' : ''}">${t || SEC_TAG[k]}</span>`;
-      h += '<h4>Плашка у входа · IFC — раздел ЦИМ</h4>'
+      h += '<h4>Плашка на карточке · IFC — раздел ЦИМ</h4>'
         + [['ar', 'ЦИМ АР'], ['ps', 'ЦИМ ПС'], ['bf', 'ЦИМ БФ']].map(([k, t]) => `<div class="li">${tg(k)}${t}</div>`).join('')
         + '<h4>Не IFC — расширение файла</h4>'
         + FT_KEYS.filter(k => k !== 'ifc').map(k => `<div class="li">${tg(k)}${esc(G.branches.types[k].split(' — ')[1] || G.branches.types[k])}</div>`).join('');
     }
-    else if (S.colorBy === 'st') h += '<h4>Цвет — статус</h4>' + stKeys.map(k => `<div class="li"><span class="sw" style="background:${{ code: 'var(--ok)', work: 'var(--warn)', spec: 'var(--s-all)', idea: 'var(--dim)' }[k]}"></span>${esc(G.statuses[k])}</div>`).join('');
-    else if (S.colorBy === 'blast') h += '<h4>Цвет — потомков при провале</h4><div class="li"><span class="sw" style="background:linear-gradient(90deg,var(--line),var(--fail));width:60px"></span>меньше → больше</div>';
-    else h += '<h4>Цвет — обратить внимание</h4><div class="li"><span class="sw" style="background:var(--desc)"></span>⚠ у родительской проверки</div><div class="li"><span class="sw" style="background:var(--warn)"></span>⚠ у конечной проверки</div><div class="li"><span class="sw" style="background:var(--line)"></span>без замечаний</div>';
     h += '<h4>Статус (значок справа)</h4>' +
       dotRow('<circle cx="6" cy="6" r="5" fill="var(--ok)"/>', 'реализована') + dotRow('<circle cx="6" cy="6" r="5" fill="var(--warn)"/>', 'в работе / переработке') +
       dotRow('<circle cx="6" cy="6" r="4.4" fill="none" stroke="var(--ink)" stroke-width="1.6"/>', 'есть аналитика, кода нет') +
@@ -2295,7 +2282,6 @@ function bind() {
     S.cnt = b.dataset.v; restyle(); renderSidebarState(); renderLegend(); writeHash();
   }));
   $('#fit').addEventListener('click', () => fit(true));
-  $('#colorBy').addEventListener('change', e => { S.colorBy = e.target.value; render({ relayout: false }); });
   $('#stepsSlider').addEventListener('input', e => { S.cols = +e.target.value; render({ fit: true, relayout: true }); });
   $('#showGate').addEventListener('change', e => { S.showGate = e.target.checked; render({ fit: false, relayout: true }); });
   $('#showAgg').addEventListener('change', e => { S.showAgg = e.target.checked; render({ fit: false, relayout: true }); });
