@@ -94,7 +94,9 @@
   .fork.lvl1{margin-left:18px}
   #fit{position:absolute;top:12px;left:50%;transform:translateX(-50%);z-index:7}
   #openInsights{position:absolute;bottom:12px;left:50%;transform:translateX(-50%);z-index:7}
-  #viewDesc .hint{margin:0 0 6px}
+  /* описание вида и ссылки — по левому краю текста галочек «Показывать», тем же кеглем, что их пояснения */
+  #viewDesc,#filtBtn,#exportSvg{margin-left:28px}
+  #viewDesc .hint{margin:0 0 6px;font-size:11px;line-height:1.35}
   #viewDesc b{color:var(--ink);font-weight:600}
   .glos{display:inline-block;margin-top:8px;color:var(--accent);cursor:pointer;font-size:12px}
   .glos:hover{text-decoration:underline}
@@ -434,9 +436,9 @@
 <div id="modal"><div class="win"><header><div><h2 id="modalTitle">Выводы анализа</h2><small id="insSub"></small></div><span class="x" id="closeModal">×</span></header><div class="body" id="insBody"></div></div></div>
 
 <script src="vendor/d3.v7.min.js"></script>
-<script src="data.js?v=60"></script>
-<script src="facts.js?v=60"></script>
-<script src="npa.js?v=60"></script>
+<script src="data.js?v=61"></script>
+<script src="facts.js?v=61"></script>
+<script src="npa.js?v=61"></script>
 <script>
 (() => {
 'use strict';
