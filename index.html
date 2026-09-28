@@ -435,9 +435,9 @@
 <div id="modal"><div class="win"><header><div><h2 id="modalTitle">Выводы анализа</h2><small id="insSub"></small></div><span class="x" id="closeModal">×</span></header><div class="body" id="insBody"></div></div></div>
 
 <script src="vendor/d3.v7.min.js"></script>
-<script src="data.js?v=64"></script>
-<script src="facts.js?v=64"></script>
-<script src="npa.js?v=64"></script>
+<script src="data.js?v=65"></script>
+<script src="facts.js?v=65"></script>
+<script src="npa.js?v=65"></script>
 <script>
 (() => {
 'use strict';
@@ -1160,10 +1160,12 @@ function brRestyle() {
   const sk = new Set();
   failedV.forEach(f => brReach(f, 'out', blocks).forEach(x => sk.add(x)));
   failedV.forEach(f => sk.delete(f));
+  const aggOn = x => !!sel && x.k === 'agg' && (x.from === sel || x.to === sel);
+  const aggN = new Set(edgeSel ? edgeSel.data().filter(aggOn).flatMap(x => [x.from, x.to]) : []);
   nodeSel.classed('sel', d => d.id === sel)
-    .classed('anc', d => !!A && A.has(d.id))
+    .classed('anc', d => !!A && (A.has(d.id) || (aggN.has(d.id) && d.id !== sel)))
     .classed('desc', d => !!D && D.has(d.id))
-    .classed('dim', d => !!sel && d.id !== sel && !A.has(d.id) && !D.has(d.id))
+    .classed('dim', d => !!sel && d.id !== sel && !A.has(d.id) && !D.has(d.id) && !aggN.has(d.id))
     .classed('failed', d => S.failed.has(d.base))
     .classed('skipped', d => sk.has(d.id))
     .classed('match', d => !!q && matches(N[d.base], q));
@@ -1190,8 +1192,8 @@ function brRestyle() {
     const inA = x => on(x) && (A.has(x.from) || x.from === sel) && (A.has(x.to) || x.to === sel);
     const inD = x => on(x) && (D.has(x.to) || x.to === sel) && (D.has(x.from) || x.from === sel);
     edgeSel.attr('stroke-dasharray', x => edgeDash(x.e))
-      .classed('on-anc', inA).classed('on-desc', inD)
-      .classed('dim', x => !!sel && !inA(x) && !inD(x))
+      .classed('on-anc', x => inA(x) || aggOn(x)).classed('on-desc', inD)
+      .classed('dim', x => !!sel && !inA(x) && !inD(x) && !aggOn(x))
       .attr('marker-end', x => 'url(#ar-' + x.k + ')');
     syncHits();
   }
@@ -1551,12 +1553,14 @@ function restyle() {
   if (S.view === 'branches') { brRestyle(); applyFileDisc(); return; }
   const sk = skippedSet();
   const chain = S.sel ? chainOf(S.sel) : null;
+  const aggOn = e => !!chain && e.k === 'agg' && (e.from === S.sel || e.to === S.sel);
+  const aggN = new Set(edgeSel ? edgeSel.data().filter(aggOn).flatMap(e => [e.from, e.to]) : []);
   const q = S.q.trim().toLowerCase();
   if (nodeSel) {
     nodeSel.classed('sel', d => d.id === S.sel)
-      .classed('anc', d => !!chain && chain.anc.has(d.id))
+      .classed('anc', d => !!chain && (chain.anc.has(d.id) || (aggN.has(d.id) && d.id !== S.sel)))
       .classed('desc', d => !!chain && chain.desc.has(d.id))
-      .classed('dim', d => !!chain && d.id !== S.sel && !chain.anc.has(d.id) && !chain.desc.has(d.id))
+      .classed('dim', d => !!chain && d.id !== S.sel && !chain.anc.has(d.id) && !chain.desc.has(d.id) && !aggN.has(d.id))
       .classed('failed', d => S.failed.has(d.id))
       .classed('skipped', d => sk.has(d.id))
       .classed('match', d => !!q && matches(N[d.id], q));
@@ -1585,9 +1589,9 @@ function restyle() {
     const inAnc = e => !!chain && e.k !== 'agg' && (chain.anc.has(e.from) || e.from === S.sel) && (chain.anc.has(e.to) || e.to === S.sel);
     const inDesc = e => !!chain && e.k !== 'agg' && (chain.desc.has(e.to) || e.to === S.sel) && (chain.desc.has(e.from) || e.from === S.sel);
     edgeSel.attr('stroke-dasharray', d => edgeDash(ee(d)))
-      .classed('on-anc', d => inAnc(ee(d)))
+      .classed('on-anc', d => inAnc(ee(d)) || aggOn(ee(d)))
       .classed('on-desc', d => inDesc(ee(d)))
-      .classed('dim', d => !!chain && !inAnc(ee(d)) && !inDesc(ee(d)))
+      .classed('dim', d => !!chain && !inAnc(ee(d)) && !inDesc(ee(d)) && !aggOn(ee(d)))
       .attr('marker-end', d => 'url(#ar-' + ee(d).k + ')');
     syncHits();
   }
