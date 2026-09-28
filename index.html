@@ -304,6 +304,50 @@
   #rank .rootbox h3{margin:0 0 6px;font-size:12px}
   .dot{display:inline-block;width:9px;height:9px;border-radius:50%;margin-right:6px;vertical-align:-1px}
 
+  /* ───── Алгоритм проверки (окно из карточки) ───── */
+  #algo{position:fixed;inset:0;z-index:45;background:var(--bg);display:none;flex-direction:column}
+  #algo.on{display:flex}
+  #algo header{display:flex;justify-content:space-between;align-items:flex-start;gap:16px;padding:14px 20px 12px;background:var(--panel);border-bottom:1px solid var(--line)}
+  #algo .code{font:700 18px ui-monospace,"SF Mono",Menlo,Consolas,monospace}
+  #algo .ttl{font-size:14px;font-weight:600;margin-top:2px}
+  #algo small{display:block;color:var(--muted);font-size:11.5px;margin-top:4px}
+  #algo .hbtn{display:flex;gap:10px;align-items:center}
+  #algo .x{cursor:pointer;color:var(--muted);font-size:22px;line-height:1}
+  #algo .x:hover{color:var(--ink)}
+  #algoSvg{flex:1;width:100%;min-height:0;display:block;cursor:grab}
+  #algoSvg:active{cursor:grabbing}
+  #algoSvg text{font-family:inherit}
+  .al-inbox{fill:var(--panel);stroke:var(--line);stroke-width:1.2}
+  .al-cap{font-size:10px;text-transform:uppercase;letter-spacing:.08em;fill:var(--muted)}
+  .al-sep{stroke:var(--line);stroke-width:1}
+  .al-pid{font:700 11.5px ui-monospace,"SF Mono",Menlo,Consolas,monospace}
+  .al-via{font-size:11px;fill:var(--muted)}
+  .al-t{font-size:12.5px;fill:var(--ink)}
+  .al-code{font:10.5px ui-monospace,"SF Mono",Menlo,Consolas,monospace;fill:var(--muted)}
+  .al-step .box{fill:var(--panel);stroke:var(--line);stroke-width:1.2}
+  .al-gate .box{fill:var(--panel);stroke:var(--warn);stroke-width:1.6}
+  .al-err .box{fill:var(--panel);stroke:var(--fail);stroke-width:1.4}
+  .al-err .msg{fill:rgba(214,69,69,.09)}
+  .al-err .al-msg{fill:var(--ink);opacity:.85}
+  .al-x{font:700 13px sans-serif;fill:var(--fail)}
+  .al-et{font-size:12.5px;font-weight:600;fill:var(--fail)}
+  .al-after{font-size:11px;fill:var(--muted)}
+  .al-ok .box{fill:rgba(47,158,88,.10);stroke:var(--ok);stroke-width:1.8}
+  .al-fail .box{fill:rgba(214,69,69,.10);stroke:var(--fail);stroke-width:1.8}
+  .al-big{font:700 17px ui-monospace,"SF Mono",Menlo,Consolas,monospace}
+  .al-ok .al-big{fill:var(--ok)} .al-fail .al-big{fill:var(--fail)}
+  .al-edge{fill:none;stroke:var(--muted);stroke-width:1.6}
+  .al-edge.no{stroke:var(--fail);opacity:.8}
+  .al-edge.ok{stroke:var(--ok)}
+  .al-bus{fill:none;stroke:var(--fail);stroke-width:1.5;opacity:.55}
+  .al-dot{fill:var(--fail);opacity:.8}
+  .al-lab{font-size:11px;font-weight:600;fill:var(--muted);paint-order:stroke;stroke:var(--bg);stroke-width:4px;stroke-linejoin:round}
+  .al-lab.no{fill:var(--fail)} .al-lab.ok{fill:var(--ok)}
+  .al-loop rect{fill:var(--lane1);stroke:var(--chipbd);stroke-width:1.2;stroke-dasharray:6 4}
+  .al-loop text{font-size:11.5px;fill:var(--ink)}
+  .al-loop .al-rep{fill:var(--accent);font-weight:700}
+  .al-loop .al-lcode{font:10.5px ui-monospace,"SF Mono",Menlo,Consolas,monospace;fill:var(--muted)}
+
   /* ───── Модалка ───── */
   #modal{position:fixed;inset:0;background:rgba(10,14,22,.45);z-index:50;display:none;align-items:center;justify-content:center;padding:24px}
   #modal.on{display:flex}
@@ -437,12 +481,14 @@
 <div id="detail"></div>
 <div id="etip"></div>
 
+<div id="algo"><header><div><div class="code" id="algoCode"></div><div class="ttl" id="algoTitle"></div><small id="algoSub"></small></div><div class="hbtn"><button class="btn" id="algoFit">К центру</button><span class="x" id="algoClose" title="Закрыть (Esc)">×</span></div></header><svg id="algoSvg"></svg></div>
+
 <div id="modal"><div class="win"><header><div><h2 id="modalTitle">Выводы анализа</h2><small id="insSub"></small></div><span class="x" id="closeModal">×</span></header><div class="body" id="insBody"></div></div></div>
 
 <script src="vendor/d3.v7.min.js"></script>
-<script src="data.js?v=67"></script>
-<script src="facts.js?v=67"></script>
-<script src="npa.js?v=67"></script>
+<script src="data.js?v=68"></script>
+<script src="facts.js?v=68"></script>
+<script src="npa.js?v=68"></script>
 <script>
 (() => {
 'use strict';
@@ -1831,6 +1877,7 @@ function renderDetail() {
     <div class="desc">${esc(n.what)}</div>
     <div class="req"><span>Требование</span>${esc(n.d)}</div>
     <div style="color:var(--muted);font-size:12px">Пункт требований: ${esc(n.p)}</div>`;
+  if (G.algo && G.algo[n.id]) h += `<div class="btns" style="margin:10px 0 4px"><button class="btn" id="openAlgo">Открыть алгоритм проверки</button></div>`;
   if (n.amb) h += `<div class="box amb"><b>⚠ Внимание.</b> ${esc(n.amb)}${m.desc.length ? `<br><br>Проверка родительская: если при сомнении она вернёт false, каскадом не выполнятся ещё <b>${m.desc.length}</b> дочерних.` : ''}</div>`;
   if (n.logic) h += `<div class="box logic"><b>Предполагаемая логика.</b> ${esc(n.logic)}</div>`;
   if (n.note) h += `<div class="box note">${esc(n.note)}</div>`;
@@ -1843,9 +1890,249 @@ function renderDetail() {
   box.innerHTML = h;
   box.classList.add('on');
   $('#dx').addEventListener('click', () => select(null));
+  if ($('#openAlgo')) $('#openAlgo').addEventListener('click', () => openAlgo(n.id));
   box.querySelectorAll('.lnk,a.chip').forEach(x => x.addEventListener('click', () => select(x.dataset.id)));
 }
 const GATE_ID = 'IFC-01';
+
+// ───────── алгоритм проверки (окно из карточки справа): вход → шаги и развилки → true; ошибки внизу сходятся в false ─────────
+const AL = { stepW: 196, gateW: 212, errW: 246, endW: 172, inW: 236, gapX: 64, gapY: 62 };
+const AL_FONT = {
+  t: '12.5px -apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Arial,sans-serif',
+  b: '600 12.5px -apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Arial,sans-serif',
+  s: '11px -apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Arial,sans-serif',
+  c: '10.5px ui-monospace,"SF Mono",Menlo,Consolas,monospace',
+};
+const alCtx = document.createElement('canvas').getContext('2d');
+function alWrap(t, w, font) {
+  alCtx.font = font;
+  const out = []; let cur = '';
+  String(t || '').split(/\s+/).filter(Boolean).forEach(wd => {
+    const nx = cur ? cur + ' ' + wd : wd;
+    if (cur && alCtx.measureText(nx).width > w) { out.push(cur); cur = wd; } else cur = nx;
+  });
+  if (cur) out.push(cur);
+  return out;
+}
+function alText(g, arr, x, y, lh, cls, anchor) {
+  const t = g.append('text').attr('class', cls).attr('x', x).attr('y', y);
+  if (anchor) t.attr('text-anchor', anchor);
+  arr.forEach((s, i) => t.append('tspan').attr('x', x).attr('dy', i ? lh : 0).text(s));
+  return t;
+}
+// размеры узлов: текст переносится по ширине, высота — по числу строк
+function alSize(x) {
+  if (x.t === 'step' || x.t === 'gate') {
+    x.w = x.t === 'step' ? AL.stepW : AL.gateW;
+    const iw = x.w - (x.t === 'gate' ? 44 : 26);
+    x.L = alWrap(x.text, iw, AL_FONT.t); x.C = x.code ? alWrap(x.code, iw, AL_FONT.c) : [];
+    x.h = Math.max(x.t === 'gate' ? 58 : 46, 26 + x.L.length * 16 + (x.C.length ? 5 + x.C.length * 13.5 : 0));
+  } else if (x.t === 'err') {
+    x.w = AL.errW;
+    x.T = alWrap(x.title, x.w - 42, AL_FONT.b); x.A = x.after ? alWrap(x.after, x.w - 26, AL_FONT.s) : [];
+    x.M = alWrap(x.text, x.w - 38, AL_FONT.c);
+    x.h = 14 + x.T.length * 16 + (x.A.length ? 2 + x.A.length * 14 : 0) + 10 + (x.M.length * 13.5 + 14) + 12;
+  } else {
+    x.w = AL.endW; x.P = alWrap(x.text, x.w - 26, AL_FONT.s);
+    x.h = 50 + x.P.length * 14;
+  }
+}
+function alLayout(cid) {
+  const a = G.algo[cid], by = {};
+  const nodes = a.nodes.map(x => ({ ...x })), errs = a.errors.map(x => ({ ...x, t: 'err', row: 'E' }));
+  nodes.concat(errs).forEach(x => { by[x.id] = x; });
+  const last = {};
+  nodes.forEach(x => { x.prev = last[x.row] || null; if (x.prev) x.prev.next = x; last[x.row] = x; });
+  const from = id => nodes.filter(p => p.br.some(b => b.to === id));
+  nodes.forEach(x => { x.col = x.prev ? x.prev.col + 1 : x.row === 0 ? 0 : (from(x.id)[0] || { col: -1 }).col + 1; });
+  const taken = new Set();
+  errs.forEach(e => { let c = Math.max(...from(e.id).map(p => p.col)); while (taken.has(c)) c++; taken.add(c); e.col = c; });
+  const endCol = Math.max(...nodes.concat(errs).map(x => x.col)) + 1;
+  const OK = { id: '$ok', t: 'ok', row: 0, col: endCol, text: a.ok }, FAIL = { id: '$fail', t: 'fail', row: 'E', col: endCol, text: a.fail };
+  const all = nodes.concat(errs, [OK], errs.length ? [FAIL] : []);
+  all.forEach(alSize);
+  // колонки
+  const colW = [], colX = [];
+  all.forEach(x => { colW[x.col] = Math.max(colW[x.col] || 0, x.w + AL.gapX); });
+  for (let c = 0; c <= endCol; c++) { colW[c] = colW[c] || AL.stepW + AL.gapX; colX[c] = c ? colX[c - 1] + colW[c - 1] : AL.inW + 40; }
+  // циклы: вложенность и охват по колонкам (вместе с ошибками под своими развилками)
+  const loops = a.loops.map(l => {
+    const c1 = by[l.from].col, c2 = by[l.to].col;
+    const inside = nodes.filter(x => x.col >= c1 && x.col <= c2);
+    const c3 = Math.max(c2, ...errs.filter(e => from(e.id).some(p => inside.includes(p))).map(e => e.col));
+    return { text: l.text, c1, c2: c3, inside };
+  });
+  loops.forEach(l => { l.lvl = loops.filter(o => o !== l && o.c1 <= l.c1 && o.c2 >= l.c2).length; });
+  const nLvl = loops.length ? Math.max(...loops.map(l => l.lvl)) + 1 : 0;
+  // ряды: основной, побочные, ошибки
+  const rows = [...new Set(nodes.map(x => x.row))].sort((p, q) => p - q);
+  const rowH = r => Math.max(...all.filter(x => x.row === r).map(x => x.h));
+  let y = 16 + nLvl * 26;
+  const rowC = {};
+  rows.forEach(r => { const h = rowH(r); rowC[r] = y + h / 2; y += h + AL.gapY; });
+  const eTop = y + 6, eBot = errs.length ? eTop + rowH('E') : eTop - AL.gapY;
+  all.forEach(x => {
+    const cx = colX[x.col] + (colW[x.col] - AL.gapX) / 2;
+    x.x = cx - x.w / 2;
+    x.y = x.row === 'E' ? eTop : rowC[x.row] - x.h / 2;
+  });
+  loops.forEach(l => {
+    const ins = 8 + 14 * l.lvl;
+    l.x = colX[l.c1] - AL.gapX / 2 + ins; l.x2 = colX[l.c2] + colW[l.c2] - AL.gapX / 2 - ins;
+    const withErr = errs.some(e => e.col >= l.c1 && e.col <= l.c2);
+    l.y = 6 + 26 * l.lvl; l.y2 = (withErr ? eBot : Math.max(...l.inside.map(x => x.y + x.h))) + 16 + 14 * (nLvl - 1 - l.lvl);
+  });
+  const busY = eBot + 16 + 14 * nLvl + 14;
+  // рёбра: шаг → следующий по ряду; развилка → по ответам (без цели — дальше по ряду, в конце — true)
+  const cont = x => x.next || OK;
+  const edges = [];
+  nodes.forEach(x => {
+    if (x.t === 'step') edges.push({ a: x, b: cont(x) });
+    else x.br.forEach(b => edges.push({ a: x, b: b.to ? by[b.to] : cont(x), lab: b.lab }));
+  });
+  // у развилки, где один ответ уходит строго вниз, остальные «вниз» выходят правее
+  edges.forEach(e => { e.down = e.b.row === 'E' || (e.b.row !== e.a.row && e.b.t !== 'ok'); });
+  edges.forEach(e => { e.side = e.down && e.b.col !== e.a.col && edges.some(o => o.a === e.a && o.down && o.b.col === e.a.col); });
+  return { a, nodes, errs, OK, FAIL, all, loops, edges, rowC, busY, eTop, first: nodes.find(x => x.row === 0) };
+}
+function alEdgePath(e, L) {
+  const { a, b } = e, r = 10, acy = a.y + a.h / 2;
+  if (!e.down) {
+    e.lx = a.x + a.w + 7; e.ly = acy - 7; e.anchor = 'start';
+    if (b.row === a.row || (b.t === 'ok' && a.row === 0)) return `M${a.x + a.w},${acy}H${b.x - AR_L}`;
+    const by_ = b.y + b.h / 2, mx = b.x - 28;   // из побочного ряда — обратно наверх к true
+    return `M${a.x + a.w},${acy}H${mx - r}Q${mx},${acy} ${mx},${acy - r}V${by_ + r}Q${mx},${by_} ${mx + r},${by_}H${b.x - AR_L}`;
+  }
+  const px = e.side ? a.x + a.w * 0.8 : a.x + a.w / 2, py = a.y + a.h;
+  e.lx = e.side ? px + 7 : px - 7; e.ly = py + 15; e.anchor = e.side ? 'start' : 'end';
+  if (b.col === a.col) return `M${px},${py}V${b.y - AR_L}`;
+  if (e.side && b.t === 'err') {
+    const hy = L.eTop - 24, bx = b.x + b.w / 2;
+    return `M${px},${py}V${hy - r}Q${px},${hy} ${px + r},${hy}H${bx - r}Q${bx},${hy} ${bx},${hy + r}V${b.y - AR_L}`;
+  }
+  const ty = b.t === 'err' ? b.y + 21 : b.y + b.h / 2;
+  return `M${px},${py}V${ty - r}Q${px},${ty} ${px + r},${ty}H${b.x - AR_L}`;
+}
+function drawAlgo(cid) {
+  const n = N[cid], L = alLayout(cid);
+  const svgA = d3.select('#algoSvg');
+  svgA.selectAll('*').remove();
+  const defs = svgA.append('defs');
+  [['al-m', '--muted'], ['al-ok', '--ok'], ['al-no', '--fail']].forEach(([id, v]) => defs.append('marker').attr('id', id).attr('viewBox', '0 -4 8 8').attr('refX', 0).attr('refY', 0)
+    .attr('markerUnits', 'userSpaceOnUse').attr('markerWidth', AR_L).attr('markerHeight', AR_L).attr('orient', 'auto')
+    .append('path').attr('d', 'M0,-3.5L8,0L0,3.5Z').style('fill', `var(${v})`));
+  const root = svgA.append('g');
+  // рамки циклов
+  L.loops.slice().sort((p, q) => p.lvl - q.lvl).forEach(l => {
+    const g = root.append('g').attr('class', 'al-loop');
+    g.append('rect').attr('x', l.x).attr('y', l.y).attr('width', l.x2 - l.x).attr('height', l.y2 - l.y).attr('rx', 14);
+    const t = g.append('text').attr('x', l.x + 12).attr('y', l.y + 18);
+    t.append('tspan').attr('class', 'al-rep').text('↻ ');
+    const [head, tail] = l.text.split(/:\s*/);
+    t.append('tspan').text(head);
+    if (tail) t.append('tspan').attr('class', 'al-lcode').text('  ' + tail);
+  });
+  // вход: какие файлы + что приходит от других проверок (из связей графа)
+  const gi = root.append('g').attr('class', 'al-in');
+  const cy0 = L.rowC[0];
+  const par = IN[cid].filter(e => e.k !== 'agg').sort((p, q) => (q.implicit - p.implicit) || N[p.from].depth - N[q.from].depth);
+  const ft = ftOf(cid), sec = n.sec;
+  const parts = ft !== 'ifc' ? [ft] : sec === 'both' ? ['ar', 'ps'] : sec === 'all' ? ['ar', 'ps', 'bf'] : [sec];
+  const iw = AL.inW;
+  let iy = 36;
+  gi.append('text').attr('class', 'al-cap').attr('x', 14).attr('y', 22).text('Вход · какие файлы');
+  const tg = gi.append('g').attr('class', 'sectag');
+  parts.forEach((p, i) => {
+    const el = tg.append('g').attr('class', 't-' + p + (EXT[p] ? ' ext' : ''));
+    el.append('rect').attr('x', 14 + i * 40).attr('y', iy).attr('width', 34).attr('height', 16).attr('rx', 8);
+    el.append('text').attr('x', 14 + i * 40 + 17).attr('y', iy + 11.5).text(SEC_TAG[p]);
+  });
+  iy += 36;
+  const fl = alWrap(L.a.files, iw - 28, AL_FONT.t);
+  alText(gi, fl, 14, iy, 16, 'al-t'); iy += (fl.length - 1) * 16 + 16;
+  if (par.length) {
+    gi.append('line').attr('class', 'al-sep').attr('x1', 14).attr('x2', iw - 14).attr('y1', iy).attr('y2', iy); iy += 22;
+    gi.append('text').attr('class', 'al-cap').attr('x', 14).attr('y', iy).text('Что берём у других проверок'); iy += 22;
+    par.forEach(e => {
+      gi.append('text').attr('class', 'al-pid').attr('x', 14).attr('y', iy).style('fill', `var(--k-${e.k})`).text(N[e.from].label);
+      const vl = alWrap(e.implicit ? 'файл открылся — допуск к проверке' : e.via, iw - 28, AL_FONT.s);
+      alText(gi, vl, 14, iy + 16, 14, 'al-via'); iy += 16 + vl.length * 14 + 10;
+    });
+  }
+  const iTop = Math.min(L.first.y, cy0 - 30);
+  gi.attr('transform', `translate(0,${iTop})`);
+  gi.insert('rect', ':first-child').attr('class', 'al-inbox').attr('width', iw).attr('height', iy + 2).attr('rx', 12);
+  // рёбра
+  const ge = root.append('g');
+  ge.append('path').attr('class', 'al-edge').attr('marker-end', 'url(#al-m)').attr('d', `M${iw},${cy0}H${L.first.x - AR_L}`);
+  L.edges.forEach(e => {
+    const d = alEdgePath(e, L), cls = e.b.t === 'err' ? 'no' : e.b.t === 'ok' ? 'ok' : '';
+    ge.append('path').attr('class', 'al-edge ' + cls).attr('d', d).attr('marker-end', `url(#${cls === 'no' ? 'al-no' : cls === 'ok' ? 'al-ok' : 'al-m'})`);
+    if (e.lab) ge.append('text').attr('class', 'al-lab ' + cls).attr('x', e.lx).attr('y', e.ly).attr('text-anchor', e.anchor).text(e.lab);
+  });
+  // шина: все ошибки сходятся в false
+  if (L.errs.length) {
+    const F = L.FAIL, fx = F.x + F.w / 2, r = 10;
+    L.errs.forEach(x => ge.append('path').attr('class', 'al-bus').attr('d', `M${x.x + x.w / 2},${x.y + x.h}V${L.busY}`));
+    const x0 = Math.min(...L.errs.map(x => x.x + x.w / 2));
+    ge.append('path').attr('class', 'al-bus').attr('marker-end', 'url(#al-no)').attr('d', `M${x0},${L.busY}H${fx - r}Q${fx},${L.busY} ${fx},${L.busY - r}V${F.y + F.h + AR_L}`);
+    L.errs.forEach(x => ge.append('circle').attr('class', 'al-dot').attr('cx', x.x + x.w / 2).attr('cy', L.busY).attr('r', 2.6));
+  }
+  // узлы
+  const gn = root.append('g');
+  L.all.forEach(x => {
+    const g = gn.append('g').attr('class', 'al-' + x.t).attr('transform', `translate(${x.x},${x.y})`);
+    if (x.t === 'step' || x.t === 'gate') {
+      const w = x.w, h = x.h, k = 16, mid = x.t === 'gate';
+      if (mid) g.append('path').attr('class', 'box').attr('d', `M0,${h / 2}L${k},0H${w - k}L${w},${h / 2}L${w - k},${h}H${k}Z`);
+      else g.append('rect').attr('class', 'box').attr('width', w).attr('height', h).attr('rx', 9);
+      const ty = h / 2 - (x.L.length * 16 + (x.C.length ? 5 + x.C.length * 13.5 : 0)) / 2 + 12;
+      const tx = mid ? w / 2 : 13, an = mid ? 'middle' : null;
+      alText(g, x.L, tx, ty, 16, 'al-t', an);
+      if (x.C.length) alText(g, x.C, tx, ty + (x.L.length - 1) * 16 + 19, 13.5, 'al-code', an);
+    } else if (x.t === 'err') {
+      g.append('rect').attr('class', 'box').attr('width', x.w).attr('height', x.h).attr('rx', 9);
+      g.append('text').attr('class', 'al-x').attr('x', 14).attr('y', 26).text('✕');
+      alText(g, x.T, 32, 26, 16, 'al-et');
+      let yy = 26 + (x.T.length - 1) * 16;
+      if (x.A.length) { alText(g, x.A, 14, yy + 17, 14, 'al-after'); yy += 3 + x.A.length * 14; }
+      yy += 12;
+      g.append('rect').attr('class', 'msg').attr('x', 10).attr('y', yy).attr('width', x.w - 20).attr('height', x.M.length * 13.5 + 14).attr('rx', 6);
+      alText(g, x.M, 19, yy + 17, 13.5, 'al-code al-msg');
+    } else {
+      g.append('rect').attr('class', 'box').attr('width', x.w).attr('height', x.h).attr('rx', 12);
+      g.append('text').attr('class', 'al-big').attr('x', x.w / 2).attr('y', 30).attr('text-anchor', 'middle').text(x.t === 'ok' ? '✓ true' : '✕ false');
+      alText(g, x.P, x.w / 2, 50, 14, 'al-after', 'middle');
+    }
+  });
+  return root;
+}
+let alZoom = null;
+function alFit() {
+  const svgA = d3.select('#algoSvg'), root = svgA.select('g'), el = svgA.node();
+  if (root.empty()) return;
+  const bb = root.node().getBBox(), W = el.clientWidth, H = el.clientHeight, pad = 36;
+  const kf = Math.min((W - 2 * pad) / bb.width, (H - 2 * pad) / bb.height);
+  const k = Math.max(0.62, Math.min(1.1, kf));
+  const tx = kf >= 0.62 ? (W - bb.width * k) / 2 - bb.x * k : pad - bb.x * k;
+  const ty = Math.max(pad, (H - bb.height * k) / 2) - bb.y * k;
+  svgA.call(alZoom.transform, d3.zoomIdentity.translate(tx, ty).scale(k));
+}
+function openAlgo(cid) {
+  if (!G.algo || !G.algo[cid]) return;
+  const n = N[cid];
+  $('#algoCode').textContent = n.label;
+  $('#algoTitle').textContent = n.n;
+  $('#algoSub').textContent = `Алгоритм проверки · ${n.p}. Слева направо: какие файлы берём → шаги и развилки → true. Ошибки — под развилкой, которая их даёт; все сходятся в false.`;
+  $('#algo').classList.add('on');
+  const svgA = d3.select('#algoSvg');
+  drawAlgo(cid);
+  alZoom = d3.zoom().scaleExtent([0.2, 3]).on('zoom', ev => svgA.select('g').attr('transform', ev.transform));
+  svgA.call(alZoom).on('dblclick.zoom', null);
+  alFit();
+}
+const closeAlgo = () => $('#algo').classList.remove('on');
+
 
 function select(id) {
   if (S.view === 'npa') { npaSelect(id); return; }
@@ -2118,7 +2405,9 @@ function bind() {
   $('#exportSvg').addEventListener('click', exportSvg);
   $('#closeModal').addEventListener('click', () => $('#modal').classList.remove('on'));
   $('#modal').addEventListener('click', e => { if (e.target.id === 'modal') $('#modal').classList.remove('on'); });
-  document.addEventListener('keydown', e => { if (e.key === 'Escape') { if ($('#filePick').classList.contains('open')) $('#filePick').classList.remove('open'); else if ($('#modal').classList.contains('on')) $('#modal').classList.remove('on'); else select(null); } });
+  $('#algoClose').addEventListener('click', closeAlgo);
+  $('#algoFit').addEventListener('click', alFit);
+  document.addEventListener('keydown', e => { if (e.key === 'Escape') { if ($('#algo').classList.contains('on')) closeAlgo(); else if ($('#filePick').classList.contains('open')) $('#filePick').classList.remove('open'); else if ($('#modal').classList.contains('on')) $('#modal').classList.remove('on'); else select(null); } });
   $('#q').addEventListener('input', e => {
     S.q = e.target.value;
     const q = S.q.trim().toLowerCase();
