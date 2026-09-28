@@ -1,7 +1,7 @@
 // Сгенерировано build_npa.py — руками не править.
 window.NPA_GRAPH = {
  "meta": {
-  "asof": "2026-09-24",
+  "asof": "2026-09-28",
   "source": "лист «IFC к 16.10» рабочей таблицы проверок"
  },
  "sections": [
@@ -101,7 +101,7 @@ window.NPA_GRAPH = {
    "sec": "4.1",
    "changed": false,
    "role": null,
-   "analysis": false,
+   "analysis": true,
    "dev": false,
    "inModel": [
     "IFC-01"
@@ -123,7 +123,7 @@ window.NPA_GRAPH = {
    "sec": "4.1",
    "changed": true,
    "role": null,
-   "analysis": false,
+   "analysis": true,
    "dev": false,
    "inModel": [
     "IFC-96"
@@ -496,7 +496,7 @@ window.NPA_GRAPH = {
    "changed": true,
    "role": null,
    "analysis": false,
-   "dev": false,
+   "dev": true,
    "inModel": [
     "IFC-35-39"
    ],
@@ -671,7 +671,7 @@ window.NPA_GRAPH = {
    "sec": "5.1",
    "changed": true,
    "role": null,
-   "analysis": false,
+   "analysis": true,
    "dev": false,
    "inModel": [
     "IFC-72"
@@ -718,7 +718,7 @@ window.NPA_GRAPH = {
    "sec": "5.2",
    "changed": true,
    "role": null,
-   "analysis": false,
+   "analysis": true,
    "dev": false,
    "inModel": [
     "IFC-50"
@@ -741,7 +741,7 @@ window.NPA_GRAPH = {
    "sec": "5.2",
    "changed": true,
    "role": null,
-   "analysis": false,
+   "analysis": true,
    "dev": false,
    "inModel": [
     "IFC-51"
@@ -790,7 +790,7 @@ window.NPA_GRAPH = {
    "sec": "5.2",
    "changed": true,
    "role": null,
-   "analysis": false,
+   "analysis": true,
    "dev": false,
    "inModel": [
     "IFC-97"
@@ -813,7 +813,7 @@ window.NPA_GRAPH = {
    "sec": "5.2",
    "changed": true,
    "role": null,
-   "analysis": false,
+   "analysis": true,
    "dev": false,
    "inModel": [
     "IFC-98"
@@ -890,8 +890,8 @@ window.NPA_GRAPH = {
    "disc": "both"
   },
   {
-   "id": "IFC-109-b",
-   "label": "IFC-109 (2)",
+   "id": "IFC-110",
+   "label": "IFC-110",
    "title": "IfcBuildingElementProxy для раздела ЦИМ ПС",
    "parts": [
     "IfcBuildingElementProxy для раздела ЦИМ ПС"
@@ -905,7 +905,7 @@ window.NPA_GRAPH = {
    "analysis": false,
    "dev": false,
    "inModel": [
-    "IFC-109-b"
+    "IFC-110"
    ],
    "ord": 35,
    "side": "",
@@ -947,7 +947,7 @@ window.NPA_GRAPH = {
    "sec": "5.2",
    "changed": true,
    "role": null,
-   "analysis": false,
+   "analysis": true,
    "dev": false,
    "inModel": [
     "IFC-99"
@@ -1444,7 +1444,5 @@ window.NPA_GRAPH = {
    "disc": ""
   }
  ],
- "notes": [
-  "IFC-109: номер встречается в таблице дважды — вторая строка (п. 5.2.18) показана как IFC-109 (2)"
- ]
+ "notes": []
 };

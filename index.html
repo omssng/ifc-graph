@@ -440,9 +440,9 @@
 <div id="modal"><div class="win"><header><div><h2 id="modalTitle">Выводы анализа</h2><small id="insSub"></small></div><span class="x" id="closeModal">×</span></header><div class="body" id="insBody"></div></div></div>
 
 <script src="vendor/d3.v7.min.js"></script>
-<script src="data.js?v=66"></script>
-<script src="facts.js?v=66"></script>
-<script src="npa.js?v=66"></script>
+<script src="data.js?v=67"></script>
+<script src="facts.js?v=67"></script>
+<script src="npa.js?v=67"></script>
 <script>
 (() => {
 'use strict';
@@ -681,19 +681,19 @@ function setupSvg() {
   svg.selectAll('*').remove();
   const defs = svg.append('defs');
   KIND_ORDER.forEach(k => {
-    defs.append('marker').attr('id', 'ar-' + k).attr('viewBox', '0 -4 8 8').attr('refX', 7).attr('refY', 0)
-      .attr('markerWidth', 6.5).attr('markerHeight', 6.5).attr('orient', 'auto')
+    defs.append('marker').attr('id', 'ar-' + k).attr('viewBox', '0 -4 8 8').attr('refX', 0).attr('refY', 0)
+      .attr('markerUnits', 'userSpaceOnUse').attr('markerWidth', AR_L).attr('markerHeight', AR_L).attr('orient', 'auto')
       .append('path').attr('d', 'M0,-3.5L8,0L0,3.5Z').attr('class', 'mk mk-' + k);
   });
-  defs.append('marker').attr('id', 'ar-npa').attr('viewBox', '0 -4 8 8').attr('refX', 7).attr('refY', 0)
-    .attr('markerWidth', 7).attr('markerHeight', 7).attr('orient', 'auto')
+  defs.append('marker').attr('id', 'ar-npa').attr('viewBox', '0 -4 8 8').attr('refX', 0).attr('refY', 0)
+    .attr('markerUnits', 'userSpaceOnUse').attr('markerWidth', AR_L).attr('markerHeight', AR_L).attr('orient', 'auto')
     .append('path').attr('d', 'M0,-3.5L8,0L0,3.5Z').attr('class', 'mk mk-npa');
-  defs.append('marker').attr('id', 'ar-back').attr('viewBox', '0 -4 8 8').attr('refX', 7).attr('refY', 0)
-    .attr('markerWidth', 7).attr('markerHeight', 7).attr('orient', 'auto')
+  defs.append('marker').attr('id', 'ar-back').attr('viewBox', '0 -4 8 8').attr('refX', 0).attr('refY', 0)
+    .attr('markerUnits', 'userSpaceOnUse').attr('markerWidth', AR_L).attr('markerHeight', AR_L).attr('orient', 'auto')
     .append('path').attr('d', 'M0,-3.5L8,0L0,3.5Z').attr('class', 'mk mk-back');
   ['anc', 'desc'].forEach(k => {
-    defs.append('marker').attr('id', 'ar-' + k).attr('viewBox', '0 -4 8 8').attr('refX', 7).attr('refY', 0)
-      .attr('markerWidth', 7).attr('markerHeight', 7).attr('orient', 'auto')
+    defs.append('marker').attr('id', 'ar-' + k).attr('viewBox', '0 -4 8 8').attr('refX', 0).attr('refY', 0)
+      .attr('markerUnits', 'userSpaceOnUse').attr('markerWidth', AR_L).attr('markerHeight', AR_L).attr('orient', 'auto')
       .append('path').attr('d', 'M0,-3.5L8,0L0,3.5Z').attr('class', 'mk mk-' + k);
   });
   const pat = defs.append('pattern').attr('id', 'hatch').attr('width', 6).attr('height', 6).attr('patternUnits', 'userSpaceOnUse').attr('patternTransform', 'rotate(45)');
@@ -771,10 +771,13 @@ function layered(nodes, edges, lanes) {
   return { P, depths, cols, UF, xs: X.xs, laneBands, W: X.W, H, LM, GX };
 }
 
+// стрелка фиксированной длины AR_L: линия кончается у её основания, остриё — на рамке карточки
+const AR_L = 9;
+const arrowEnd = (cx, cy, x, y) => { const dx = x - cx, dy = y - cy, l = Math.hypot(dx, dy) || 1; return `${x - dx / l * AR_L},${y - dy / l * AR_L}`; };
 const edgePath = (a, b) => {
   const x1 = a.x + NW, y1 = a.y + NH / 2, x2 = b.x, y2 = b.y + NH / 2;
   const dx = Math.max(30, (x2 - x1) * 0.5);
-  return `M${x1},${y1}C${x1 + dx},${y1} ${x2 - dx},${y2} ${x2},${y2}`;
+  return `M${x1},${y1}C${x1 + dx},${y1} ${x2 - dx},${y2} ${arrowEnd(x2 - dx, y2, x2, y2)}`;
 };
 // плашка раздела слева от карточки, там, куда сходятся входящие провода; у «ПС + АР» — две плашки столбиком
 // IFC — пишем раздел ЦИМ; не IFC — расширение файла, из которого берутся данные
@@ -1351,7 +1354,7 @@ function drawNpa() {
       const x1 = bx(l.from) + NW + 2 * PAD, y1 = by(l.from) + Math.min(bh(l.from), 90) / 2;
       const x2 = bx(l.to), y2 = by(l.to) + Math.min(bh(l.to), 90) / 2;
       const dx = Math.max(24, (x2 - x1) * 0.5);
-      return `M${x1},${y1}C${x1 + dx},${y1} ${x2 - dx},${y2} ${x2 - 2},${y2}`;
+      return `M${x1},${y1}C${x1 + dx},${y1} ${x2 - dx},${y2} ${arrowEnd(x2 - dx, y2, x2, y2)}`;
     });
   // карточки
   const pos = [];
@@ -1367,15 +1370,15 @@ function drawNpa() {
       .attr('d', l => {
         const a = P[l.from], b = P[l.to];
         if (l.dir === 'fwd') {
-          const x1 = a.x + NW, x2 = b.x - 2, dx = Math.max(30, (x2 - x1) * 0.45);
-          return `M${x1},${cy(a)}C${x1 + dx},${cy(a)} ${x2 - dx},${cy(b)} ${x2},${cy(b)}`;
+          const x1 = a.x + NW, x2 = b.x, dx = Math.max(30, (x2 - x1) * 0.45);
+          return `M${x1},${cy(a)}C${x1 + dx},${cy(a)} ${x2 - dx},${cy(b)} ${arrowEnd(x2 - dx, cy(b), x2, cy(b))}`;
         }
         if (l.dir === 'same') {  // дуга справа от раздела
           const x = a.x + NW, xo = x + 16 + Math.min(34, Math.abs(cy(b) - cy(a)) * 0.12);
-          return `M${x},${cy(a)}C${xo},${cy(a)} ${xo},${cy(b)} ${x + 2},${cy(b)}`;
+          return `M${x},${cy(a)}C${xo},${cy(a)} ${xo},${cy(b)} ${arrowEnd(xo, cy(b), x, cy(b))}`;
         }
-        const x1 = a.x, x2 = b.x + NW + 2, up = 70 + Math.abs(x1 - x2) * 0.08;  // назад — дугой сверху
-        return `M${x1},${cy(a)}C${x1 - 40},${cy(a) - up} ${x2 + 40},${cy(b) - up} ${x2},${cy(b)}`;
+        const x1 = a.x, x2 = b.x + NW, up = 70 + Math.abs(x1 - x2) * 0.08;  // назад — дугой сверху
+        return `M${x1},${cy(a)}C${x1 - 40},${cy(a) - up} ${x2 + 40},${cy(b) - up} ${arrowEnd(x2 + 40, cy(b) - up, x2, cy(b))}`;
       });
   }
   nodeSel = gRoot.append('g').selectAll('g').data(pos).join('g')
