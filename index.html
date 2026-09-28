@@ -348,6 +348,96 @@
   .al-loop .al-rep{fill:var(--accent);font-weight:700}
   .al-loop .al-lcode{font:10.5px ui-monospace,"SF Mono",Menlo,Consolas,monospace;fill:var(--muted)}
 
+  #algo header>div:first-child{min-width:0}
+  #algo .hbtn{flex-wrap:wrap;justify-content:flex-end}
+  #algo.html #algoSvg{display:none}
+  #algoHtml{display:none;flex:1;min-height:0;overflow:auto;padding:26px 32px 56px;scrollbar-width:thin;scrollbar-color:var(--line) transparent}
+  #algo.html #algoHtml{display:block}
+  .al-doc{max-width:1020px;margin:0 auto}
+  .al-inh{background:var(--panel);border:1px solid var(--line);border-radius:12px;padding:12px 16px;margin-bottom:16px;font-size:12.5px}
+  .al-inh .cap{font-size:10px;text-transform:uppercase;letter-spacing:.08em;color:var(--muted);margin:2px 0 6px}
+  .al-inh .cap+.fl{margin-bottom:10px}
+  .al-inh .fl{display:flex;align-items:center;flex-wrap:wrap;gap:2px}
+  .al-inh .fl .lgtag{margin-right:6px}
+  .al-inh .par{display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:4px 18px;color:var(--muted);font-size:12px}
+  .al-inh .par b{font:700 11.5px ui-monospace,"SF Mono",Menlo,Consolas,monospace;margin-right:4px}
+  .hc{display:block;font:11px ui-monospace,"SF Mono",Menlo,Consolas,monospace;color:var(--muted);margin-top:3px}
+  /* метро */
+  .al-trunk{fill:none;stroke:var(--chipbd);stroke-width:4;stroke-linecap:round}
+  .al-brk{fill:none;stroke:var(--accent);stroke-width:1.6;opacity:.7}
+  .al-mloop{font-size:11.5px;fill:var(--ink);paint-order:stroke;stroke:var(--bg);stroke-width:5px;stroke-linejoin:round}
+  .al-mloop .al-rep{fill:var(--accent);font-weight:700}
+  .al-mloop .al-lcode{font:10.5px ui-monospace,"SF Mono",Menlo,Consolas,monospace;fill:var(--muted)}
+  .al-st-step{fill:var(--panel);stroke:var(--ink);stroke-width:2.4}
+  .al-st-gate{fill:var(--panel);stroke:var(--warn);stroke-width:2.4}
+  .al-st-in{fill:var(--accent)}
+  .al-st-ok{fill:var(--ok)}
+  .al-st-okt{font:700 13px sans-serif;fill:var(--panel)}
+  .al-q{font-weight:600}
+  .al-okc{fill:var(--ok)}
+  .al-ans{fill:var(--chipbg);stroke:var(--chipbd);stroke-width:1}
+  .al-ans.no{fill:rgba(214,69,69,.12);stroke:var(--fail)}
+  .al-anst{font-size:11px;font-weight:600;fill:var(--chipink)}
+  .al-anst.no{fill:var(--fail)}
+  /* структурограмма */
+  .ns{background:var(--panel);border:1.5px solid var(--chipbd);border-radius:12px;overflow:hidden;font-size:12.5px}
+  .ns-seq>*+*{border-top:1px solid var(--chipbd)}
+  .ns-step{padding:10px 14px}
+  .ns-lh{padding:9px 14px;background:var(--lane1)}
+  .ns-lh>b{color:var(--accent);margin-right:4px}
+  .ns-lh .hc{display:inline;margin-left:6px}
+  .ns-lb{margin-left:30px;border-left:1px solid var(--chipbd);border-top:1px solid var(--chipbd)}
+  .ns-q{position:relative;min-height:84px;padding:10px 14px 30px;text-align:center;border-bottom:1px solid var(--chipbd)}
+  .ns-q svg{position:absolute;inset:0;width:100%;height:100%}
+  .ns-q line{stroke:var(--warn);stroke-width:1.4;vector-effect:non-scaling-stroke;opacity:.75}
+  .ns-q .qt{position:relative;display:inline-block;max-width:52%;font-weight:600;background:var(--panel);padding:2px 6px;border-radius:6px}
+  .ns-labs{position:absolute;left:0;right:0;bottom:6px;display:grid;grid-template-columns:var(--cols);text-align:center}
+  .ns-labs i{font-style:normal;font-weight:600;font-size:11.5px;color:var(--muted);background:var(--panel);padding:0 6px;border-radius:6px;justify-self:center;position:relative}
+  .ns-labs i.no{color:var(--fail)}
+  .ns-brs{display:grid;grid-template-columns:var(--cols)}
+  .ns-br+.ns-br{border-left:1px solid var(--chipbd)}
+  .ns-br{display:flex;flex-direction:column}
+  .ns-br>*{flex:1}
+  .ns-err{padding:10px 14px;background:rgba(214,69,69,.08)}
+  .ns-err b{color:var(--fail)}
+  .ns-err small{display:block;color:var(--muted);font-size:11.5px;margin-top:2px}
+  .ns-err code{display:block;margin-top:6px;font:11px/1.45 ui-monospace,"SF Mono",Menlo,Consolas,monospace;color:var(--ink);opacity:.85}
+  .ns-cont{padding:10px 14px;color:var(--muted);text-align:center;display:flex;align-items:center;justify-content:center}
+  .ns-end{display:grid;grid-template-columns:1fr 1fr;border-top:1.5px solid var(--chipbd)}
+  .ns-end>div{padding:10px 14px;color:var(--muted);font-size:12px}
+  .ns-end>div+div{border-left:1px solid var(--chipbd)}
+  .ns-end b{font:700 13px ui-monospace,"SF Mono",Menlo,Consolas,monospace;margin-right:6px}
+  .al-doc .ok{color:var(--ok)} .al-doc .no{color:var(--fail)}
+  /* псевдокод */
+  .pc{background:var(--panel);border:1px solid var(--line);border-radius:12px;padding:18px 22px;font-size:13px;line-height:1.6}
+  .pc-l{position:relative;padding-left:calc(var(--i) * 26px)}
+  .pc-l::before{content:'';position:absolute;left:0;top:0;bottom:0;width:calc(var(--i) * 26px);background:repeating-linear-gradient(90deg,transparent 0 7px,var(--line) 7px 8px,transparent 8px 26px)}
+  .pc-gap{height:12px}
+  .pc .kw{font:700 11.5px ui-monospace,"SF Mono",Menlo,Consolas,monospace;letter-spacing:.04em;margin-right:8px}
+  .pc .kw.lp{color:var(--accent)} .pc .kw.if{color:var(--warn)} .pc .kw.in{color:var(--muted)}
+  .pc .ans{font-weight:600;color:var(--ink);background:var(--chipbg);border-radius:6px;padding:0 6px;margin:0 2px}
+  .pc .err{color:var(--fail);font-weight:600} .pc .ok{color:var(--ok);font-weight:700}
+  .pc .cm{color:var(--muted);font-size:12px}
+  .pc .msg{font:11.5px ui-monospace,"SF Mono",Menlo,Consolas,monospace;color:var(--muted)}
+  .pc .pid{font:700 11.5px ui-monospace,"SF Mono",Menlo,Consolas,monospace}
+  .pc .lgtag{margin-right:6px}
+  /* таблица решений */
+  .al-tab{border-collapse:separate;border-spacing:0;width:100%;background:var(--panel);border:1px solid var(--line);border-radius:12px;overflow:hidden;font-size:12.5px}
+  .al-tab th{text-align:left;vertical-align:bottom;font-weight:600;font-size:12px;padding:10px 12px;border-bottom:1px solid var(--line);color:var(--ink);background:var(--lane1)}
+  .al-tab th small{display:block;font-weight:400;font-size:10.5px;color:var(--accent);margin-bottom:3px}
+  .al-tab td{padding:9px 12px;border-bottom:1px solid var(--line);vertical-align:top}
+  .al-tab tr:last-child td{border-bottom:0}
+  .al-tab .n{width:34px;color:var(--muted);text-align:center}
+  .al-tab .dash{color:var(--dim)}
+  .al-tab .res{width:38%}
+  .al-tab .res b{display:block}
+  .al-tab .res small{display:block;color:var(--muted);font-size:11.5px;margin-top:2px}
+  .al-tab .res code{display:block;margin-top:5px;font:11px/1.45 ui-monospace,"SF Mono",Menlo,Consolas,monospace;color:var(--muted)}
+  .al-cell{display:inline-block;padding:1px 8px;border-radius:9px;background:var(--chipbg);color:var(--chipink);font-weight:600;font-size:11.5px}
+  .al-cell.key{background:rgba(214,69,69,.14);color:var(--fail)}
+  .al-cell.okk{background:rgba(47,158,88,.14);color:var(--ok)}
+  .al-tnote{color:var(--muted);font-size:12px;margin-top:10px}
+
   /* ───── Модалка ───── */
   #modal{position:fixed;inset:0;background:rgba(10,14,22,.45);z-index:50;display:none;align-items:center;justify-content:center;padding:24px}
   #modal.on{display:flex}
@@ -481,14 +571,14 @@
 <div id="detail"></div>
 <div id="etip"></div>
 
-<div id="algo"><header><div><div class="code" id="algoCode"></div><div class="ttl" id="algoTitle"></div><small id="algoSub"></small></div><div class="hbtn"><button class="btn" id="algoFit">К центру</button><span class="x" id="algoClose" title="Закрыть (Esc)">×</span></div></header><svg id="algoSvg"></svg></div>
+<div id="algo"><header><div><div class="code" id="algoCode"></div><div class="ttl" id="algoTitle"></div><small id="algoSub"></small></div><div class="hbtn"><div class="seg" id="algoViews" role="group" aria-label="Вид алгоритма"></div><button class="btn" id="algoFit">К центру</button><span class="x" id="algoClose" title="Закрыть (Esc)">×</span></div></header><svg id="algoSvg"></svg><div id="algoHtml"></div></div>
 
 <div id="modal"><div class="win"><header><div><h2 id="modalTitle">Выводы анализа</h2><small id="insSub"></small></div><span class="x" id="closeModal">×</span></header><div class="body" id="insBody"></div></div></div>
 
 <script src="vendor/d3.v7.min.js"></script>
-<script src="data.js?v=68"></script>
-<script src="facts.js?v=68"></script>
-<script src="npa.js?v=68"></script>
+<script src="data.js?v=69"></script>
+<script src="facts.js?v=69"></script>
+<script src="npa.js?v=69"></script>
 <script>
 (() => {
 'use strict';
@@ -1895,8 +1985,18 @@ function renderDetail() {
 }
 const GATE_ID = 'IFC-01';
 
-// ───────── алгоритм проверки (окно из карточки справа): вход → шаги и развилки → true; ошибки внизу сходятся в false ─────────
-const AL = { stepW: 196, gateW: 212, errW: 246, endW: 172, inW: 236, gapX: 64, gapY: 62 };
+// ───────── алгоритм проверки (окно из карточки справа) — несколько видов, переключатель в шапке окна ─────────
+const AL = { stepW: 196, gateW: 212, errW: 246, endW: 172, inW: 236 };
+const AL_VIEWS = [
+  ['h', 'Схема →', 'Слева направо: какие файлы берём → шаги и развилки → true. Ошибки — под развилкой, которая их даёт; все сходятся в false.'],
+  ['v', 'Схема ↓', 'Сверху вниз: какие файлы берём → шаги и развилки → true. Ошибки — справа от развилки, которая их даёт; все сходятся в false. Колесо — прокрутка, Ctrl + колесо — масштаб.'],
+  ['metro', 'Метро', 'Линия — ход проверки сверху вниз: кружок — шаг, ромб — развилка, ответ-ошибка уходит вправо к своему тексту. Скобка слева — цикл. Колесо — прокрутка, Ctrl + колесо — масштаб.'],
+  ['ns', 'Структурограмма', 'Блоки сверху вниз. Цикл — блок с отступом слева; развилка — треугольник, под ним ветви по ответам, каждая до своего исхода.'],
+  ['code', 'Псевдокод', 'Та же логика текстом, как программа: отступ — вложенность, ДЛЯ КАЖДОГО — цикл, ЕСЛИ и ВЫБОР — развилки.'],
+  ['table', 'Таблица решений', 'Все сценарии: какие ответы на развилках к какому итогу приводят. «—» — до этой развилки проверка не доходит.'],
+];
+const AL_SVG = new Set(['h', 'v', 'metro']);
+let alView = 'h', alCur = null, alZoom = null;
 const AL_FONT = {
   t: '12.5px -apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Arial,sans-serif',
   b: '600 12.5px -apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Arial,sans-serif',
@@ -1914,11 +2014,30 @@ function alWrap(t, w, font) {
   if (cur) out.push(cur);
   return out;
 }
+const alTextW = (t, font) => { alCtx.font = font; return alCtx.measureText(t).width; };
 function alText(g, arr, x, y, lh, cls, anchor) {
   const t = g.append('text').attr('class', cls).attr('x', x).attr('y', y);
   if (anchor) t.attr('text-anchor', anchor);
   arr.forEach((s, i) => t.append('tspan').attr('x', x).attr('dy', i ? lh : 0).text(s));
   return t;
+}
+// ломаная с закруглёнными углами; последний отрезок укорочен на длину стрелки
+function alPath(xy, arrow = true, r = 10) {
+  xy = xy.map(p => p.slice());
+  const n = xy.length;
+  if (arrow) {
+    const [x1, y1] = xy[n - 2], [x2, y2] = xy[n - 1], L = Math.hypot(x2 - x1, y2 - y1) || 1;
+    xy[n - 1] = [x2 - (x2 - x1) / L * AR_L, y2 - (y2 - y1) / L * AR_L];
+  }
+  let d = `M${xy[0][0]},${xy[0][1]}`;
+  for (let i = 1; i < n - 1; i++) {
+    const [px, py] = xy[i - 1], [cx, cy] = xy[i], [nx, ny] = xy[i + 1];
+    const d1 = Math.hypot(cx - px, cy - py), d2 = Math.hypot(nx - cx, ny - cy);
+    if (!d1 || !d2) { d += `L${cx},${cy}`; continue; }
+    const rr = Math.min(r, d1 / 2, d2 / 2);
+    d += `L${cx - (cx - px) / d1 * rr},${cy - (cy - py) / d1 * rr}Q${cx},${cy} ${cx + (nx - cx) / d2 * rr},${cy + (ny - cy) / d2 * rr}`;
+  }
+  return d + `L${xy[n - 1][0]},${xy[n - 1][1]}`;
 }
 // размеры узлов: текст переносится по ширине, высота — по числу строк
 function alSize(x) {
@@ -1937,199 +2056,469 @@ function alSize(x) {
     x.h = 50 + x.P.length * 14;
   }
 }
-function alLayout(cid) {
+// ── модель алгоритма: узлы по рядам, ошибки, рёбра (для схем) ──
+function alModel(cid) {
   const a = G.algo[cid], by = {};
   const nodes = a.nodes.map(x => ({ ...x })), errs = a.errors.map(x => ({ ...x, t: 'err', row: 'E' }));
   nodes.concat(errs).forEach(x => { by[x.id] = x; });
   const last = {};
   nodes.forEach(x => { x.prev = last[x.row] || null; if (x.prev) x.prev.next = x; last[x.row] = x; });
   const from = id => nodes.filter(p => p.br.some(b => b.to === id));
-  nodes.forEach(x => { x.col = x.prev ? x.prev.col + 1 : x.row === 0 ? 0 : (from(x.id)[0] || { col: -1 }).col + 1; });
-  const taken = new Set();
-  errs.forEach(e => { let c = Math.max(...from(e.id).map(p => p.col)); while (taken.has(c)) c++; taken.add(c); e.col = c; });
-  const endCol = Math.max(...nodes.concat(errs).map(x => x.col)) + 1;
-  const OK = { id: '$ok', t: 'ok', row: 0, col: endCol, text: a.ok }, FAIL = { id: '$fail', t: 'fail', row: 'E', col: endCol, text: a.fail };
-  const all = nodes.concat(errs, [OK], errs.length ? [FAIL] : []);
-  all.forEach(alSize);
-  // колонки
-  const colW = [], colX = [];
-  all.forEach(x => { colW[x.col] = Math.max(colW[x.col] || 0, x.w + AL.gapX); });
-  for (let c = 0; c <= endCol; c++) { colW[c] = colW[c] || AL.stepW + AL.gapX; colX[c] = c ? colX[c - 1] + colW[c - 1] : AL.inW + 40; }
-  // циклы: вложенность и охват по колонкам (вместе с ошибками под своими развилками)
-  const loops = a.loops.map(l => {
-    const c1 = by[l.from].col, c2 = by[l.to].col;
-    const inside = nodes.filter(x => x.col >= c1 && x.col <= c2);
-    const c3 = Math.max(c2, ...errs.filter(e => from(e.id).some(p => inside.includes(p))).map(e => e.col));
-    return { text: l.text, c1, c2: c3, inside };
-  });
-  loops.forEach(l => { l.lvl = loops.filter(o => o !== l && o.c1 <= l.c1 && o.c2 >= l.c2).length; });
-  const nLvl = loops.length ? Math.max(...loops.map(l => l.lvl)) + 1 : 0;
-  // ряды: основной, побочные, ошибки
-  const rows = [...new Set(nodes.map(x => x.row))].sort((p, q) => p - q);
-  const rowH = r => Math.max(...all.filter(x => x.row === r).map(x => x.h));
-  let y = 16 + nLvl * 26;
-  const rowC = {};
-  rows.forEach(r => { const h = rowH(r); rowC[r] = y + h / 2; y += h + AL.gapY; });
-  const eTop = y + 6, eBot = errs.length ? eTop + rowH('E') : eTop - AL.gapY;
-  all.forEach(x => {
-    const cx = colX[x.col] + (colW[x.col] - AL.gapX) / 2;
-    x.x = cx - x.w / 2;
-    x.y = x.row === 'E' ? eTop : rowC[x.row] - x.h / 2;
-  });
-  loops.forEach(l => {
-    const ins = 8 + 14 * l.lvl;
-    l.x = colX[l.c1] - AL.gapX / 2 + ins; l.x2 = colX[l.c2] + colW[l.c2] - AL.gapX / 2 - ins;
-    const withErr = errs.some(e => e.col >= l.c1 && e.col <= l.c2);
-    l.y = 6 + 26 * l.lvl; l.y2 = (withErr ? eBot : Math.max(...l.inside.map(x => x.y + x.h))) + 16 + 14 * (nLvl - 1 - l.lvl);
-  });
-  const busY = eBot + 16 + 14 * nLvl + 14;
-  // рёбра: шаг → следующий по ряду; развилка → по ответам (без цели — дальше по ряду, в конце — true)
+  const OK = { id: '$ok', t: 'ok', row: 0, text: a.ok }, FAIL = { id: '$fail', t: 'fail', row: 'E', text: a.fail };
   const cont = x => x.next || OK;
   const edges = [];
   nodes.forEach(x => {
     if (x.t === 'step') edges.push({ a: x, b: cont(x) });
     else x.br.forEach(b => edges.push({ a: x, b: b.to ? by[b.to] : cont(x), lab: b.lab }));
   });
-  // у развилки, где один ответ уходит строго вниз, остальные «вниз» выходят правее
-  edges.forEach(e => { e.down = e.b.row === 'E' || (e.b.row !== e.a.row && e.b.t !== 'ok'); });
-  edges.forEach(e => { e.side = e.down && e.b.col !== e.a.col && edges.some(o => o.a === e.a && o.down && o.b.col === e.a.col); });
-  return { a, nodes, errs, OK, FAIL, all, loops, edges, rowC, busY, eTop, first: nodes.find(x => x.row === 0) };
+  return { a, by, nodes, errs, OK, FAIL, from, edges };
 }
-function alEdgePath(e, L) {
-  const { a, b } = e, r = 10, acy = a.y + a.h / 2;
-  if (!e.down) {
-    e.lx = a.x + a.w + 7; e.ly = acy - 7; e.anchor = 'start';
-    if (b.row === a.row || (b.t === 'ok' && a.row === 0)) return `M${a.x + a.w},${acy}H${b.x - AR_L}`;
-    const by_ = b.y + b.h / 2, mx = b.x - 28;   // из побочного ряда — обратно наверх к true
-    return `M${a.x + a.w},${acy}H${mx - r}Q${mx},${acy} ${mx},${acy - r}V${by_ + r}Q${mx},${by_} ${mx + r},${by_}H${b.x - AR_L}`;
-  }
-  const px = e.side ? a.x + a.w * 0.8 : a.x + a.w / 2, py = a.y + a.h;
-  e.lx = e.side ? px + 7 : px - 7; e.ly = py + 15; e.anchor = e.side ? 'start' : 'end';
-  if (b.col === a.col) return `M${px},${py}V${b.y - AR_L}`;
-  if (e.side && b.t === 'err') {
-    const hy = L.eTop - 24, bx = b.x + b.w / 2;
-    return `M${px},${py}V${hy - r}Q${px},${hy} ${px + r},${hy}H${bx - r}Q${bx},${hy} ${bx},${hy + r}V${b.y - AR_L}`;
-  }
-  const ty = b.t === 'err' ? b.y + 21 : b.y + b.h / 2;
-  return `M${px},${py}V${ty - r}Q${px},${ty} ${px + r},${ty}H${b.x - AR_L}`;
-}
-function drawAlgo(cid) {
-  const n = N[cid], L = alLayout(cid);
-  const svgA = d3.select('#algoSvg');
-  svgA.selectAll('*').remove();
-  const defs = svgA.append('defs');
-  [['al-m', '--muted'], ['al-ok', '--ok'], ['al-no', '--fail']].forEach(([id, v]) => defs.append('marker').attr('id', id).attr('viewBox', '0 -4 8 8').attr('refX', 0).attr('refY', 0)
-    .attr('markerUnits', 'userSpaceOnUse').attr('markerWidth', AR_L).attr('markerHeight', AR_L).attr('orient', 'auto')
-    .append('path').attr('d', 'M0,-3.5L8,0L0,3.5Z').style('fill', `var(${v})`));
-  const root = svgA.append('g');
-  // рамки циклов
-  L.loops.slice().sort((p, q) => p.lvl - q.lvl).forEach(l => {
-    const g = root.append('g').attr('class', 'al-loop');
-    g.append('rect').attr('x', l.x).attr('y', l.y).attr('width', l.x2 - l.x).attr('height', l.y2 - l.y).attr('rx', 14);
-    const t = g.append('text').attr('x', l.x + 12).attr('y', l.y + 18);
-    t.append('tspan').attr('class', 'al-rep').text('↻ ');
-    const [head, tail] = l.text.split(/:\s*/);
-    t.append('tspan').text(head);
-    if (tail) t.append('tspan').attr('class', 'al-lcode').text('  ' + tail);
+// ── то же деревом (для структурограммы, псевдокода, метро) + все сценарии (для таблицы решений) ──
+function alTree(cid) {
+  const a = G.algo[cid], by = {}, rows = {};
+  a.nodes.forEach(x => { by[x.id] = x; (rows[x.row] = rows[x.row] || []).push(x); });
+  a.errors.forEach(e => { by[e.id] = { ...e, t: 'err' }; });
+  const nxt = x => { const r = rows[x.row]; return r[r.indexOf(x) + 1] || null; };
+  const item = x => x.t === 'step' ? { k: 'step', id: x.id, text: x.text, code: x.code }
+    : { k: 'gate', id: x.id, text: x.text, code: x.code, br: x.br.map(b => ({ lab: b.lab, body: !b.to ? { k: 'cont' } : by[b.to].t === 'err' ? { k: 'err', ...by[b.to] } : chain(by[b.to]) })) };
+  const chain = s => { const items = []; for (let x = s; x; x = nxt(x)) items.push(item(x)); return { k: 'seq', items }; };
+  const main = chain(rows[0][0]);
+  const subs = z => z.k === 'loop' ? [z.body] : z.k === 'gate' ? z.br.filter(b => b.body.k === 'seq').map(b => b.body) : [];
+  const has = (z, id) => z.id === id || subs(z).some(s => s.items.some(y => has(y, id)));
+  const findSeq = (s, id) => { if (s.items.some(z => z.id === id)) return s; for (const z of s.items) for (const q of subs(z)) { const r = findSeq(q, id); if (r) return r; } return null; };
+  const ord = id => a.nodes.findIndex(x => x.id === id);
+  a.loops.slice().sort((p, q) => ord(p.from) - ord(q.from) || ord(q.to) - ord(p.to)).forEach(l => {
+    const s = findSeq(main, l.from), i = s.items.findIndex(z => z.id === l.from), j = s.items.findIndex(z => has(z, l.to));
+    const body = s.items.slice(i, j + 1);
+    s.items.splice(i, j - i + 1, { k: 'loop', text: l.text, body: { k: 'seq', items: body } });
   });
-  // вход: какие файлы + что приходит от других проверок (из связей графа)
-  const gi = root.append('g').attr('class', 'al-in');
-  const cy0 = L.rowC[0];
-  const par = IN[cid].filter(e => e.k !== 'agg').sort((p, q) => (q.implicit - p.implicit) || N[p.from].depth - N[q.from].depth);
-  const ft = ftOf(cid), sec = n.sec;
+  // сценарии: все пути от первого шага до итога (циклы — как одна итерация)
+  const OKT = { t: 'ok' }, paths = [];
+  const go = (x, conds) => {
+    if (x.t === 'ok' || x.t === 'err') { paths.push({ conds, end: x }); return; }
+    if (x.t === 'step') return go(nxt(x) || OKT, conds);
+    x.br.forEach((b, bi) => go(b.to ? by[b.to] : nxt(x) || OKT, conds.concat([{ id: x.id, lab: b.lab, bi }])));
+  };
+  go(rows[0][0], []);
+  const lastKey = p => p.conds.length ? ord(p.conds[p.conds.length - 1].id) * 10 + p.conds[p.conds.length - 1].bi : -1;
+  paths.sort((p, q) => (p.end.t === 'ok') - (q.end.t === 'ok') || lastKey(p) - lastKey(q));
+  return { main, paths, gates: a.nodes.filter(x => x.t === 'gate'), loops: a.loops, by };
+}
+// ── вход: какие файлы + что берём у других проверок (из связей графа) ──
+function alInput(cid) {
+  const n = N[cid], ft = ftOf(cid), sec = n.sec;
   const parts = ft !== 'ifc' ? [ft] : sec === 'both' ? ['ar', 'ps'] : sec === 'all' ? ['ar', 'ps', 'bf'] : [sec];
-  const iw = AL.inW;
+  const par = IN[cid].filter(e => e.k !== 'agg').sort((p, q) => (q.implicit - p.implicit) || N[p.from].depth - N[q.from].depth)
+    .map(e => ({ label: N[e.from].label, k: e.k, via: e.implicit ? 'файл открылся — допуск к проверке' : e.via }));
+  return { parts, files: G.algo[cid].files, par };
+}
+function alInPanel(g, inp, iw) {
   let iy = 36;
-  gi.append('text').attr('class', 'al-cap').attr('x', 14).attr('y', 22).text('Вход · какие файлы');
-  const tg = gi.append('g').attr('class', 'sectag');
-  parts.forEach((p, i) => {
+  g.append('text').attr('class', 'al-cap').attr('x', 14).attr('y', 22).text('Вход · какие файлы');
+  const tg = g.append('g').attr('class', 'sectag');
+  inp.parts.forEach((p, i) => {
     const el = tg.append('g').attr('class', 't-' + p + (EXT[p] ? ' ext' : ''));
     el.append('rect').attr('x', 14 + i * 40).attr('y', iy).attr('width', 34).attr('height', 16).attr('rx', 8);
     el.append('text').attr('x', 14 + i * 40 + 17).attr('y', iy + 11.5).text(SEC_TAG[p]);
   });
   iy += 36;
-  const fl = alWrap(L.a.files, iw - 28, AL_FONT.t);
-  alText(gi, fl, 14, iy, 16, 'al-t'); iy += (fl.length - 1) * 16 + 16;
-  if (par.length) {
-    gi.append('line').attr('class', 'al-sep').attr('x1', 14).attr('x2', iw - 14).attr('y1', iy).attr('y2', iy); iy += 22;
-    gi.append('text').attr('class', 'al-cap').attr('x', 14).attr('y', iy).text('Что берём у других проверок'); iy += 22;
-    par.forEach(e => {
-      gi.append('text').attr('class', 'al-pid').attr('x', 14).attr('y', iy).style('fill', `var(--k-${e.k})`).text(N[e.from].label);
-      const vl = alWrap(e.implicit ? 'файл открылся — допуск к проверке' : e.via, iw - 28, AL_FONT.s);
-      alText(gi, vl, 14, iy + 16, 14, 'al-via'); iy += 16 + vl.length * 14 + 10;
+  const fl = alWrap(inp.files, iw - 28, AL_FONT.t);
+  alText(g, fl, 14, iy, 16, 'al-t'); iy += (fl.length - 1) * 16 + 16;
+  if (inp.par.length) {
+    g.append('line').attr('class', 'al-sep').attr('x1', 14).attr('x2', iw - 14).attr('y1', iy).attr('y2', iy); iy += 22;
+    g.append('text').attr('class', 'al-cap').attr('x', 14).attr('y', iy).text('Что берём у других проверок'); iy += 22;
+    inp.par.forEach(p => {
+      g.append('text').attr('class', 'al-pid').attr('x', 14).attr('y', iy).style('fill', `var(--k-${p.k})`).text(p.label);
+      const vl = alWrap(p.via, iw - 28, AL_FONT.s);
+      alText(g, vl, 14, iy + 16, 14, 'al-via'); iy += 16 + vl.length * 14 + 10;
     });
   }
-  const iTop = Math.min(L.first.y, cy0 - 30);
-  gi.attr('transform', `translate(0,${iTop})`);
-  gi.insert('rect', ':first-child').attr('class', 'al-inbox').attr('width', iw).attr('height', iy + 2).attr('rx', 12);
+  g.insert('rect', ':first-child').attr('class', 'al-inbox').attr('width', iw).attr('height', iy + 2).attr('rx', 12);
+  return iy + 2;
+}
+function alDefs(svgA) {
+  const defs = svgA.append('defs');
+  [['al-m', '--muted'], ['al-ok', '--ok'], ['al-no', '--fail']].forEach(([id, v]) => defs.append('marker').attr('id', id).attr('viewBox', '0 -4 8 8').attr('refX', 0).attr('refY', 0)
+    .attr('markerUnits', 'userSpaceOnUse').attr('markerWidth', AR_L).attr('markerHeight', AR_L).attr('orient', 'auto')
+    .append('path').attr('d', 'M0,-3.5L8,0L0,3.5Z').style('fill', `var(${v})`));
+}
+function alLoopFrame(root, l) {
+  const g = root.append('g').attr('class', 'al-loop');
+  g.append('rect').attr('x', l.x).attr('y', l.y).attr('width', l.w).attr('height', l.h).attr('rx', 14);
+  const t = g.append('text').attr('x', l.tx || l.x + 12).attr('y', l.y + 18);
+  t.append('tspan').attr('class', 'al-rep').text('↻ ');
+  const [head, tail] = l.text.split(/:\s*/);
+  t.append('tspan').text(head);
+  if (tail) t.append('tspan').attr('class', 'al-lcode').text('  ' + tail);
+}
+function alDrawNode(gn, x) {
+  const g = gn.append('g').attr('class', 'al-' + x.t).attr('transform', `translate(${x.x},${x.y})`);
+  if (x.t === 'step' || x.t === 'gate') {
+    const w = x.w, h = x.h, k = 16, mid = x.t === 'gate';
+    if (mid) g.append('path').attr('class', 'box').attr('d', `M0,${h / 2}L${k},0H${w - k}L${w},${h / 2}L${w - k},${h}H${k}Z`);
+    else g.append('rect').attr('class', 'box').attr('width', w).attr('height', h).attr('rx', 9);
+    const ty = h / 2 - (x.L.length * 16 + (x.C.length ? 5 + x.C.length * 13.5 : 0)) / 2 + 12;
+    const tx = mid ? w / 2 : 13, an = mid ? 'middle' : null;
+    alText(g, x.L, tx, ty, 16, 'al-t', an);
+    if (x.C.length) alText(g, x.C, tx, ty + (x.L.length - 1) * 16 + 19, 13.5, 'al-code', an);
+  } else if (x.t === 'err') {
+    g.append('rect').attr('class', 'box').attr('width', x.w).attr('height', x.h).attr('rx', 9);
+    g.append('text').attr('class', 'al-x').attr('x', 14).attr('y', 26).text('✕');
+    alText(g, x.T, 32, 26, 16, 'al-et');
+    let yy = 26 + (x.T.length - 1) * 16;
+    if (x.A.length) { alText(g, x.A, 14, yy + 17, 14, 'al-after'); yy += 3 + x.A.length * 14; }
+    yy += 12;
+    g.append('rect').attr('class', 'msg').attr('x', 10).attr('y', yy).attr('width', x.w - 20).attr('height', x.M.length * 13.5 + 14).attr('rx', 6);
+    alText(g, x.M, 19, yy + 17, 13.5, 'al-code al-msg');
+  } else {
+    g.append('rect').attr('class', 'box').attr('width', x.w).attr('height', x.h).attr('rx', 12);
+    g.append('text').attr('class', 'al-big').attr('x', x.w / 2).attr('y', 30).attr('text-anchor', 'middle').text(x.t === 'ok' ? '✓ true' : '✕ false');
+    alText(g, x.P, x.w / 2, 50, 14, 'al-after', 'middle');
+  }
+}
+// ── «Схема →» и «Схема ↓»: одна раскладка, оси меняются местами.
+//    f — по ходу алгоритма (x в →, y в ↓), l — поперёк: основной ряд, побочные, ошибки (y в →, x в ↓)
+function drawScheme(cid, vert) {
+  const M = alModel(cid), { nodes, errs, OK, FAIL, from, edges } = M;
+  nodes.forEach(x => { x.col = x.prev ? x.prev.col + 1 : x.row === 0 ? 0 : (from(x.id)[0] || { col: -1 }).col + 1; });
+  const taken = new Set();
+  errs.forEach(e => { let c = Math.max(...from(e.id).map(p => p.col)); while (taken.has(c)) c++; taken.add(c); e.col = c; });
+  const endCol = Math.max(...nodes.concat(errs).map(x => x.col)) + 1;
+  OK.col = FAIL.col = endCol;
+  const all = nodes.concat(errs, [OK], errs.length ? [FAIL] : []);
+  all.forEach(alSize);
+  const FS = x => vert ? x.h : x.w, LS = x => vert ? x.w : x.h, XY = (f, l) => vert ? [l, f] : [f, l];
+  const gapF = vert ? 58 : 64, gapL = vert ? 76 : 62, LEAD = 34;
+  const inp = alInput(cid), inH = alInPanel(d3.create('svg:g'), inp, AL.inW);
+  // циклы: вложенность и охват (вместе с ошибками под своими развилками)
+  const loops = M.a.loops.map(l => {
+    const c1 = M.by[l.from].col, c2 = M.by[l.to].col;
+    const inside = nodes.filter(x => x.col >= c1 && x.col <= c2);
+    const c3 = Math.max(c2, ...errs.filter(e => from(e.id).some(p => inside.includes(p))).map(e => e.col));
+    return { text: l.text, c1, c2: c3, inside };
+  });
+  loops.forEach(l => { l.lvl = loops.filter(o => o !== l && o.c1 <= l.c1 && o.c2 >= l.c2).length; });
+  const nLvl = loops.length ? Math.max(...loops.map(l => l.lvl)) + 1 : 0;
+  const starts = c => loops.filter(l => l.c1 === c).sort((p, q) => p.lvl - q.lvl);
+  // шаги по ходу алгоритма
+  const lvS = [], lvP = [];
+  all.forEach(x => { lvS[x.col] = Math.max(lvS[x.col] || 0, FS(x)); });
+  let p = vert ? inH + 46 : AL.inW + 40;
+  for (let c = 0; c <= endCol; c++) { lvS[c] = lvS[c] || 60; if (vert) p += LEAD * starts(c).length; lvP[c] = p; p += lvS[c] + gapF; }
+  // ряды поперёк
+  const lanes = [...new Set(nodes.map(x => x.row))].sort((m, q) => m - q).concat(errs.length ? ['E'] : []);
+  const lnS = r => Math.max(...all.filter(x => x.row === r).map(LS));
+  const lnP = {}, lnC = {};
+  let q = vert ? 24 + nLvl * 14 : 16 + nLvl * 26;
+  lanes.forEach(r => { if (r === 'E') q += 6; lnP[r] = q; lnC[r] = q + lnS(r) / 2; q += lnS(r) + gapL; });
+  const eS = errs.length ? lnP.E : 0, eE = errs.length ? lnP.E + lnS('E') : 0;
+  all.forEach(x => {
+    x.fs = FS(x); x.ls = LS(x);
+    x.f = lvP[x.col] + (lvS[x.col] - x.fs) / 2;
+    x.l = x.row === 'E' ? lnP.E : lnC[x.row] - x.ls / 2;
+    [x.x, x.y] = XY(x.f, x.l);
+  });
+  loops.forEach(l => {
+    const withErr = errs.some(e => e.col >= l.c1 && e.col <= l.c2);
+    const lEnd = withErr ? eE : Math.max(...l.inside.map(x => x.l + x.ls)), out = nLvl - 1 - l.lvl;
+    let f1, f2, l1, l2;
+    if (!vert) { const ins = 8 + 14 * l.lvl; f1 = lvP[l.c1] - gapF / 2 + ins; f2 = lvP[l.c2] + lvS[l.c2] + gapF / 2 - ins; l1 = 6 + 26 * l.lvl; l2 = lEnd + 16 + 14 * out; }
+    else { const st = starts(l.c1); f1 = lvP[l.c1] - LEAD * (st.length - st.indexOf(l)) - 8; f2 = lvP[l.c2] + lvS[l.c2] + 12 + 14 * out; l1 = lnP[0] - 12 - 14 * out; l2 = lEnd + 12 + 14 * out; }
+    [l.x, l.y] = XY(f1, l1); const [x2, y2] = XY(f2, l2); l.w = x2 - l.x; l.h = y2 - l.y;
+    if (vert) l.tx = lnC[0] + 16;
+  });
+  const frameEnd = loops.length ? Math.max(...loops.map(l => vert ? l.x + l.w : l.y + l.h)) : 0;
+  const busL = Math.max(eE + 16, frameEnd + 14);
   // рёбра
-  const ge = root.append('g');
-  ge.append('path').attr('class', 'al-edge').attr('marker-end', 'url(#al-m)').attr('d', `M${iw},${cy0}H${L.first.x - AR_L}`);
-  L.edges.forEach(e => {
-    const d = alEdgePath(e, L), cls = e.b.t === 'err' ? 'no' : e.b.t === 'ok' ? 'ok' : '';
+  edges.forEach(e => { e.down = e.b.row === 'E' || (e.b.row !== e.a.row && e.b.t !== 'ok'); });
+  edges.forEach(e => { e.side = e.down && e.b.col !== e.a.col && edges.some(o => o.a === e.a && o.down && o.b.col === e.a.col); });
+  const lMid = x => x.l + x.ls / 2, fMid = x => x.f + x.fs / 2;
+  const laneEndAt = (x, t) => [x.f + t * x.fs, x.l + x.ls - (vert && x.t === 'gate' ? 16 * Math.abs(2 * t - 1) : 0)];
+  const route = e => {
+    const { a, b } = e;
+    if (!e.down) {
+      const s = [a.f + a.fs, lMid(a)], [sx, sy] = XY(...s);
+      e.lp = vert ? [sx + 8, sy + 15, 'start'] : [sx + 7, sy - 7, 'start'];
+      if (b.row === a.row || (b.t === 'ok' && a.row === 0)) return [s, [b.f, lMid(b)]];
+      const m = b.f - 28;   // из побочного ряда — обратно к true
+      return [s, [m, lMid(a)], [m, lMid(b)], [b.f, lMid(b)]];
+    }
+    const s = laneEndAt(a, e.side ? 0.8 : 0.5), [sx, sy] = XY(...s);
+    e.lp = vert ? [sx + 8, e.side ? sy + 15 : sy - 7, 'start'] : [e.side ? sx + 7 : sx - 7, sy + 15, e.side ? 'start' : 'end'];
+    if (b.col === a.col) return [s, [s[0], b.l]];
+    if (e.side && b.t === 'err') { const h = eS - 24; return [s, [s[0], h], [fMid(b), h], [fMid(b), b.l]]; }
+    const ty = b.t === 'err' ? b.l + 21 : lMid(b);
+    return [s, [s[0], ty], [b.f, ty]];
+  };
+  const svgA = d3.select('#algoSvg');
+  svgA.selectAll('*').remove();
+  alDefs(svgA);
+  const root = svgA.append('g').attr('class', 'alroot');
+  loops.slice().sort((m, o) => m.lvl - o.lvl).forEach(l => alLoopFrame(root, l));
+  const gi = root.append('g'), ge = root.append('g');
+  alInPanel(gi, inp, AL.inW);
+  const first = nodes.find(x => x.row === 0);
+  if (!vert) {
+    const cy0 = lnC[0];
+    gi.attr('transform', `translate(0,${Math.min(first.y, cy0 - 30)})`);
+    ge.append('path').attr('class', 'al-edge').attr('marker-end', 'url(#al-m)').attr('d', alPath([[AL.inW, cy0], [first.x, cy0]]));
+  } else {
+    const cx0 = lnC[0];
+    gi.attr('transform', `translate(${cx0 - AL.inW / 2},0)`);
+    ge.append('path').attr('class', 'al-edge').attr('marker-end', 'url(#al-m)').attr('d', alPath([[cx0, inH], [cx0, first.y]]));
+  }
+  edges.forEach(e => {
+    const d = alPath(route(e).map(pt => XY(...pt))), cls = e.b.t === 'err' ? 'no' : e.b.t === 'ok' ? 'ok' : '';
     ge.append('path').attr('class', 'al-edge ' + cls).attr('d', d).attr('marker-end', `url(#${cls === 'no' ? 'al-no' : cls === 'ok' ? 'al-ok' : 'al-m'})`);
-    if (e.lab) ge.append('text').attr('class', 'al-lab ' + cls).attr('x', e.lx).attr('y', e.ly).attr('text-anchor', e.anchor).text(e.lab);
+    if (e.lab) ge.append('text').attr('class', 'al-lab ' + cls).attr('x', e.lp[0]).attr('y', e.lp[1]).attr('text-anchor', e.lp[2]).text(e.lab);
   });
   // шина: все ошибки сходятся в false
-  if (L.errs.length) {
-    const F = L.FAIL, fx = F.x + F.w / 2, r = 10;
-    L.errs.forEach(x => ge.append('path').attr('class', 'al-bus').attr('d', `M${x.x + x.w / 2},${x.y + x.h}V${L.busY}`));
-    const x0 = Math.min(...L.errs.map(x => x.x + x.w / 2));
-    ge.append('path').attr('class', 'al-bus').attr('marker-end', 'url(#al-no)').attr('d', `M${x0},${L.busY}H${fx - r}Q${fx},${L.busY} ${fx},${L.busY - r}V${F.y + F.h + AR_L}`);
-    L.errs.forEach(x => ge.append('circle').attr('class', 'al-dot').attr('cx', x.x + x.w / 2).attr('cy', L.busY).attr('r', 2.6));
+  if (errs.length) {
+    errs.forEach(x => ge.append('path').attr('class', 'al-bus').attr('d', alPath([XY(fMid(x), x.l + x.ls), XY(fMid(x), busL)], false)));
+    const f0 = Math.min(...errs.map(fMid));
+    ge.append('path').attr('class', 'al-bus').attr('marker-end', 'url(#al-no)').attr('d', alPath([XY(f0, busL), XY(fMid(FAIL), busL), XY(fMid(FAIL), FAIL.l + FAIL.ls)]));
+    errs.forEach(x => { const [cx, cy] = XY(fMid(x), busL); ge.append('circle').attr('class', 'al-dot').attr('cx', cx).attr('cy', cy).attr('r', 2.6); });
   }
-  // узлы
   const gn = root.append('g');
-  L.all.forEach(x => {
-    const g = gn.append('g').attr('class', 'al-' + x.t).attr('transform', `translate(${x.x},${x.y})`);
-    if (x.t === 'step' || x.t === 'gate') {
-      const w = x.w, h = x.h, k = 16, mid = x.t === 'gate';
-      if (mid) g.append('path').attr('class', 'box').attr('d', `M0,${h / 2}L${k},0H${w - k}L${w},${h / 2}L${w - k},${h}H${k}Z`);
-      else g.append('rect').attr('class', 'box').attr('width', w).attr('height', h).attr('rx', 9);
-      const ty = h / 2 - (x.L.length * 16 + (x.C.length ? 5 + x.C.length * 13.5 : 0)) / 2 + 12;
-      const tx = mid ? w / 2 : 13, an = mid ? 'middle' : null;
-      alText(g, x.L, tx, ty, 16, 'al-t', an);
-      if (x.C.length) alText(g, x.C, tx, ty + (x.L.length - 1) * 16 + 19, 13.5, 'al-code', an);
-    } else if (x.t === 'err') {
-      g.append('rect').attr('class', 'box').attr('width', x.w).attr('height', x.h).attr('rx', 9);
-      g.append('text').attr('class', 'al-x').attr('x', 14).attr('y', 26).text('✕');
-      alText(g, x.T, 32, 26, 16, 'al-et');
-      let yy = 26 + (x.T.length - 1) * 16;
-      if (x.A.length) { alText(g, x.A, 14, yy + 17, 14, 'al-after'); yy += 3 + x.A.length * 14; }
-      yy += 12;
-      g.append('rect').attr('class', 'msg').attr('x', 10).attr('y', yy).attr('width', x.w - 20).attr('height', x.M.length * 13.5 + 14).attr('rx', 6);
-      alText(g, x.M, 19, yy + 17, 13.5, 'al-code al-msg');
-    } else {
-      g.append('rect').attr('class', 'box').attr('width', x.w).attr('height', x.h).attr('rx', 12);
-      g.append('text').attr('class', 'al-big').attr('x', x.w / 2).attr('y', 30).attr('text-anchor', 'middle').text(x.t === 'ok' ? '✓ true' : '✕ false');
-      alText(g, x.P, x.w / 2, 50, 14, 'al-after', 'middle');
-    }
-  });
-  return root;
+  all.forEach(x => alDrawNode(gn, x));
 }
-let alZoom = null;
+// ── «Метро»: вертикальная линия шагов, ромб — развилка, ошибки — съезды вправо, скобки циклов слева ──
+function drawMetro(cid) {
+  const T = alTree(cid), inp = alInput(cid), a = G.algo[cid];
+  const rows = [{ k: 'in', depth: 0 }];
+  const walk = (seq, depth, lvl) => seq.items.forEach(it => {
+    if (it.k === 'loop') { const r = { k: 'loop', text: it.text, lvl, depth }; rows.push(r); walk(it.body, depth, lvl + 1); r.end = rows.length - 1; return; }
+    if (it.k === 'step') { rows.push({ k: 'step', depth, text: it.text, code: it.code }); return; }
+    const g = { k: 'gate', depth, text: it.text, code: it.code, br: it.br, forks: [] };
+    rows.push(g);
+    it.br.forEach(b => { if (b.body.k === 'seq') { g.forks.push(rows.length); walk(b.body, depth + 1, lvl); } });
+  });
+  walk(T.main, 0, 0);
+  rows.push({ k: 'ok', depth: 0 });
+  const nLvl = Math.max(0, ...rows.filter(r => r.k === 'loop').map(r => r.lvl + 1));
+  const maxD = Math.max(...rows.map(r => r.depth));
+  const BX = l => 10 + 18 * l, DX = 30, SX = 10 + 18 * nLvl + 26, sx = d => SX + d * DX;
+  const TX = sx(maxD) + 28, TW = 340, EX = TX + TW + 96, EW = AL.errW, RX = EX + EW + 30;
+  // размеры строк
+  const seen = new Map();   // ошибка → её карточка (одна на все ссылки)
+  const cards = [];
+  let y = 0;
+  const inH = alInPanel(d3.create('svg:g'), inp, TW);
+  rows.forEach(r => {
+    r.top = y;
+    if (r.k === 'in') r.h = inH;
+    else if (r.k === 'loop') r.h = 24;
+    else if (r.k === 'ok') r.h = 52;
+    else {
+      r.L = alWrap(r.text, TW, r.k === 'gate' ? AL_FONT.b : AL_FONT.t); r.C = r.code ? alWrap(r.code, TW, AL_FONT.c) : [];
+      let th = r.L.length * 16 + (r.C.length ? 4 + r.C.length * 13.5 : 0);
+      if (r.k === 'gate') { r.ansY = th + 8; th += 8 + r.br.length * 21; }
+      let ch = 0;
+      (r.br || []).forEach(b => {
+        if (b.body.k !== 'err' || seen.has(b.body.id)) return;
+        const c = { t: 'err', ...b.body }; alSize(c);
+        c.x = EX; c.y = y + ch; seen.set(b.body.id, c); cards.push(c); ch += c.h + 12;
+      });
+      r.h = Math.max(th, ch - 12);
+    }
+    y += r.h + (r.k === 'loop' ? 8 : 22);
+  });
+  const okRow = rows[rows.length - 1];
+  const FAIL = { t: 'fail', text: a.fail }; alSize(FAIL); FAIL.x = EX + (EW - FAIL.w) / 2; FAIL.y = Math.max(okRow.top, cards.length ? Math.max(...cards.map(c => c.y + c.h)) + 24 : 0);
+  okRow.top = Math.max(okRow.top, FAIL.y);
+  const stY = r => r.k === 'in' ? r.top + 18 : r.k === 'ok' ? r.top + 20 : r.top + 8;
+  const svgA = d3.select('#algoSvg');
+  svgA.selectAll('*').remove();
+  alDefs(svgA);
+  const root = svgA.append('g').attr('class', 'alroot');
+  const gl = root.append('g'), ge = root.append('g'), gs = root.append('g'), gt = root.append('g');
+  // скобки циклов
+  rows.forEach(r => {
+    if (r.k !== 'loop') return;
+    const e = rows[r.end], x = BX(r.lvl), y1 = r.top + 2, y2 = e.top + e.h + 6;
+    gl.append('path').attr('class', 'al-brk').attr('d', `M${x + 10},${y1}H${x}V${y2}H${x + 10}`);
+    gl.append('path').attr('class', 'al-brk').attr('d', `M${x + 10},${y1}H${TX - 8}`).style('opacity', .25);
+    const t = gl.append('text').attr('class', 'al-mloop').attr('x', TX).attr('y', r.top + 15);
+    const [head, tail] = r.text.split(/:\s*/);
+    t.append('tspan').attr('class', 'al-rep').text('↻ ');
+    t.append('tspan').text(head);
+    if (tail) t.append('tspan').attr('class', 'al-lcode').text('  ' + tail);
+  });
+  // линии: следующий шаг того же уровня; развилка → ветка на уровень правее
+  const st = rows.map((r, i) => ({ r, i })).filter(o => o.r.k !== 'loop');
+  st.forEach(({ r, i }) => {
+    const hasCont = r.k !== 'gate' || r.br.some(b => b.body.k === 'cont');
+    if (r.k === 'ok' || !hasCont) return;
+    const nx = st.find(o => o.i > i && o.r.depth <= r.depth);
+    if (!nx) return;
+    const x1 = sx(r.depth), x2 = sx(nx.r.depth), y1 = stY(r), y2 = stY(nx.r);
+    gs.append('path').attr('class', 'al-trunk').attr('d', x1 === x2 ? `M${x1},${y1}V${y2}` : `M${x1},${y1}V${y2 - 22}Q${x1},${y2} ${x2 + (x1 > x2 ? 12 : -12)},${y2}H${x2}`);
+  });
+  rows.forEach(r => (r.forks || []).forEach(fi => {
+    const f = rows[fi], x1 = sx(r.depth), x2 = sx(f.depth), y1 = stY(r), y2 = stY(f);
+    gs.append('path').attr('class', 'al-trunk').attr('d', `M${x1},${y1}C${x1},${y1 + 26} ${x2},${y2 - 26} ${x2},${y2}`);
+  }));
+  // станции и тексты
+  rows.forEach(r => {
+    const cx = sx(r.depth), cy = stY(r);
+    if (r.k === 'loop') return;
+    if (r.k === 'in') {
+      gs.append('circle').attr('class', 'al-st-in').attr('cx', cx).attr('cy', cy).attr('r', 7);
+      const g = gt.append('g').attr('transform', `translate(${TX},${r.top})`); alInPanel(g, inp, TW); return;
+    }
+    if (r.k === 'ok') {
+      gs.append('circle').attr('class', 'al-st-ok').attr('cx', cx).attr('cy', cy).attr('r', 11);
+      gs.append('text').attr('class', 'al-st-okt').attr('x', cx).attr('y', cy + 4.5).attr('text-anchor', 'middle').text('✓');
+      gt.append('text').attr('class', 'al-big al-okc').attr('x', TX).attr('y', r.top + 24).text('true');
+      alText(gt, alWrap(a.ok, TW, AL_FONT.s), TX, r.top + 42, 14, 'al-after');
+      return;
+    }
+    if (r.k === 'gate') gs.append('path').attr('class', 'al-st-gate').attr('d', `M${cx},${cy - 8}L${cx + 8},${cy}L${cx},${cy + 8}L${cx - 8},${cy}Z`);
+    else gs.append('circle').attr('class', 'al-st-step').attr('cx', cx).attr('cy', cy).attr('r', 6.5);
+    alText(gt, r.L, TX, r.top + 13, 16, r.k === 'gate' ? 'al-t al-q' : 'al-t');
+    if (r.C.length) alText(gt, r.C, TX, r.top + 13 + (r.L.length - 1) * 16 + 17, 13.5, 'al-code');
+    if (r.k !== 'gate') return;
+    r.br.forEach((b, i) => {
+      const ay = r.top + r.ansY + i * 21 + 13, isErr = b.body.k === 'err';
+      const lw = alTextW(b.lab, '600 11px -apple-system,"Segoe UI",sans-serif') + 14;
+      gt.append('rect').attr('class', 'al-ans' + (isErr ? ' no' : '')).attr('x', TX).attr('y', ay - 12).attr('width', lw).attr('height', 17).attr('rx', 8.5);
+      gt.append('text').attr('class', 'al-anst' + (isErr ? ' no' : '')).attr('x', TX + lw / 2).attr('y', ay).attr('text-anchor', 'middle').text(b.lab);
+      if (!isErr) { gt.append('text').attr('class', 'al-after').attr('x', TX + lw + 8).attr('y', ay).text(b.body.k === 'cont' ? '↓ дальше по линии' : '↘ ветка — ниже, правее'); return; }
+      const c = seen.get(b.body.id), ty = c.y + 21, vx = EX - 20 - 10 * i;
+      ge.append('path').attr('class', 'al-edge no').attr('marker-end', 'url(#al-no)').attr('d', alPath([[TX + lw + 6, ay - 4], [vx, ay - 4], [vx, ty], [EX, ty]]));
+    });
+  });
+  // карточки ошибок, шина → false
+  cards.forEach(c => alDrawNode(gt, c));
+  if (cards.length) {
+    const fy = FAIL.y + FAIL.h / 2;
+    cards.forEach(c => ge.append('path').attr('class', 'al-bus').attr('d', alPath([[c.x + c.w, c.y + 21], [RX, c.y + 21]], false)));
+    ge.append('path').attr('class', 'al-bus').attr('marker-end', 'url(#al-no)').attr('d', alPath([[RX, cards[0].y + 21], [RX, fy], [FAIL.x + FAIL.w, fy]]));
+    cards.forEach(c => ge.append('circle').attr('class', 'al-dot').attr('cx', RX).attr('cy', c.y + 21).attr('r', 2.6));
+    alDrawNode(gt, FAIL);
+  }
+}
+// ── HTML-виды: вход одинаковый ──
+function alInHtml(inp) {
+  const pills = inp.parts.map(p => `<span class="lgtag t-${p}${EXT[p] ? ' ext' : ''}">${SEC_TAG[p]}</span>`).join('');
+  return `<div class="al-inh"><div class="cap">Вход · какие файлы</div><div class="fl">${pills}<span>${esc(inp.files)}</span></div>`
+    + (inp.par.length ? `<div class="cap">Что берём у других проверок</div><div class="par">${inp.par.map(p => `<div><b style="color:var(--k-${p.k})">${esc(p.label)}</b> ${esc(p.via)}</div>`).join('')}</div>` : '') + '</div>';
+}
+const alSplit = t => { const [h, tl] = String(t).split(/:\s*/); return [h, tl || '']; };
+// ── «Структурограмма» (Насси — Шнейдерман) ──
+// ширина ветви: «дальше» — узкая, ошибка — одна доля, вложенная развилка — сумма своих ветвей
+const alNsW = b => b.k === 'cont' ? 0.55 : b.k === 'err' ? 1 : Math.max(1, ...b.items.map(z => z.k === 'gate' ? z.br.reduce((m, q) => m + alNsW(q.body), 0) : z.k === 'loop' ? alNsW(z.body) : 1));
+function alNsHtml(cid) {
+  const T = alTree(cid), a = G.algo[cid];
+  const code = c => c ? `<small class="hc">${esc(c)}</small>` : '';
+  const err = e => `<div class="ns-err"><b>✕ ${esc(e.title)}</b>${e.after ? `<small>${esc(e.after)}</small>` : ''}<code>${esc(e.text)}</code></div>`;
+  const seq = s => `<div class="ns-seq">${s.items.map(blk).join('')}</div>`;
+  const blk = it => {
+    if (it.k === 'step') return `<div class="ns-step">${esc(it.text)}${code(it.code)}</div>`;
+    if (it.k === 'loop') { const [h, tl] = alSplit(it.text); return `<div class="ns-loop"><div class="ns-lh"><b>↻</b> ${esc(h)}${tl ? ` <small class="hc">${esc(tl)}</small>` : ''}</div><div class="ns-lb">${seq(it.body)}</div></div>`; }
+    const n = it.br.length, wt = it.br.map(b => alNsW(b.body)), sum = wt.reduce((m, v) => m + v, 0);
+    const edge = wt.map((_, i) => wt.slice(0, i).reduce((m, v) => m + v, 0) / sum * 100), bp = n === 2 ? edge[1] : edge[n - 1];
+    let ln = `<line x1="0" y1="0" x2="${bp}" y2="100"/><line x1="100" y1="0" x2="${bp}" y2="100"/>`;
+    for (let i = 1; i < n - 1; i++) { const x = edge[i]; ln += `<line x1="${x}" y1="${x / bp * 100}" x2="${x}" y2="100"/>`; }
+    const cols = wt.map(v => `minmax(0,${v}fr)`).join(' ');
+    return `<div class="ns-gate" style="--cols:${cols}"><div class="ns-q"><svg viewBox="0 0 100 100" preserveAspectRatio="none">${ln}</svg><span class="qt">${esc(it.text)}${code(it.code)}</span>`
+      + `<div class="ns-labs">${it.br.map(b => `<i class="${b.body.k === 'err' ? 'no' : ''}">${esc(b.lab)}</i>`).join('')}</div></div>`
+      + `<div class="ns-brs">${it.br.map(b => `<div class="ns-br">${b.body.k === 'err' ? err(b.body) : b.body.k === 'cont' ? '<div class="ns-cont">↓ дальше</div>' : seq(b.body)}</div>`).join('')}</div></div>`;
+  };
+  return `<div class="al-doc">${alInHtml(alInput(cid))}<div class="ns">${seq(T.main)}`
+    + `<div class="ns-end"><div><b class="ok">✓ true</b> ${esc(a.ok)}</div><div><b class="no">✕ false</b> ${esc(a.fail)}</div></div></div></div>`;
+}
+// ── «Псевдокод» ──
+function alCodeHtml(cid) {
+  const T = alTree(cid), a = G.algo[cid], inp = alInput(cid), out = [];
+  const L = (i, h, cls) => out.push(`<div class="pc-l ${cls || ''}" style="--i:${i}">${h}</div>`);
+  const cm = c => c ? ` <span class="cm">· ${esc(c)}</span>` : '';
+  const err = (i, e, head) => { L(i, `${head} <span class="err">✕ ${esc(e.title)}</span>${e.after ? ` <span class="cm">— ${esc(e.after)}</span>` : ''}`); L(i + 1, `<span class="msg">«${esc(e.text)}»</span>`); };
+  L(0, `<b class="kw in">ВХОД</b> ${inp.parts.map(p => `<span class="lgtag t-${p}${EXT[p] ? ' ext' : ''}">${SEC_TAG[p]}</span>`).join('')}${esc(inp.files)}`);
+  inp.par.forEach(p => L(1, `<b class="pid" style="color:var(--k-${p.k})">${esc(p.label)}</b> <span class="cm">— ${esc(p.via)}</span>`));
+  out.push('<div class="pc-gap"></div>');
+  const walk = (s, i) => s.items.forEach(it => {
+    if (it.k === 'step') return L(i, esc(it.text) + cm(it.code));
+    if (it.k === 'loop') { const [h, tl] = alSplit(it.text); L(i, `<b class="kw lp">ДЛЯ КАЖДОГО</b>${esc(h.replace(/^для\s+каждого\s*/i, ''))}${tl ? ` <span class="cm">· ${esc(tl)}</span>` : ''}:`); return walk(it.body, i + 1); }
+    const conts = it.br.filter(b => b.body.k === 'cont'), errs = it.br.filter(b => b.body.k === 'err');
+    if (it.br.length === 2 && conts.length === 1 && errs.length === 1) {   // «если нет → ошибка», иначе дальше
+      if (it.code) L(i, `<span class="cm">${esc(it.code)}</span>`);
+      return err(i, errs[0].body, `<b class="kw if">ЕСЛИ</b>${esc(it.text)} <b class="ans">${esc(errs[0].lab)}</b> →`);
+    }
+    L(i, `<b class="kw if">${it.br.length > 2 ? 'ВЫБОР' : 'ЕСЛИ'}</b>${esc(it.text)}` + cm(it.code));
+    it.br.forEach(b => {
+      if (b.body.k === 'cont') return L(i + 1, `<b class="ans">${esc(b.lab)}</b> → <span class="cm">дальше</span>`);
+      if (b.body.k === 'err') return err(i + 1, b.body, `<b class="ans">${esc(b.lab)}</b> →`);
+      L(i + 1, `<b class="ans">${esc(b.lab)}</b>:`); walk(b.body, i + 2);
+    });
+  });
+  walk(T.main, 0);
+  out.push('<div class="pc-gap"></div>');
+  L(0, `<b class="kw in">ИТОГ</b>ошибок нет → <span class="ok">✓ true</span> <span class="cm">— ${esc(a.ok)}</span>`);
+  L(0, `<b class="kw in" style="visibility:hidden">ИТОГ</b>есть ошибки → <span class="err">✕ false</span> <span class="cm">— ${esc(a.fail)}</span>`);
+  return `<div class="al-doc"><div class="pc">${out.join('')}</div></div>`;
+}
+// ── «Таблица решений»: каждая строка — сценарий ──
+function alTableHtml(cid) {
+  const T = alTree(cid), a = G.algo[cid];
+  const gates = T.gates.filter(g => T.paths.some(p => p.conds.some(c => c.id === g.id)));
+  const loopOf = g => { const ord = id => G.algo[cid].nodes.findIndex(x => x.id === id), i = ord(g.id); return T.loops.filter(l => ord(l.from) <= i && ord(l.to) >= i).map(l => alSplit(l.text)[0]); };
+  let h = `<div class="al-doc">${alInHtml(alInput(cid))}<table class="al-tab"><thead><tr><th class="n">№</th>`
+    + gates.map(g => { const lp = loopOf(g); return `<th>${lp.length ? `<small>↻ ${esc(lp.join(' · '))}</small>` : ''}${esc(g.text)}</th>`; }).join('') + '<th class="res">Итог</th></tr></thead><tbody>';
+  T.paths.forEach((p, i) => {
+    const last = p.conds[p.conds.length - 1], ok = p.end.t === 'ok';
+    h += `<tr class="${ok ? 'ok' : 'no'}"><td class="n">${i + 1}</td>` + gates.map(g => {
+      const c = p.conds.find(x => x.id === g.id);
+      return c ? `<td><span class="al-cell${c === last ? (ok ? ' okk' : ' key') : ''}">${esc(c.lab)}</span></td>` : '<td class="dash">—</td>';
+    }).join('');
+    h += ok ? `<td class="res"><b class="ok">✓ true</b><small>${esc(a.ok)}</small></td>`
+      : `<td class="res"><b class="no">✕ ${esc(p.end.title)}</b>${p.end.after ? `<small>${esc(p.end.after)}</small>` : ''}<code>${esc(p.end.text)}</code></td>`;
+    h += '</tr>';
+  });
+  return h + `</tbody></table><div class="al-tnote">Итог проверки — <b class="ok">true</b>, если во всех итерациях циклов сценарий дошёл до true; иначе <b class="no">false</b> со всеми найденными ошибками.</div></div>`;
+}
+// ── окно ──
 function alFit() {
-  const svgA = d3.select('#algoSvg'), root = svgA.select('g'), el = svgA.node();
-  if (root.empty()) return;
+  const svgA = d3.select('#algoSvg'), root = svgA.select('g.alroot'), el = svgA.node();
+  if (root.empty() || !alZoom) return;
   const bb = root.node().getBBox(), W = el.clientWidth, H = el.clientHeight, pad = 36;
   const kf = Math.min((W - 2 * pad) / bb.width, (H - 2 * pad) / bb.height);
-  const k = Math.max(0.62, Math.min(1.1, kf));
-  const tx = kf >= 0.62 ? (W - bb.width * k) / 2 - bb.x * k : pad - bb.x * k;
-  const ty = Math.max(pad, (H - bb.height * k) / 2) - bb.y * k;
+  const k = alView === 'h' ? Math.max(0.62, Math.min(1.1, kf)) : Math.max(1, Math.min(1.1, kf));
+  const tx = bb.width * k <= W - 2 * pad ? (W - bb.width * k) / 2 - bb.x * k : pad - bb.x * k;
+  const ty = bb.height * k <= H - 2 * pad ? (H - bb.height * k) / 2 - bb.y * k : pad - bb.y * k;
   svgA.call(alZoom.transform, d3.zoomIdentity.translate(tx, ty).scale(k));
+}
+function renderAlgo() {
+  const cid = alCur;
+  if (!cid) return;
+  const V = AL_VIEWS.find(v => v[0] === alView), svgMode = AL_SVG.has(alView);
+  $('#algoViews').querySelectorAll('button').forEach(b => b.classList.toggle('on', b.dataset.v === alView));
+  $('#algoSub').textContent = `Алгоритм проверки · ${N[cid].p}. ${V[2]}`;
+  $('#algo').classList.toggle('html', !svgMode);
+  $('#algoFit').style.visibility = svgMode ? '' : 'hidden';
+  if (!svgMode) {
+    const box = $('#algoHtml');
+    box.innerHTML = alView === 'ns' ? alNsHtml(cid) : alView === 'code' ? alCodeHtml(cid) : alTableHtml(cid);
+    box.scrollTop = 0;
+    return;
+  }
+  const svgA = d3.select('#algoSvg'), tall = alView !== 'h';
+  if (alView === 'metro') drawMetro(cid); else drawScheme(cid, alView === 'v');
+  svgA.on('.zoom', null).on('wheel.pan', null);
+  // вертикальные виды: колесо прокручивает, Ctrl + колесо — масштаб
+  alZoom = d3.zoom().scaleExtent([0.2, 3]).filter(ev => (!ev.ctrlKey || ev.type === 'wheel') && !ev.button && (!tall || ev.type !== 'wheel' || ev.ctrlKey))
+    .on('zoom', ev => svgA.select('g.alroot').attr('transform', ev.transform));
+  svgA.call(alZoom).on('dblclick.zoom', null);
+  if (tall) svgA.on('wheel.pan', ev => { if (ev.ctrlKey) return; ev.preventDefault(); const k = d3.zoomTransform(svgA.node()).k; svgA.call(alZoom.translateBy, -ev.deltaX / k, -ev.deltaY / k); });
+  alFit();
 }
 function openAlgo(cid) {
   if (!G.algo || !G.algo[cid]) return;
-  const n = N[cid];
-  $('#algoCode').textContent = n.label;
-  $('#algoTitle').textContent = n.n;
-  $('#algoSub').textContent = `Алгоритм проверки · ${n.p}. Слева направо: какие файлы берём → шаги и развилки → true. Ошибки — под развилкой, которая их даёт; все сходятся в false.`;
+  alCur = cid;
+  $('#algoCode').textContent = N[cid].label;
+  $('#algoTitle').textContent = N[cid].n;
   $('#algo').classList.add('on');
-  const svgA = d3.select('#algoSvg');
-  drawAlgo(cid);
-  alZoom = d3.zoom().scaleExtent([0.2, 3]).on('zoom', ev => svgA.select('g').attr('transform', ev.transform));
-  svgA.call(alZoom).on('dblclick.zoom', null);
-  alFit();
+  renderAlgo();
 }
 const closeAlgo = () => $('#algo').classList.remove('on');
 
@@ -2406,6 +2795,8 @@ function bind() {
   $('#closeModal').addEventListener('click', () => $('#modal').classList.remove('on'));
   $('#modal').addEventListener('click', e => { if (e.target.id === 'modal') $('#modal').classList.remove('on'); });
   $('#algoClose').addEventListener('click', closeAlgo);
+  $('#algoViews').innerHTML = AL_VIEWS.map(([k, t]) => `<button data-v="${k}">${t}</button>`).join('');
+  $('#algoViews').addEventListener('click', ev => { const b = ev.target.closest('button'); if (b) { alView = b.dataset.v; renderAlgo(); } });
   $('#algoFit').addEventListener('click', alFit);
   document.addEventListener('keydown', e => { if (e.key === 'Escape') { if ($('#algo').classList.contains('on')) closeAlgo(); else if ($('#filePick').classList.contains('open')) $('#filePick').classList.remove('open'); else if ($('#modal').classList.contains('on')) $('#modal').classList.remove('on'); else select(null); } });
   $('#q').addEventListener('input', e => {
