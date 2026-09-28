@@ -435,9 +435,9 @@
 <div id="modal"><div class="win"><header><div><h2 id="modalTitle">Выводы анализа</h2><small id="insSub"></small></div><span class="x" id="closeModal">×</span></header><div class="body" id="insBody"></div></div></div>
 
 <script src="vendor/d3.v7.min.js"></script>
-<script src="data.js?v=63"></script>
-<script src="facts.js?v=63"></script>
-<script src="npa.js?v=63"></script>
+<script src="data.js?v=64"></script>
+<script src="facts.js?v=64"></script>
+<script src="npa.js?v=64"></script>
 <script>
 (() => {
 'use strict';
@@ -2056,7 +2056,6 @@ function bind() {
   });
   document.querySelectorAll('#views button[data-v]').forEach(b => b.addEventListener('click', () => {
     S.view = b.dataset.v;
-    if (S.view === 'npa' && !S.cnt) S.cnt = 'all';
     render({ fit: true, relayout: true });
   }));
   $('#npaPsAr').addEventListener('change', e => { S.npaPsAr = e.target.checked; render({ fit: true }); });
