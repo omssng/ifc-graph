@@ -312,7 +312,12 @@
   #modal header h2{margin:0;font-size:16px}
   #modal header small{color:var(--muted);display:block;margin-top:3px}
   #modal .x{cursor:pointer;color:var(--muted);font-size:22px;line-height:1}
-  #modal .body{overflow-y:auto;padding:0 22px 22px}
+  #modal .body{overflow-y:auto;padding:0 22px 22px;scrollbar-width:thin;scrollbar-color:transparent transparent;scrollbar-gutter:stable}
+  /* прокрутка как в левой колонке: тонкая, проявляется при наведении */
+  #modal .body:hover{scrollbar-color:var(--line) transparent}
+  #modal .body::-webkit-scrollbar{width:6px}
+  #modal .body::-webkit-scrollbar-thumb{background:transparent;border-radius:6px}
+  #modal .body:hover::-webkit-scrollbar-thumb{background:var(--line)}
   #modal .ins{border-top:1px solid var(--line);padding:12px 0}
   #modal .ins h3{margin:0 0 4px;font-size:13px}
   #modal .ins p{margin:0 0 8px;color:var(--ink)}
@@ -435,9 +440,9 @@
 <div id="modal"><div class="win"><header><div><h2 id="modalTitle">Выводы анализа</h2><small id="insSub"></small></div><span class="x" id="closeModal">×</span></header><div class="body" id="insBody"></div></div></div>
 
 <script src="vendor/d3.v7.min.js"></script>
-<script src="data.js?v=65"></script>
-<script src="facts.js?v=65"></script>
-<script src="npa.js?v=65"></script>
+<script src="data.js?v=66"></script>
+<script src="facts.js?v=66"></script>
+<script src="npa.js?v=66"></script>
 <script>
 (() => {
 'use strict';
