@@ -102,14 +102,18 @@ window.NPA_GRAPH = {
    "sec": "4.1",
    "changed": false,
    "role": null,
-   "analysis": false,
-   "dev": true,
    "inModel": [
     "IFC-01"
    ],
    "ord": 0,
    "side": "",
-   "disc": ""
+   "disc": "",
+   "sa": "work",
+   "saT": "нужно согласовать",
+   "sd": "done",
+   "sdT": "готово",
+   "analysis": false,
+   "dev": true
   },
   {
    "id": "IFC-96",
@@ -124,14 +128,18 @@ window.NPA_GRAPH = {
    "sec": "4.1",
    "changed": true,
    "role": null,
-   "analysis": true,
-   "dev": true,
    "inModel": [
     "IFC-96"
    ],
    "ord": 1,
    "side": "",
-   "disc": ""
+   "disc": "",
+   "sa": "done",
+   "saT": "готово",
+   "sd": "done",
+   "sdT": "готово",
+   "analysis": true,
+   "dev": true
   },
   {
    "id": "IFC-03",
@@ -146,14 +154,18 @@ window.NPA_GRAPH = {
    "sec": "4.1",
    "changed": false,
    "role": null,
-   "analysis": true,
-   "dev": false,
    "inModel": [
     "IFC-03"
    ],
    "ord": 2,
    "side": "",
-   "disc": ""
+   "disc": "",
+   "sa": "done",
+   "saT": "готово",
+   "sd": "none",
+   "sdT": "нет",
+   "analysis": true,
+   "dev": false
   },
   {
    "id": "IFC-93",
@@ -168,14 +180,18 @@ window.NPA_GRAPH = {
    "sec": "4.1",
    "changed": true,
    "role": null,
-   "analysis": true,
-   "dev": false,
    "inModel": [
     "IFC-93"
    ],
    "ord": 3,
    "side": "",
-   "disc": ""
+   "disc": "",
+   "sa": "done",
+   "saT": "готово",
+   "sd": "none",
+   "sdT": "нет",
+   "analysis": true,
+   "dev": false
   },
   {
    "id": "IFC-94",
@@ -190,14 +206,18 @@ window.NPA_GRAPH = {
    "sec": "4.1",
    "changed": false,
    "role": null,
-   "analysis": false,
-   "dev": false,
    "inModel": [
     "IFC-94"
    ],
    "ord": 4,
    "side": "",
-   "disc": ""
+   "disc": "",
+   "sa": "work",
+   "saT": "в работе",
+   "sd": "none",
+   "sdT": "нет",
+   "analysis": false,
+   "dev": false
   },
   {
    "id": "IFC-108",
@@ -213,14 +233,18 @@ window.NPA_GRAPH = {
    "sec": "4.1",
    "changed": true,
    "role": null,
-   "analysis": true,
-   "dev": false,
    "inModel": [
     "IFC-108"
    ],
    "ord": 5,
    "side": "",
-   "disc": ""
+   "disc": "",
+   "sa": "done",
+   "saT": "готово",
+   "sd": "none",
+   "sdT": "нет",
+   "analysis": true,
+   "dev": false
   },
   {
    "id": "IFC-109",
@@ -236,14 +260,18 @@ window.NPA_GRAPH = {
    "sec": "4.1",
    "changed": true,
    "role": null,
-   "analysis": true,
-   "dev": false,
    "inModel": [
     "IFC-109"
    ],
    "ord": 6,
    "side": "",
-   "disc": ""
+   "disc": "",
+   "sa": "done",
+   "saT": "готово",
+   "sd": "none",
+   "sdT": "нет",
+   "analysis": true,
+   "dev": false
   },
   {
    "id": "IFC-05",
@@ -260,14 +288,18 @@ window.NPA_GRAPH = {
    "sec": "4.1",
    "changed": false,
    "role": null,
-   "analysis": true,
-   "dev": true,
    "inModel": [
     "IFC-05"
    ],
    "ord": 7,
    "side": "ved",
-   "disc": ""
+   "disc": "",
+   "sa": "done",
+   "saT": "готово",
+   "sd": "done",
+   "sdT": "готово",
+   "analysis": true,
+   "dev": true
   },
   {
    "id": "IFC-11-19",
@@ -288,14 +320,18 @@ window.NPA_GRAPH = {
    "sec": "4.3",
    "changed": true,
    "role": null,
-   "analysis": true,
-   "dev": false,
    "inModel": [
     "IFC-11-19"
    ],
    "ord": 8,
    "side": "",
-   "disc": ""
+   "disc": "",
+   "sa": "done",
+   "saT": "готово",
+   "sd": "work",
+   "sdT": "в процессе MR",
+   "analysis": true,
+   "dev": false
   },
   {
    "id": "IFC-21-24",
@@ -317,8 +353,6 @@ window.NPA_GRAPH = {
    "sec": "4.6",
    "changed": true,
    "role": null,
-   "analysis": false,
-   "dev": false,
    "inModel": [
     "IFC-21",
     "IFC-22",
@@ -327,7 +361,13 @@ window.NPA_GRAPH = {
    ],
    "ord": 9,
    "side": "",
-   "disc": ""
+   "disc": "",
+   "sa": "work",
+   "saT": "в работе",
+   "sd": "none",
+   "sdT": "нет",
+   "analysis": false,
+   "dev": false
   },
   {
    "id": "IFC-25",
@@ -342,14 +382,18 @@ window.NPA_GRAPH = {
    "sec": "4.7",
    "changed": true,
    "role": null,
-   "analysis": true,
-   "dev": false,
    "inModel": [
     "IFC-25"
    ],
    "ord": 10,
    "side": "",
-   "disc": ""
+   "disc": "",
+   "sa": "done",
+   "saT": "готово",
+   "sd": "work",
+   "sdT": "в процессе MR",
+   "analysis": true,
+   "dev": false
   },
   {
    "id": "IFC-26",
@@ -364,14 +408,18 @@ window.NPA_GRAPH = {
    "sec": "4.7",
    "changed": false,
    "role": null,
-   "analysis": false,
-   "dev": false,
    "inModel": [
     "IFC-26"
    ],
    "ord": 11,
    "side": "",
-   "disc": ""
+   "disc": "",
+   "sa": "work",
+   "saT": "в работе",
+   "sd": "none",
+   "sdT": "нет",
+   "analysis": false,
+   "dev": false
   },
   {
    "id": "IFC-27",
@@ -386,14 +434,18 @@ window.NPA_GRAPH = {
    "sec": "4.7",
    "changed": false,
    "role": null,
-   "analysis": false,
-   "dev": false,
    "inModel": [
     "IFC-27"
    ],
    "ord": 12,
    "side": "",
-   "disc": ""
+   "disc": "",
+   "sa": "none",
+   "saT": "нет",
+   "sd": "none",
+   "sdT": "нет",
+   "analysis": false,
+   "dev": false
   },
   {
    "id": "IFC-28",
@@ -408,14 +460,18 @@ window.NPA_GRAPH = {
    "sec": "4.8",
    "changed": false,
    "role": null,
-   "analysis": true,
-   "dev": true,
    "inModel": [
     "IFC-28"
    ],
    "ord": 13,
    "side": "",
-   "disc": ""
+   "disc": "",
+   "sa": "done",
+   "saT": "готово",
+   "sd": "done",
+   "sdT": "готово",
+   "analysis": true,
+   "dev": true
   },
   {
    "id": "IFC-29",
@@ -430,14 +486,18 @@ window.NPA_GRAPH = {
    "sec": "4.8",
    "changed": false,
    "role": null,
-   "analysis": true,
-   "dev": false,
    "inModel": [
     "IFC-29"
    ],
    "ord": 14,
    "side": "",
-   "disc": ""
+   "disc": "",
+   "sa": "done",
+   "saT": "готово",
+   "sd": "none",
+   "sdT": "нет",
+   "analysis": true,
+   "dev": false
   },
   {
    "id": "IFC-30",
@@ -452,14 +512,18 @@ window.NPA_GRAPH = {
    "sec": "4.8",
    "changed": false,
    "role": null,
-   "analysis": false,
-   "dev": false,
    "inModel": [
     "IFC-30"
    ],
    "ord": 15,
    "side": "",
-   "disc": ""
+   "disc": "",
+   "sa": "work",
+   "saT": "в работе",
+   "sd": "none",
+   "sdT": "нет",
+   "analysis": false,
+   "dev": false
   },
   {
    "id": "IFC-35-39",
@@ -474,14 +538,18 @@ window.NPA_GRAPH = {
    "sec": "4.8",
    "changed": true,
    "role": null,
-   "analysis": true,
-   "dev": true,
    "inModel": [
     "IFC-35-39"
    ],
    "ord": 16,
    "side": "",
-   "disc": ""
+   "disc": "",
+   "sa": "done",
+   "saT": "готово, есть вопросы",
+   "sd": "done",
+   "sdT": "готово, есть вопрос",
+   "analysis": true,
+   "dev": true
   },
   {
    "id": "IFC-40-41",
@@ -496,14 +564,18 @@ window.NPA_GRAPH = {
    "sec": "4.8",
    "changed": false,
    "role": null,
-   "analysis": true,
-   "dev": false,
    "inModel": [
     "IFC-40-41"
    ],
    "ord": 17,
    "side": "",
-   "disc": ""
+   "disc": "",
+   "sa": "done",
+   "saT": "готово",
+   "sd": "none",
+   "sdT": "нет",
+   "analysis": true,
+   "dev": false
   },
   {
    "id": "IFC-42",
@@ -518,14 +590,18 @@ window.NPA_GRAPH = {
    "sec": "4.9",
    "changed": false,
    "role": null,
-   "analysis": false,
-   "dev": false,
    "inModel": [
     "IFC-42"
    ],
    "ord": 18,
    "side": "",
-   "disc": ""
+   "disc": "",
+   "sa": "none",
+   "saT": "нет",
+   "sd": "none",
+   "sdT": "нет",
+   "analysis": false,
+   "dev": false
   },
   {
    "id": "IFC-43",
@@ -540,14 +616,18 @@ window.NPA_GRAPH = {
    "sec": "4.9",
    "changed": false,
    "role": null,
-   "analysis": false,
-   "dev": false,
    "inModel": [
     "IFC-43"
    ],
    "ord": 19,
    "side": "",
-   "disc": ""
+   "disc": "",
+   "sa": "none",
+   "saT": "нет",
+   "sd": "none",
+   "sdT": "нет",
+   "analysis": false,
+   "dev": false
   },
   {
    "id": "IFC-44",
@@ -562,14 +642,18 @@ window.NPA_GRAPH = {
    "sec": "4.9",
    "changed": false,
    "role": null,
-   "analysis": false,
-   "dev": false,
    "inModel": [
     "IFC-44"
    ],
    "ord": 20,
    "side": "",
-   "disc": ""
+   "disc": "",
+   "sa": "work",
+   "saT": "в работе",
+   "sd": "none",
+   "sdT": "нет",
+   "analysis": false,
+   "dev": false
   },
   {
    "id": "IFC-45",
@@ -584,14 +668,18 @@ window.NPA_GRAPH = {
    "sec": "5.1",
    "changed": false,
    "role": null,
-   "analysis": true,
-   "dev": true,
    "inModel": [
     "IFC-45"
    ],
    "ord": 21,
    "side": "",
-   "disc": ""
+   "disc": "",
+   "sa": "done",
+   "saT": "готово",
+   "sd": "done",
+   "sdT": "готово",
+   "analysis": true,
+   "dev": true
   },
   {
    "id": "IFC-46",
@@ -606,14 +694,18 @@ window.NPA_GRAPH = {
    "sec": "5.1",
    "changed": true,
    "role": null,
-   "analysis": true,
-   "dev": false,
    "inModel": [
     "IFC-46"
    ],
    "ord": 22,
    "side": "",
-   "disc": ""
+   "disc": "",
+   "sa": "done",
+   "saT": "готово",
+   "sd": "work",
+   "sdT": "в процессе MR",
+   "analysis": true,
+   "dev": false
   },
   {
    "id": "IFC-92",
@@ -628,14 +720,18 @@ window.NPA_GRAPH = {
    "sec": "5.1",
    "changed": true,
    "role": null,
-   "analysis": false,
-   "dev": false,
    "inModel": [
     "IFC-92"
    ],
    "ord": 23,
    "side": "",
-   "disc": ""
+   "disc": "",
+   "sa": "none",
+   "saT": "нет",
+   "sd": "none",
+   "sdT": "нет",
+   "analysis": false,
+   "dev": false
   },
   {
    "id": "IFC-72",
@@ -650,14 +746,18 @@ window.NPA_GRAPH = {
    "sec": "5.1",
    "changed": true,
    "role": null,
-   "analysis": true,
-   "dev": false,
    "inModel": [
     "IFC-72"
    ],
    "ord": 24,
    "side": "",
-   "disc": ""
+   "disc": "",
+   "sa": "done",
+   "saT": "готово",
+   "sd": "work",
+   "sdT": "в процессе MR",
+   "analysis": true,
+   "dev": false
   },
   {
    "id": "IFC-73",
@@ -673,14 +773,18 @@ window.NPA_GRAPH = {
    "sec": "5.1",
    "changed": false,
    "role": null,
-   "analysis": true,
-   "dev": false,
    "inModel": [
     "IFC-73"
    ],
    "ord": 25,
    "side": "",
-   "disc": ""
+   "disc": "",
+   "sa": "done",
+   "saT": "готово",
+   "sd": "work",
+   "sdT": "в процессе MR",
+   "analysis": true,
+   "dev": false
   },
   {
    "id": "IFC-97",
@@ -698,14 +802,18 @@ window.NPA_GRAPH = {
    "sec": "5.2",
    "changed": true,
    "role": null,
-   "analysis": true,
-   "dev": false,
    "inModel": [
     "IFC-97"
    ],
    "ord": 26,
    "side": "",
-   "disc": "ps"
+   "disc": "ps",
+   "sa": "done",
+   "saT": "готово",
+   "sd": "none",
+   "sdT": "нет",
+   "analysis": true,
+   "dev": false
   },
   {
    "id": "IFC-50",
@@ -722,14 +830,18 @@ window.NPA_GRAPH = {
    "sec": "5.2",
    "changed": true,
    "role": null,
-   "analysis": false,
-   "dev": false,
    "inModel": [
     "IFC-50"
    ],
    "ord": 27,
    "side": "",
-   "disc": "ps"
+   "disc": "ps",
+   "sa": "work",
+   "saT": "в работе",
+   "sd": "none",
+   "sdT": "нет",
+   "analysis": false,
+   "dev": false
   },
   {
    "id": "IFC-51",
@@ -745,14 +857,18 @@ window.NPA_GRAPH = {
    "sec": "5.2",
    "changed": true,
    "role": null,
-   "analysis": false,
-   "dev": false,
    "inModel": [
     "IFC-51"
    ],
    "ord": 28,
    "side": "",
-   "disc": "ps"
+   "disc": "ps",
+   "sa": "work",
+   "saT": "в работе",
+   "sd": "none",
+   "sdT": "нет",
+   "analysis": false,
+   "dev": false
   },
   {
    "id": "IFC-52",
@@ -769,14 +885,18 @@ window.NPA_GRAPH = {
    "sec": "5.2",
    "changed": true,
    "role": null,
-   "analysis": true,
-   "dev": false,
    "inModel": [
     "IFC-52"
    ],
    "ord": 29,
    "side": "",
-   "disc": "ps"
+   "disc": "ps",
+   "sa": "done",
+   "saT": "готово",
+   "sd": "none",
+   "sdT": "нет",
+   "analysis": true,
+   "dev": false
   },
   {
    "id": "IFC-98",
@@ -792,14 +912,18 @@ window.NPA_GRAPH = {
    "sec": "5.2",
    "changed": true,
    "role": null,
-   "analysis": true,
-   "dev": false,
    "inModel": [
     "IFC-98"
    ],
    "ord": 30,
    "side": "",
-   "disc": "ps"
+   "disc": "ps",
+   "sa": "done",
+   "saT": "готово",
+   "sd": "none",
+   "sdT": "нет",
+   "analysis": true,
+   "dev": false
   },
   {
    "id": "IFC-47",
@@ -814,14 +938,18 @@ window.NPA_GRAPH = {
    "sec": "5.2",
    "changed": true,
    "role": null,
-   "analysis": false,
-   "dev": false,
    "inModel": [
     "IFC-47"
    ],
    "ord": 31,
    "side": "",
-   "disc": "ps"
+   "disc": "ps",
+   "sa": "work",
+   "saT": "в работе",
+   "sd": "none",
+   "sdT": "нет",
+   "analysis": false,
+   "dev": false
   },
   {
    "id": "IFC-101",
@@ -836,14 +964,18 @@ window.NPA_GRAPH = {
    "sec": "5.2",
    "changed": true,
    "role": null,
-   "analysis": false,
-   "dev": false,
    "inModel": [
     "IFC-101"
    ],
    "ord": 32,
    "side": "",
-   "disc": "ps"
+   "disc": "ps",
+   "sa": "work",
+   "saT": "в работе",
+   "sd": "none",
+   "sdT": "нет",
+   "analysis": false,
+   "dev": false
   },
   {
    "id": "IFC-02",
@@ -859,14 +991,18 @@ window.NPA_GRAPH = {
    "sec": "5.2",
    "changed": true,
    "role": null,
-   "analysis": true,
-   "dev": false,
    "inModel": [
     "IFC-02"
    ],
    "ord": 33,
    "side": "",
-   "disc": "both"
+   "disc": "both",
+   "sa": "done",
+   "saT": "готово",
+   "sd": "none",
+   "sdT": "нет",
+   "analysis": true,
+   "dev": false
   },
   {
    "id": "IFC-110",
@@ -881,14 +1017,18 @@ window.NPA_GRAPH = {
    "sec": "5.2",
    "changed": true,
    "role": null,
-   "analysis": false,
-   "dev": false,
    "inModel": [
     "IFC-110"
    ],
    "ord": 34,
    "side": "",
-   "disc": "ps"
+   "disc": "ps",
+   "sa": "none",
+   "saT": "нет",
+   "sd": "none",
+   "sdT": "нет",
+   "analysis": false,
+   "dev": false
   },
   {
    "id": "IFC-59",
@@ -903,14 +1043,18 @@ window.NPA_GRAPH = {
    "sec": "5.2",
    "changed": true,
    "role": null,
-   "analysis": false,
-   "dev": false,
    "inModel": [
     "IFC-59"
    ],
    "ord": 35,
    "side": "",
-   "disc": "ps"
+   "disc": "ps",
+   "sa": "none",
+   "saT": "нет",
+   "sd": "none",
+   "sdT": "нет",
+   "analysis": false,
+   "dev": false
   },
   {
    "id": "IFC-99",
@@ -926,14 +1070,18 @@ window.NPA_GRAPH = {
    "sec": "5.2",
    "changed": true,
    "role": null,
-   "analysis": true,
-   "dev": false,
    "inModel": [
     "IFC-99"
    ],
    "ord": 36,
    "side": "",
-   "disc": "both"
+   "disc": "both",
+   "sa": "done",
+   "saT": "готово",
+   "sd": "none",
+   "sdT": "нет",
+   "analysis": true,
+   "dev": false
   },
   {
    "id": "IFC-102",
@@ -948,14 +1096,18 @@ window.NPA_GRAPH = {
    "sec": "5.2",
    "changed": false,
    "role": null,
-   "analysis": false,
-   "dev": false,
    "inModel": [
     "IFC-102"
    ],
    "ord": 37,
    "side": "",
-   "disc": "ps"
+   "disc": "ps",
+   "sa": "none",
+   "saT": "нет",
+   "sd": "done",
+   "sdT": "сделано без аналитики",
+   "analysis": false,
+   "dev": true
   },
   {
    "id": "IFC-60",
@@ -971,14 +1123,18 @@ window.NPA_GRAPH = {
    "sec": "5.3",
    "changed": true,
    "role": null,
-   "analysis": false,
-   "dev": false,
    "inModel": [
     "IFC-60"
    ],
    "ord": 38,
    "side": "",
-   "disc": "ar"
+   "disc": "ar",
+   "sa": "none",
+   "saT": "нет",
+   "sd": "none",
+   "sdT": "нет",
+   "analysis": false,
+   "dev": false
   },
   {
    "id": "IFC-64",
@@ -993,14 +1149,18 @@ window.NPA_GRAPH = {
    "sec": "5.3",
    "changed": true,
    "role": null,
-   "analysis": true,
-   "dev": false,
    "inModel": [
     "IFC-64"
    ],
    "ord": 39,
    "side": "",
-   "disc": "ar"
+   "disc": "ar",
+   "sa": "done",
+   "saT": "готово",
+   "sd": "none",
+   "sdT": "нет",
+   "analysis": true,
+   "dev": false
   },
   {
    "id": "IFC-65-66",
@@ -1017,14 +1177,18 @@ window.NPA_GRAPH = {
    "sec": "5.3",
    "changed": true,
    "role": null,
-   "analysis": false,
-   "dev": false,
    "inModel": [
     "IFC-65-66"
    ],
    "ord": 40,
    "side": "",
-   "disc": "ar"
+   "disc": "ar",
+   "sa": "none",
+   "saT": "нет",
+   "sd": "none",
+   "sdT": "нет",
+   "analysis": false,
+   "dev": false
   },
   {
    "id": "IFC-107",
@@ -1041,14 +1205,18 @@ window.NPA_GRAPH = {
    "sec": "5.3",
    "changed": true,
    "role": null,
-   "analysis": false,
-   "dev": false,
    "inModel": [
     "IFC-107"
    ],
    "ord": 41,
    "side": "",
-   "disc": "ar"
+   "disc": "ar",
+   "sa": "none",
+   "saT": "нет",
+   "sd": "none",
+   "sdT": "нет",
+   "analysis": false,
+   "dev": false
   },
   {
    "id": "IFC-106",
@@ -1063,14 +1231,18 @@ window.NPA_GRAPH = {
    "sec": "5.3",
    "changed": true,
    "role": null,
-   "analysis": false,
-   "dev": false,
    "inModel": [
     "IFC-106"
    ],
    "ord": 42,
    "side": "",
-   "disc": "ar"
+   "disc": "ar",
+   "sa": "none",
+   "saT": "нет",
+   "sd": "none",
+   "sdT": "нет",
+   "analysis": false,
+   "dev": false
   },
   {
    "id": "IFC-68",
@@ -1086,14 +1258,18 @@ window.NPA_GRAPH = {
    "sec": "5.3",
    "changed": true,
    "role": null,
-   "analysis": false,
-   "dev": false,
    "inModel": [
     "IFC-68"
    ],
    "ord": 43,
    "side": "",
-   "disc": "ar"
+   "disc": "ar",
+   "sa": "none",
+   "saT": "нет",
+   "sd": "none",
+   "sdT": "нет",
+   "analysis": false,
+   "dev": false
   },
   {
    "id": "IFC-100",
@@ -1108,14 +1284,18 @@ window.NPA_GRAPH = {
    "sec": "5.3",
    "changed": true,
    "role": null,
-   "analysis": false,
-   "dev": false,
    "inModel": [
     "IFC-100"
    ],
    "ord": 44,
    "side": "",
-   "disc": "ar"
+   "disc": "ar",
+   "sa": "work",
+   "saT": "в работе",
+   "sd": "none",
+   "sdT": "нет",
+   "analysis": false,
+   "dev": false
   },
   {
    "id": "IFC-111",
@@ -1130,14 +1310,18 @@ window.NPA_GRAPH = {
    "sec": "5.3",
    "changed": true,
    "role": null,
-   "analysis": false,
-   "dev": false,
    "inModel": [
     "IFC-111"
    ],
    "ord": 45,
    "side": "",
-   "disc": "ar"
+   "disc": "ar",
+   "sa": "none",
+   "saT": "нет",
+   "sd": "none",
+   "sdT": "нет",
+   "analysis": false,
+   "dev": false
   },
   {
    "id": "IFC-105",
@@ -1153,14 +1337,18 @@ window.NPA_GRAPH = {
    "sec": "5.3",
    "changed": true,
    "role": null,
-   "analysis": false,
-   "dev": false,
    "inModel": [
     "IFC-105"
    ],
    "ord": 46,
    "side": "",
-   "disc": "ar"
+   "disc": "ar",
+   "sa": "none",
+   "saT": "нет",
+   "sd": "none",
+   "sdT": "нет",
+   "analysis": false,
+   "dev": false
   },
   {
    "id": "IFC-104",
@@ -1177,14 +1365,18 @@ window.NPA_GRAPH = {
    "sec": "5.3",
    "changed": true,
    "role": null,
-   "analysis": false,
-   "dev": false,
    "inModel": [
     "IFC-104"
    ],
    "ord": 47,
    "side": "",
-   "disc": "ar"
+   "disc": "ar",
+   "sa": "none",
+   "saT": "нет",
+   "sd": "none",
+   "sdT": "нет",
+   "analysis": false,
+   "dev": false
   },
   {
    "id": "IFC-70",
@@ -1200,14 +1392,18 @@ window.NPA_GRAPH = {
    "sec": "5.3",
    "changed": true,
    "role": null,
-   "analysis": true,
-   "dev": false,
    "inModel": [
     "IFC-70"
    ],
    "ord": 48,
    "side": "",
-   "disc": "ar"
+   "disc": "ar",
+   "sa": "done",
+   "saT": "готово",
+   "sd": "none",
+   "sdT": "нет",
+   "analysis": true,
+   "dev": false
   },
   {
    "id": "IFC-71",
@@ -1222,14 +1418,18 @@ window.NPA_GRAPH = {
    "sec": "5.3",
    "changed": false,
    "role": null,
-   "analysis": false,
-   "dev": false,
    "inModel": [
     "IFC-71"
    ],
    "ord": 49,
    "side": "",
-   "disc": "ar"
+   "disc": "ar",
+   "sa": "none",
+   "saT": "нет",
+   "sd": "none",
+   "sdT": "нет",
+   "analysis": false,
+   "dev": false
   },
   {
    "id": "IFC-74",
@@ -1244,14 +1444,18 @@ window.NPA_GRAPH = {
    "sec": "6.1",
    "changed": true,
    "role": null,
-   "analysis": false,
-   "dev": false,
    "inModel": [
     "IFC-74"
    ],
    "ord": 50,
    "side": "ved",
-   "disc": ""
+   "disc": "",
+   "sa": "none",
+   "saT": "отложено",
+   "sd": "none",
+   "sdT": "нет",
+   "analysis": false,
+   "dev": false
   },
   {
    "id": "IFC-75",
@@ -1266,14 +1470,18 @@ window.NPA_GRAPH = {
    "sec": "6.1",
    "changed": true,
    "role": null,
-   "analysis": false,
-   "dev": false,
    "inModel": [
     "IFC-75"
    ],
    "ord": 51,
    "side": "ved",
-   "disc": ""
+   "disc": "",
+   "sa": "none",
+   "saT": "отложено",
+   "sd": "none",
+   "sdT": "нет",
+   "analysis": false,
+   "dev": false
   },
   {
    "id": "IFC-76",
@@ -1292,14 +1500,18 @@ window.NPA_GRAPH = {
    "sec": "6.1",
    "changed": true,
    "role": null,
-   "analysis": false,
-   "dev": false,
    "inModel": [
     "IFC-76"
    ],
    "ord": 52,
    "side": "ved",
-   "disc": ""
+   "disc": "",
+   "sa": "none",
+   "saT": "отложено",
+   "sd": "none",
+   "sdT": "нет",
+   "analysis": false,
+   "dev": false
   },
   {
    "id": "IFC-86",
@@ -1314,14 +1526,18 @@ window.NPA_GRAPH = {
    "sec": "6.2",
    "changed": false,
    "role": null,
-   "analysis": false,
-   "dev": false,
    "inModel": [
     "IFC-86"
    ],
    "ord": 53,
    "side": "",
-   "disc": ""
+   "disc": "",
+   "sa": "none",
+   "saT": "нет",
+   "sd": "none",
+   "sdT": "нет",
+   "analysis": false,
+   "dev": false
   },
   {
    "id": "IFC-88",
@@ -1338,8 +1554,6 @@ window.NPA_GRAPH = {
    "sec": "6.2",
    "changed": false,
    "role": null,
-   "analysis": false,
-   "dev": false,
    "inModel": [
     "IFC-88-1",
     "IFC-88-2",
@@ -1347,7 +1561,13 @@ window.NPA_GRAPH = {
    ],
    "ord": 54,
    "side": "",
-   "disc": ""
+   "disc": "",
+   "sa": "none",
+   "saT": "нет",
+   "sd": "none",
+   "sdT": "нет",
+   "analysis": false,
+   "dev": false
   },
   {
    "id": "IFC-112",
@@ -1362,14 +1582,18 @@ window.NPA_GRAPH = {
    "sec": "6.2",
    "changed": false,
    "role": null,
-   "analysis": false,
-   "dev": false,
    "inModel": [
     "IFC-112"
    ],
    "ord": 55,
    "side": "",
-   "disc": ""
+   "disc": "",
+   "sa": "none",
+   "saT": "нет",
+   "sd": "none",
+   "sdT": "нет",
+   "analysis": false,
+   "dev": false
   },
   {
    "id": "IFC-95",
@@ -1384,14 +1608,18 @@ window.NPA_GRAPH = {
    "sec": "6.2",
    "changed": false,
    "role": null,
-   "analysis": true,
-   "dev": false,
    "inModel": [
     "IFC-95"
    ],
    "ord": 56,
    "side": "",
-   "disc": ""
+   "disc": "",
+   "sa": "done",
+   "saT": "готово",
+   "sd": "none",
+   "sdT": "нет",
+   "analysis": true,
+   "dev": false
   },
   {
    "id": "IFC-89-91",
@@ -1410,8 +1638,6 @@ window.NPA_GRAPH = {
    "sec": "7",
    "changed": true,
    "role": null,
-   "analysis": false,
-   "dev": false,
    "inModel": [
     "IFC-89",
     "IFC-90",
@@ -1419,7 +1645,13 @@ window.NPA_GRAPH = {
    ],
    "ord": 57,
    "side": "",
-   "disc": "ar"
+   "disc": "ar",
+   "sa": "none",
+   "saT": "нет",
+   "sd": "work",
+   "sdT": "пауза",
+   "analysis": false,
+   "dev": false
   },
   {
    "id": "IFC-103",
@@ -1434,14 +1666,18 @@ window.NPA_GRAPH = {
    "sec": "7",
    "changed": true,
    "role": null,
-   "analysis": false,
-   "dev": false,
    "inModel": [
     "IFC-103"
    ],
    "ord": 58,
    "side": "",
-   "disc": ""
+   "disc": "",
+   "sa": "none",
+   "saT": "нет",
+   "sd": "none",
+   "sdT": "нет",
+   "analysis": false,
+   "dev": false
   }
  ],
  "notes": []

@@ -183,7 +183,13 @@
   .node{cursor:pointer}
   .node .card{fill:var(--panel);stroke:var(--line);stroke-width:1.2}
   svg.nost .node .stat{display:none}
-  .node.idea .card{stroke-dasharray:4 3;stroke:var(--dim)}
+  .node.an-none .card{stroke-dasharray:4 3;stroke:var(--dim)}
+  .st-none{color:var(--dim)} .st-work{color:var(--warn)} .st-done{color:var(--ok)}
+  .ic-an path{fill:none;stroke:currentColor;stroke-width:1.15;stroke-linejoin:round;stroke-linecap:round}
+  .ic-an path.sheet{fill:currentColor;fill-opacity:.16}
+  .ic-dev text,text.ic-dev{font:700 9px ui-monospace,"SF Mono",Menlo,Consolas,monospace;fill:currentColor}
+  .sti{display:inline-flex;vertical-align:-2px;margin-right:4px}
+  .tag.stt{white-space:nowrap}
   .node .id{font:700 11.5px ui-monospace,"SF Mono",Menlo,Consolas,monospace;fill:var(--ink)}
   .node .nm{font-size:10px;fill:var(--muted)}
   .node .amb{font-size:11px;fill:var(--warn)}
@@ -478,7 +484,7 @@
       <label class="chk"><input type="checkbox" id="showGate" checked><span>Допуск IFC-01 ко всем проверкам<small>«файл должен читаться». Где IFC-01 — единственный родитель, линия видна всегда; остальные допуски повторяют цепочку и по умолчанию скрыты</small></span></label>
       <label class="chk"><input type="checkbox" id="showAgg" checked><span>Своды<small>точечные линии к IFC-21 и IFC-44: собирают итоги «прошла / не прошла» других проверок, сами ничего не проверяют и не блокируют</small></span></label>
       <label class="chk"><input type="checkbox" id="showImplied" checked><span>Связи в обход цепочки<small>настоящие зависимости любого вида, но порядок они не меняют: карточка и так стоит после родителя через другую цепочку, а линия лишь показывает, что она напрямую берёт у него данные</small></span></label>
-      <label class="chk"><input type="checkbox" id="showSt"><span>Статус реализации<small>кружок в углу карточки: реализована, в работе, есть аналитика; пунктирная рамка «аналитики ещё нет» видна всегда</small></span></label>
+      <label class="chk"><input type="checkbox" id="showSt" checked><span>Статусы: аналитика и код<small>два значка в углу карточки: лист — аналитика, &lt;/&gt; — код; серый — нет, жёлтый — в работе, зелёный — готово. Пунктирная рамка «аналитики нет» видна всегда</small></span></label>
     </fieldset>
 
 
@@ -512,8 +518,12 @@
       <div id="fFam"></div>
     </fieldset>
     <fieldset>
-      <legend>Статус <a id="allst">все</a></legend>
-      <div id="fSt"></div>
+      <legend>Аналитика <a id="allan">все</a></legend>
+      <div id="fAn"></div>
+    </fieldset>
+    <fieldset>
+      <legend>Разработка <a id="alldev">все</a></legend>
+      <div id="fDev"></div>
     </fieldset>
     </div>
     <a id="exportSvg" class="glos" style="margin-top:10px">Скачать SVG</a>
@@ -556,10 +566,10 @@
 <div id="modal"><div class="win"><header><div><h2 id="modalTitle">Выводы анализа</h2><small id="insSub"></small></div><span class="x" id="closeModal">×</span></header><div class="body" id="insBody"></div></div></div>
 
 <script src="vendor/d3.v7.min.js"></script>
-<script src="data.js?v=73"></script>
-<script src="algorithm-model.js?v=73"></script>
-<script src="facts.js?v=73"></script>
-<script src="npa.js?v=73"></script>
+<script src="data.js?v=74"></script>
+<script src="algorithm-model.js?v=74"></script>
+<script src="facts.js?v=74"></script>
+<script src="npa.js?v=74"></script>
 <script>
 (() => {
 'use strict';
@@ -570,7 +580,13 @@ const IN = {}, OUT = {};
 G.nodes.forEach(n => { IN[n.id] = []; OUT[n.id] = []; });
 E.forEach(e => { OUT[e.from].push(e); IN[e.to].push(e); });
 
-const secKeys = Object.keys(G.sections), famKeys = Object.keys(G.families), stKeys = Object.keys(G.statuses);
+const secKeys = Object.keys(G.sections), famKeys = Object.keys(G.families), ST_KEYS = ['none', 'work', 'done'];
+// значки статусов: лист — аналитика, </> — код; цвет — состояние (серый / жёлтый / зелёный)
+const IC_AN = '<path class="sheet" d="M0.6,0.6H5L7.4,3V9.4H0.6Z"/><path d="M5,0.6V3H7.4M2.2,5.3H5.8M2.2,7.3H5.8"/>';
+const stIcon = (kind, st) => kind === 'an'
+  ? `<svg class="sti ic-an st-${st}" width="10" height="12" viewBox="-1 -1 10 12">${IC_AN}</svg>`
+  : `<svg class="sti ic-dev st-${st}" width="18" height="12" viewBox="0 0 18 12"><text x="9" y="9.5" text-anchor="middle">&lt;/&gt;</text></svg>`;
+const ST_SW = { none: 'background:var(--dim)', work: 'background:var(--warn)', done: 'background:var(--ok)' };
 const secIdx = Object.fromEntries(secKeys.map((k, i) => [k, i]));
 const famIdx = Object.fromEntries(famKeys.map((k, i) => [k, i]));
 const RELS = { '16.10': 'Ближайший релиз', later: 'Позже / отложено' };
@@ -715,8 +731,8 @@ const S = {
   brSel: null, brOn: null, brAnc: true, brDesc: true,
   files: new Set(),   // выбор файла на IFC-01: пусто — все; иначе подмножество ps / ar / bf
   // sec: pkg / all / both в фильтре не показываются, но должны оставаться включёнными
-  sec: new Set([...secKeys, 'bf']), fam: new Set(famKeys), st: new Set(stKeys), ft: new Set(Object.keys(window.IFC_GRAPH.branches.types)),
-  showGate: true, showImplied: true, showAgg: true, showSt: false,
+  sec: new Set([...secKeys, 'bf']), fam: new Set(famKeys), an: new Set(ST_KEYS), dev: new Set(ST_KEYS), ft: new Set(Object.keys(window.IFC_GRAPH.branches.types)),
+  showGate: true, showImplied: true, showAgg: true, showSt: true,
   q: '', sel: null, failed: new Set(), rankSort: 'desc', rankDir: -1, cnt: '',
 };
 
@@ -736,7 +752,7 @@ const secOn = n => {
   if (n.sec === 'all') return S.sec.has('ps') || S.sec.has('ar') || S.sec.has('bf');
   return S.sec.has(n.sec);
 };
-const isVisible = n => S.ft.has(ftOf(n.id)) && secOn(n) && S.fam.has(n.fam) && S.st.has(n.st);
+const isVisible = n => S.ft.has(ftOf(n.id)) && secOn(n) && S.fam.has(n.fam) && S.an.has(n.an) && S.dev.has(n.dev);
 const visNodes = () => G.nodes.filter(isVisible);
 function edgeShown(e, ids) {
   if (!ids.has(e.from) || !ids.has(e.to)) return false;
@@ -776,7 +792,7 @@ const svgFill = v => v === '--s-both' ? 'url(#g-both)' : cssv(v);
 function colorOf(n) {
   const cb = S.colorBy;
   if (cb === 'sec') return svgFill('--s-' + n.sec);
-  if (cb === 'st') return { code: cssv('--ok'), work: cssv('--warn'), spec: cssv('--anc'), idea: cssv('--dim') }[n.st];
+  if (cb === 'st') return { done: cssv('--ok'), work: cssv('--warn'), none: cssv('--dim') }[n.dev];
   if (cb === 'blast') { const t = Math.sqrt(M(n).desc.length / maxDesc()); return d3.interpolateRgb(cssv('--line'), cssv('--fail'))(0.12 + 0.88 * t); }
   if (cb === 'risk') return n.amb ? (M(n).desc.length > 0 ? cssv('--desc') : cssv('--warn')) : cssv('--line');
   return cssv('--dim');
@@ -919,8 +935,8 @@ function secTag(g, h) {
 const trunc = (s, n) => s.length > n ? s.slice(0, n - 1) + '…' : s;
 
 function nodeShape(g) {
-  g.attr('class', d => 'node ' + N[d.base || d.id].st).attr('data-id', d => d.id);
-  g.append('title').text(d => { const n = N[d.base || d.id]; return n.label + ' — ' + n.n + (d.copyOf ? '\nкопия общей проверки в разделе «' + d.copyOf + '»' : '') + (d.inPath ? '\n' + d.inPath : '') + ('\nвес: ' + W_NAME[n.w]) + (n.amb ? '\n⚠ ' + n.amb : ''); });
+  g.attr('class', d => { const n = N[d.base || d.id]; return 'node an-' + n.an + ' dev-' + n.dev; }).attr('data-id', d => d.id);
+  g.append('title').text(d => { const n = N[d.base || d.id]; return n.label + ' — ' + n.n + (d.copyOf ? '\nкопия общей проверки в разделе «' + d.copyOf + '»' : '') + (d.inPath ? '\n' + d.inPath : '') + ('\nаналитика: ' + n.anT + ' · код: ' + n.devT) + ('\nвес: ' + W_NAME[n.w]) + (n.amb ? '\n⚠ ' + n.amb : ''); });
   g.append('rect').attr('class', 'card').attr('width', NW).attr('height', NH).attr('rx', 8);
   g.append('rect').attr('class', d => 'stripe' + (d.copyOf ? ' copy' : '')).attr('width', 5).attr('height', NH - 10).attr('x', 0).attr('y', 5).attr('rx', 2.5);
   secTag(g, NH);
@@ -928,14 +944,12 @@ function nodeShape(g) {
   idt.append('tspan').text(d => N[d.base || d.id].label);
   idt.filter(d => N[d.base || d.id].amb).append('tspan').attr('dx', 5).attr('class', 'amb').text('⚠');
   g.append('text').attr('class', 'nm').attr('x', 14).attr('y', 34).text(d => trunc(N[d.base || d.id].n, 24));
-  // статус
-  const st = g.append('g').attr('class', 'stat').attr('transform', `translate(${NW - 14},14)`);
+  // статусы: аналитика (лист) и код (</>), цвет — состояние из таблицы проверок
+  const st = g.append('g').attr('class', 'stat');
   st.each(function (d) {
     const n = N[d.base || d.id], el = d3.select(this);
-    if (n.st === 'code') el.append('circle').attr('r', 5).attr('fill', cssv('--ok'));
-    else if (n.st === 'work') el.append('circle').attr('r', 5).attr('fill', cssv('--warn'));
-    else if (n.st === 'spec') el.append('circle').attr('r', 4.6).attr('fill', 'none').attr('stroke', cssv('--ink')).attr('stroke-width', 1.6);
-    else el.append('circle').attr('r', 4.6).attr('fill', 'none').attr('stroke', cssv('--dim')).attr('stroke-width', 1.6).attr('stroke-dasharray', '2 2');
+    el.append('g').attr('class', 'ic-an st-' + n.an).attr('transform', `translate(${NW - 34},8)`).html(IC_AN);
+    el.append('text').attr('class', 'ic-dev st-' + n.dev).attr('x', NW - 6.5).attr('y', 17.2).attr('text-anchor', 'end').text('</>');
   });
   g.append('text').attr('class', 'cross').attr('x', NW - 14).attr('y', NH - 8).attr('text-anchor', 'middle').text(d => S.failed.has(d.base || d.id) ? '×' : '⊘');
   const cg = g.append('g').attr('class', 'cnt').style('display', 'none');
@@ -1305,7 +1319,7 @@ function brRestyle() {
     const v = brG.V[d.id], n = N[d.base], val = brCnt(v), el = d3.select(this);
     if (!S.cnt || !val) { el.style('display', 'none'); return; }
     const label = (S.cnt === 'next' ? '→ ' : 'Σ ') + val;
-    const w = 12 + label.length * 6.4, right = NW - 24, t = Math.pow(val / cntMax, gamma);
+    const w = 12 + label.length * 6.4, right = NW - (S.showSt ? 38 : 24), t = Math.pow(val / cntMax, gamma);
     el.style('display', null);
     el.select('rect').attr('x', right - w).attr('width', w).style('stroke', heat(t)).style('stroke-width', 1.6 + 1.2 * t);
     el.select('text').attr('x', right - w / 2).text(label);
@@ -1552,7 +1566,7 @@ function npaRestyle() {
     const c = NPA_C[d.id], v = npaCnt(c), el = d3.select(this);
     if (!S.cnt || !v) { el.style('display', 'none'); return; }
     const label = (S.cnt === 'next' ? '→ ' : 'Σ ') + v;
-    const w = 12 + label.length * 6.4, right = NW - 24, t = Math.pow(v / cntMax, gamma);
+    const w = 12 + label.length * 6.4, right = NW - (S.showSt ? 38 : 24), t = Math.pow(v / cntMax, gamma);
     el.style('display', null);
     el.select('rect').attr('x', right - w).attr('width', w).style('stroke', heat(t)).style('stroke-width', 1.6 + 1.2 * t);
     el.select('text').attr('x', right - w / 2).text(label);
@@ -1632,7 +1646,7 @@ function render(opts) {
   const isFacts = S.view === 'facts', isNpa = S.view === 'npa';
   ['#stepsBox'].forEach(s => { if ($(s)) $(s).style.display = isFacts || isNpa ? 'none' : ''; });
   ['#showGate'].forEach(s => { const box = $(s).closest('fieldset'); if (box) box.style.display = isFacts || isNpa ? 'none' : ''; });
-  ['#fFt', '#fSec', '#fFam', '#fSt'].forEach(s => { const box = $(s).closest('fieldset'); if (box) box.style.display = isNpa ? 'none' : ''; });
+  ['#fFt', '#fSec', '#fFam', '#fAn', '#fDev'].forEach(s => { const box = $(s).closest('fieldset'); if (box) box.style.display = isNpa ? 'none' : ''; });
   $('#npaBox').style.display = isNpa ? '' : 'none';
   $('#brBox').style.display = S.view === 'branches' ? '' : 'none';
   if (!FILE_VIEWS.includes(S.view)) $('#filePick').classList.remove('on');
@@ -1698,7 +1712,7 @@ function restyle() {
       const n = N[d.id], v = cntOf(n), el = d3.select(this);
       if (!S.cnt || !v) { el.style('display', 'none'); return; }
       const label = (S.cnt === 'next' ? '→ ' : 'Σ ') + v;
-      const w = 12 + label.length * 6.4, right = NW - 24;
+      const w = 12 + label.length * 6.4, right = NW - (S.showSt ? 38 : 24);
       const t = Math.pow(v / cntMax, gamma);
       el.style('display', null);
       el.select('rect').attr('x', right - w).attr('width', w)
@@ -1740,11 +1754,11 @@ function drawRank() {
   const roots = G.nodes.filter(n => M(n).parents.length === 0);
   const maxD = Math.max(1, ...nodes.map(n => Math.max(n.A.desc.length, n.B.desc.length)));
   const maxA = Math.max(1, ...nodes.map(n => Math.max(n.A.anc.length, n.B.anc.length)));
-  const key = { desc: n => M(n).desc.length, ancs: n => M(n).anc.length, depth: n => stepOf(n), id: n => n.topo, st: n => stKeys.indexOf(n.st) };
+  const key = { desc: n => M(n).desc.length, ancs: n => M(n).anc.length, depth: n => stepOf(n), id: n => n.topo, st: n => ST_KEYS.indexOf(n.dev) * 3 + ST_KEYS.indexOf(n.an) };
   const kf = key[S.rankSort] || key.desc;
   const rows = nodes.slice().sort((a, b) => (kf(a) - kf(b)) * S.rankDir || a.topo - b.topo);
   const bar = (v, mx, col) => `<div class="bar"><i style="width:${Math.max(v ? 3 : 0, 100 * v / mx)}%;background:${col}"></i><em>${v}</em></div>`;
-  const stDot = n => `<span class="dot" style="background:${n.st === 'code' ? cssv('--ok') : n.st === 'work' ? cssv('--warn') : 'transparent'};${n.st === 'spec' ? 'border:1.6px solid ' + cssv('--ink') : n.st === 'idea' ? 'border:1.6px dashed ' + cssv('--dim') : ''}"></span>`;
+  const stDot = n => stIcon('an', n.an) + stIcon('dev', n.dev);
   const rk = document.createElement('div');
   rk.innerHTML = `
     <h2>Рейтинг: кто кого блокирует и от скольких зависит</h2>
@@ -1753,11 +1767,11 @@ function drawRank() {
       <div class="chips">${roots.map(n => `<a class="chip" data-id="${n.id}">${esc(n.label)}</a>`).join('')}</div>
       <div class="hint">Корень один: допуск на приём комплекта — всё остальное вырастает из него.</div></div>
     <table><thead><tr>
-      <th data-s="id">Проверка</th><th data-s="st">Статус</th><th data-s="depth">Слой</th>
+      <th data-s="id">Проверка</th><th data-s="st">Аналитика · код</th><th data-s="depth">Слой</th>
       <th data-s="desc" style="min-width:210px">Потомков</th><th data-s="ancs" style="min-width:210px">Предков</th><th>Обратить внимание</th></tr></thead>
     <tbody>${rows.map(n => `<tr class="r${n.id === S.sel ? ' sel' : ''}" data-id="${n.id}">
       <td><span class="cd">${esc(n.label)}</span><br><span style="color:var(--muted);font-size:11px">${esc(trunc(n.n, 38))}</span></td>
-      <td>${stDot(n)}<span style="font-size:11px;color:var(--muted)">${esc(G.statuses[n.st].split(' — ')[0].split(' /')[0])}</span></td>
+      <td style="white-space:nowrap">${stDot(n)}<span style="font-size:11px;color:var(--muted)">${esc(n.anT + ' · ' + n.devT)}</span></td>
       <td>${stepOf(n)}</td>
       <td>${bar(n.A.desc.length, maxD, cssv('--fail'))}</td>
       <td>${bar(n.A.anc.length, maxA, cssv('--fail'))}</td>
@@ -1797,7 +1811,7 @@ function renderSidebarState() {
   if (S.view === 'branches' && brG) $('#counter').textContent = S.brOn
     ? 'ветки: ' + [...S.brOn].map(brForkName).join(', ') + ' · ' + brG.core.size + ' карточек + ' + (brG.vis.size - brG.core.size) + ' на пути'
     : vis.length + ' из ' + G.nodes.length + ' проверок' + (brG.dup ? ' · карточек с копиями: ' + brG.VN.length : '');
-  ['#fFt', '#fSec', '#fFam', '#fSt'].forEach(sel => {
+  ['#fFt', '#fSec', '#fFam', '#fAn', '#fDev'].forEach(sel => {
     $(sel).querySelectorAll('.row').forEach(r => r.classList.toggle('off', !S[r.dataset.g].has(r.dataset.k)));
   });
 }
@@ -1814,16 +1828,16 @@ function buildFilters() {
     k => ifcN.filter(n => n.sec === k || (n.sec === 'both' && (k === 'ps' || k === 'ar')) || n.sec === 'all').length,
     k => `background:var(${k === 'bf' ? '--t-bf' : '--s-' + k})`);
   mk('#fFam', 'fam', famKeys.map(k => [k, G.families[k]]), k => G.nodes.filter(n => n.fam === k).length, () => 'background:var(--chipbd)');
-  mk('#fSt', 'st', stKeys.map(k => [k, G.statuses[k]]), k => G.nodes.filter(n => n.st === k).length,
-    k => ({ code: 'background:var(--ok)', work: 'background:var(--warn)', spec: 'border:2px solid var(--ink);border-radius:50%', idea: 'border:2px dashed var(--dim);border-radius:50%' }[k]));
+  mk('#fAn', 'an', ST_KEYS.map(k => [k, G.stAn[k]]), k => G.nodes.filter(n => n.an === k).length, k => ST_SW[k]);
+  mk('#fDev', 'dev', ST_KEYS.map(k => [k, G.stDev[k]]), k => G.nodes.filter(n => n.dev === k).length, k => ST_SW[k]);
   const all = (btn, group, keys) => $(btn).addEventListener('click', () => { keys.forEach(k => S[group].add(k)); render({ fit: true, relayout: true }); });
-  all('#allsec', 'sec', [...secKeys, 'bf']); all('#allft', 'ft', FT_KEYS); all('#allfam', 'fam', famKeys); all('#allst', 'st', stKeys);
+  all('#allsec', 'sec', [...secKeys, 'bf']); all('#allft', 'ft', FT_KEYS); all('#allfam', 'fam', famKeys); all('#allan', 'an', ST_KEYS); all('#alldev', 'dev', ST_KEYS);
 }
 
 // ───────── легенда ─────────
 // ───────── как читать вид — короткое описание под фильтрами ─────────
 const Q_TEXT = 'Сверху вниз в слое — очередь выполнения: сначала лёгкие проверки (заголовок, имена, значения атрибутов), потом средние (обход элементов, сверка с таблицами), в конце тяжёлые (геометрия, 3D). Развёртка режет слой на подстолбцы 3А, 3Б… — тогда очередь идёт слева направо.';
-const FAIL_TEXT = 'Не прошла проверка хотя бы по одному файлу — все её дочерние не выполняются. Пунктирная рамка — аналитики ещё нет, логика и связи предположены.';
+const FAIL_TEXT = 'Не прошла проверка хотя бы по одному файлу — все её дочерние не выполняются. Пунктирная рамка — аналитики нет, логика и связи предположены.';
 const VIEW_DESC = {
   cascade: ['<b>Слева направо</b> — от родительских проверок к дочерним: чем правее, тем больше проверок должно пройти раньше. Столбец — слой: проверки одного слоя друг от друга не зависят.', Q_TEXT, FAIL_TEXT],
   lanes: ['<b>Слева направо</b> — от родительских проверок к дочерним, по дорожкам разделов ЦИМ.', Q_TEXT, FAIL_TEXT],
@@ -1902,10 +1916,12 @@ function renderLegend() {
   }
   h += '<h4>Связи <span style="text-transform:none;letter-spacing:0;font-weight:400">· наведите — пример</span></h4>' + KIND_ORDER.map(k => kindRow(k, `<svg width="26" height="8"><line x1="0" y1="4" x2="24" y2="4" stroke="var(--k-${k})" stroke-width="2.2" ${k === 'agg' ? 'stroke-dasharray="2 4"' : ''}/></svg>`)).join('');
   h += '<div class="hint" style="margin-top:4px">' + 'Все линии, кроме свода, блокируют.' + ' <b>Наведите на линию</b> — что передаёт связь и зачем она.</div>';
-  if (S.showSt && S.view !== 'matrix') h += '<h4>Статус (значок справа)</h4>' +
-      dotRow('<circle cx="6" cy="6" r="5" fill="var(--ok)"/>', 'реализована') + dotRow('<circle cx="6" cy="6" r="5" fill="var(--warn)"/>', 'в работе / переработке') +
-      dotRow('<circle cx="6" cy="6" r="4.4" fill="none" stroke="var(--ink)" stroke-width="1.6"/>', 'есть аналитика, кода нет') +
-      dotRow('<circle cx="6" cy="6" r="4.4" fill="none" stroke="var(--dim)" stroke-width="1.6" stroke-dasharray="2 2"/>', 'логика предположена (пунктир)');
+  if (S.showSt && S.view !== 'matrix') h += '<h4>Статусы (значки в углу карточки)</h4>' +
+      `<div class="li">${stIcon('an', 'done')}<span>аналитика</span></div><div class="li">${stIcon('dev', 'done')}<span>разработка (код)</span></div>` +
+      '<div class="li"><span class="sw" style="background:var(--dim)"></span>нет</div>' +
+      '<div class="li"><span class="sw" style="background:var(--warn)"></span>в работе · в процессе MR</div>' +
+      '<div class="li"><span class="sw" style="background:var(--ok)"></span>готово</div>' +
+      '<div class="hint" style="margin-top:2px">Пунктирная рамка — аналитики нет. Статусы — из таблицы проверок.</div>';
   if (S.view === 'branches') h += ''
     + (S.brOn ? '<div class="hint">Показаны выбранные ветки; бледные карточки с пунктирной рамкой — из других веток, но лежат на пути. <b style="color:var(--fail)">↤N / N↦</b> — связь обрывается: столько проверок из скрытых веток ещё нужны этой (слева) или ждут её (справа); наведите — список.</div>' : '');
   if (S.files.size && FILE_VIEWS.includes(S.view)) h += `<h4>${S.files.size > 1 ? 'Файлы' : 'Файл'}: ${esc(fileNames())}</h4><div class="hint" style="margin-top:0">Выбрано на узле IFC-01. Насыщенные карточки — проверки, которые ${S.files.size > 1 ? 'проходят выбранные IFC-файлы' : 'проходит IFC-файл этого раздела'}: контейнер TRM, общие проверки ПС, АР и БФ, проверки ${S.files.size > 1 ? 'выбранных разделов' : 'раздела'}${S.files.has('ps') || S.files.has('ar') ? ' и совместные ПС+АР' : ''}. Серые — не задействованы (другие разделы и другие типы файлов: XML, аннотации, 2D).</div>`;
@@ -1944,13 +1960,13 @@ function renderDetail() {
   const sk = skippedSet();
   let h = `<span class="x" id="dx">×</span>
     <div class="code">${esc(n.label)}</div><div class="title">${esc(n.n)}</div>
-    <div class="tags"><span class="tag">${esc(ftOf(n.id) === 'ifc' ? G.sections[n.sec] : G.branches.types[ftOf(n.id)])}</span><span class="tag">${esc(G.statuses[n.st])}</span><span class="tag">${esc(G.families[n.fam])}</span></div>
+    <div class="tags"><span class="tag">${esc(ftOf(n.id) === 'ifc' ? G.sections[n.sec] : G.branches.types[ftOf(n.id)])}</span><span class="tag stt">${stIcon('an', n.an)}аналитика: ${esc(n.anT)}</span><span class="tag stt">${stIcon('dev', n.dev)}код: ${esc(n.devT)}</span><span class="tag">${esc(G.families[n.fam])}</span></div>
     <div class="desc">${esc(n.what)}</div>
     <div class="req"><span>Требование</span>${esc(n.d)}</div>
     <div style="color:var(--muted);font-size:12px">Пункт требований: ${esc(n.p)}</div>`;
   if (G.algo && G.algo[n.id]) h += `<div class="btns" style="margin:10px 0 4px"><button class="btn" id="openAlgo">Открыть алгоритм проверки</button></div>`;
   if (n.amb) h += `<div class="box amb"><b>⚠ Внимание.</b> ${esc(n.amb)}${m.desc.length ? `<br><br>Проверка родительская: если при сомнении она вернёт false, каскадом не выполнятся ещё <b>${m.desc.length}</b> дочерних.` : ''}</div>`;
-  if (n.logic && n.st === 'idea') h += `<div class="box logic"><b>Предполагаемая логика.</b> ${esc(n.logic)}</div>`;
+  if (n.logic) h += `<div class="box logic"><b>Предполагаемая логика.</b> ${esc(n.logic)}</div>`;
   if (n.note) h += `<div class="box note">${esc(n.note)}</div>`;
   h += `<div class="sub">Родители — что должно выполниться раньше (${parents.length}${gate ? ' + допуск' : ''})</div>`;
   h += parents.length ? parents.map(e => linkRow(e, 'in')).join('') : '<div class="hint" style="margin:0">нет — проверка корневая' + (gate ? ', кроме неявного допуска IFC-01' : '') + '</div>';
@@ -2428,7 +2444,7 @@ function glossary() {
     { t: 'Виды связей между проверками', p: 'Стрелка на схеме — не просто «после», а конкретная зависимость одного из шести видов:', h: `<div style="margin-top:4px">${kindLi}</div>` },
     { t: 'Обратить внимание', p: 'Значок ⚠ сразу после номера проверки и жёлтая плашка «Внимание» в карточке: там записан открытый вопрос. Значит: у этой проверки есть ситуации, где по имеющимся данным нельзя однозначно сказать «пройдено» или «не пройдено» — например, что-то в модели можно понять двумя способами, нормативный порог не задан явно, или нужного признака в модели просто нет. Пример — открытый вопрос в самой карточке. Если такая проверка ещё и родительская, сомнение каскадом гасит все её дочерние проверки — сколько именно, видно в самой карточке.' },
     { t: 'Основание связи: «в аналитике» / «по коду» / «предположение»', p: 'Серый или жёлтый значок рядом с каждой связью в карточке проверки — откуда взята эта связь.<br><br><b>«в аналитике»</b> — прямо написано в карточке проверки или в командной аналитике.<br><b>«по коду»</b> — не написано явно, но видно по тому, как связь реализована в существующем коде.<br><b>«предположение»</b> (жёлтый) — связь для проверки, у которой ещё нет ни кода, ни аналитики: логика продумана по смыслу нормы, но не подтверждена, стоит перепроверить, когда аналитика появится.' },
-    { t: 'Статус реализации проверки', p: 'Кружок в правом верхнем углу карточки на схеме. Статус — по таблице проверок (лист «IFC к 16.10») и карточкам аналитики.<br><br>🟢 заполненный — <b>реализована</b>: в таблице разработка «готово» или «сделано без аналитики».<br>🟡 заполненный — <b>в работе / переработке</b>: разработка «в процессе MR», «в работе» или «пауза», либо код уже был (прежней редакции или отмеченный раньше), а отметки о разработке в таблице сейчас нет.<br>⚪ кольцо — <b>есть аналитика, кода нет</b>: карточка проверки написана, разработки ещё нет.<br>⚪ пунктирное кольцо, рамка карточки штрихом — <b>аналитики нет, логика предположена</b> (в карточке — раздел «Предполагаемая логика»: как эта проверка могла бы работать и что бы использовала от других).' },
+    { t: 'Статусы проверки: аналитика и код', p: 'Два значка в правом верхнем углу карточки на схеме: лист — аналитика, &lt;/&gt; — разработка (код). Цвет значка — состояние: серый — нет, жёлтый — в работе, зелёный — готово.<br><br>Статусы берутся автоматически из рабочей таблицы проверок (лист «IFC к 16.10», колонки «Аналитика» и «Разработка») при каждой сборке графа.<br><br><b>Аналитика:</b> «готово» — зелёный; назначен исполнитель или «нужно согласовать» — жёлтый; пусто или «отложено» — серый.<br><b>Разработка:</b> «готово» и «сделано без аналитики» — зелёный; «в процессе MR», «в работе», «пауза» — жёлтый; пусто — серый.<br><br>Точная формулировка из таблицы — в карточке проверки справа и в подсказке при наведении. Пунктирная рамка карточки — аналитики нет; если для такой проверки записана предполагаемая логика, она показана в карточке справа.' },
     { t: '«Предполагаемая логика» в карточке', p: 'Появляется только у проверок без аналитики. Это не задание и не решение по существу — черновая гипотеза, как проверку можно было бы реализовать и какие данные других проверок для этого понадобились бы, чтобы граф не обрывался в пустоте там, где норма в требованиях уже есть, а разбора ещё нет.' },
     { t: 'Потомков / предков (в «Рейтинге»)', p: '«Потомков» — сколько проверок перестанет выполняться, если эта не пройдёт. «Предков» — сколько проверок должно пройти раньше, чтобы эта вообще запустилась.' },
     { t: 'Своды', p: 'Проверки вроде «все параметры заполнены», которые не проверяют что-то своё, а просто собирают статусы других проверок в один общий результат. На схеме связи к ним идут пунктиром и подписаны «свод» — такие связи никогда не блокируют, при любом правиле каскада. По умолчанию показаны — галочка «Своды».' },
