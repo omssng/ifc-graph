@@ -1,7 +1,7 @@
 // Сгенерировано build_npa.py — руками не править.
 window.NPA_GRAPH = {
  "meta": {
-  "asof": "2026-09-28",
+  "asof": "2026-10-06",
   "source": "лист «IFC к 16.10» рабочей таблицы проверок"
  },
  "sections": [
@@ -96,13 +96,14 @@ window.NPA_GRAPH = {
    ],
    "clauses": [
     "4.1.1",
-    "4.1.2"
+    "4.1.2",
+    "4.1.3"
    ],
    "sec": "4.1",
    "changed": false,
    "role": null,
-   "analysis": true,
-   "dev": false,
+   "analysis": false,
+   "dev": true,
    "inModel": [
     "IFC-01"
    ],
@@ -124,33 +125,11 @@ window.NPA_GRAPH = {
    "changed": true,
    "role": null,
    "analysis": true,
-   "dev": false,
+   "dev": true,
    "inModel": [
     "IFC-96"
    ],
    "ord": 1,
-   "side": "",
-   "disc": ""
-  },
-  {
-   "id": "IFC-04",
-   "label": "IFC-04",
-   "title": "Схема IFC 4.0.2.1 или новее",
-   "parts": [
-    "Схема IFC 4.0.2.1 или новее"
-   ],
-   "clauses": [
-    "4.1.3"
-   ],
-   "sec": "4.1",
-   "changed": false,
-   "role": null,
-   "analysis": false,
-   "dev": false,
-   "inModel": [
-    "IFC-04"
-   ],
-   "ord": 2,
    "side": "",
    "disc": ""
   },
@@ -167,12 +146,12 @@ window.NPA_GRAPH = {
    "sec": "4.1",
    "changed": false,
    "role": null,
-   "analysis": false,
+   "analysis": true,
    "dev": false,
    "inModel": [
     "IFC-03"
    ],
-   "ord": 3,
+   "ord": 2,
    "side": "",
    "disc": ""
   },
@@ -189,12 +168,12 @@ window.NPA_GRAPH = {
    "sec": "4.1",
    "changed": true,
    "role": null,
-   "analysis": false,
+   "analysis": true,
    "dev": false,
    "inModel": [
     "IFC-93"
    ],
-   "ord": 4,
+   "ord": 3,
    "side": "",
    "disc": ""
   },
@@ -212,11 +191,11 @@ window.NPA_GRAPH = {
    "changed": false,
    "role": null,
    "analysis": false,
-   "dev": true,
+   "dev": false,
    "inModel": [
     "IFC-94"
    ],
-   "ord": 5,
+   "ord": 4,
    "side": "",
    "disc": ""
   },
@@ -234,12 +213,12 @@ window.NPA_GRAPH = {
    "sec": "4.1",
    "changed": true,
    "role": null,
-   "analysis": false,
+   "analysis": true,
    "dev": false,
    "inModel": [
     "IFC-108"
    ],
-   "ord": 6,
+   "ord": 5,
    "side": "",
    "disc": ""
   },
@@ -257,12 +236,12 @@ window.NPA_GRAPH = {
    "sec": "4.1",
    "changed": true,
    "role": null,
-   "analysis": false,
+   "analysis": true,
    "dev": false,
    "inModel": [
     "IFC-109"
    ],
-   "ord": 7,
+   "ord": 6,
    "side": "",
    "disc": ""
   },
@@ -281,12 +260,12 @@ window.NPA_GRAPH = {
    "sec": "4.1",
    "changed": false,
    "role": null,
-   "analysis": false,
-   "dev": false,
+   "analysis": true,
+   "dev": true,
    "inModel": [
     "IFC-05"
    ],
-   "ord": 8,
+   "ord": 7,
    "side": "ved",
    "disc": ""
   },
@@ -309,31 +288,31 @@ window.NPA_GRAPH = {
    "sec": "4.3",
    "changed": true,
    "role": null,
-   "analysis": false,
+   "analysis": true,
    "dev": false,
    "inModel": [
     "IFC-11-19"
    ],
-   "ord": 9,
+   "ord": 8,
    "side": "",
    "disc": ""
   },
   {
    "id": "IFC-21-24",
    "label": "IFC-21–24",
-   "title": "Координация дисциплинарных файлов между собой.",
+   "title": "Привязка к фактическим координатам местности, местной СК МСК-77, проектному углу поворота объекта относительно истинного севера",
    "parts": [
+    "Привязка к фактическим координатам местности, местной СК МСК-77, проектному углу поворота объекта относительно истинного севера",
     "Координация дисциплинарных файлов между собой.",
-    "Единая система координат, отметок и угла поворота. Что проверять: единая система координат и угол поворота.",
     "Что проверять: базовая точка — пересечение осей 1 и А, отметка 0,000.",
-    "Привязка к фактическим координатам местности, местной СК МСК-77, проектному углу поворота объекта относительно истинного севера"
+    "Единая система координат, отметок и угла поворота. Что проверять: единая система координат и угол поворота."
    ],
    "clauses": [
-    "4.6.1",
-    "4.6.2",
-    "4.6.3",
     "4.6.4",
-    "4.6.5"
+    "4.6.5",
+    "4.6.1",
+    "4.6.3",
+    "4.6.2"
    ],
    "sec": "4.6",
    "changed": true,
@@ -346,7 +325,7 @@ window.NPA_GRAPH = {
     "IFC-23",
     "IFC-24"
    ],
-   "ord": 10,
+   "ord": 9,
    "side": "",
    "disc": ""
   },
@@ -363,12 +342,12 @@ window.NPA_GRAPH = {
    "sec": "4.7",
    "changed": true,
    "role": null,
-   "analysis": false,
+   "analysis": true,
    "dev": false,
    "inModel": [
     "IFC-25"
    ],
-   "ord": 11,
+   "ord": 10,
    "side": "",
    "disc": ""
   },
@@ -390,7 +369,7 @@ window.NPA_GRAPH = {
    "inModel": [
     "IFC-26"
    ],
-   "ord": 12,
+   "ord": 11,
    "side": "",
    "disc": ""
   },
@@ -412,7 +391,7 @@ window.NPA_GRAPH = {
    "inModel": [
     "IFC-27"
    ],
-   "ord": 13,
+   "ord": 12,
    "side": "",
    "disc": ""
   },
@@ -429,12 +408,12 @@ window.NPA_GRAPH = {
    "sec": "4.8",
    "changed": false,
    "role": null,
-   "analysis": false,
-   "dev": false,
+   "analysis": true,
+   "dev": true,
    "inModel": [
     "IFC-28"
    ],
-   "ord": 14,
+   "ord": 13,
    "side": "",
    "disc": ""
   },
@@ -451,12 +430,12 @@ window.NPA_GRAPH = {
    "sec": "4.8",
    "changed": false,
    "role": null,
-   "analysis": false,
+   "analysis": true,
    "dev": false,
    "inModel": [
     "IFC-29"
    ],
-   "ord": 15,
+   "ord": 14,
    "side": "",
    "disc": ""
   },
@@ -478,7 +457,7 @@ window.NPA_GRAPH = {
    "inModel": [
     "IFC-30"
    ],
-   "ord": 16,
+   "ord": 15,
    "side": "",
    "disc": ""
   },
@@ -495,12 +474,12 @@ window.NPA_GRAPH = {
    "sec": "4.8",
    "changed": true,
    "role": null,
-   "analysis": false,
+   "analysis": true,
    "dev": true,
    "inModel": [
     "IFC-35-39"
    ],
-   "ord": 17,
+   "ord": 16,
    "side": "",
    "disc": ""
   },
@@ -517,12 +496,12 @@ window.NPA_GRAPH = {
    "sec": "4.8",
    "changed": false,
    "role": null,
-   "analysis": false,
+   "analysis": true,
    "dev": false,
    "inModel": [
     "IFC-40-41"
    ],
-   "ord": 18,
+   "ord": 17,
    "side": "",
    "disc": ""
   },
@@ -544,7 +523,7 @@ window.NPA_GRAPH = {
    "inModel": [
     "IFC-42"
    ],
-   "ord": 19,
+   "ord": 18,
    "side": "",
    "disc": ""
   },
@@ -566,7 +545,7 @@ window.NPA_GRAPH = {
    "inModel": [
     "IFC-43"
    ],
-   "ord": 20,
+   "ord": 19,
    "side": "",
    "disc": ""
   },
@@ -588,7 +567,7 @@ window.NPA_GRAPH = {
    "inModel": [
     "IFC-44"
    ],
-   "ord": 21,
+   "ord": 20,
    "side": "",
    "disc": ""
   },
@@ -610,7 +589,7 @@ window.NPA_GRAPH = {
    "inModel": [
     "IFC-45"
    ],
-   "ord": 22,
+   "ord": 21,
    "side": "",
    "disc": ""
   },
@@ -628,11 +607,11 @@ window.NPA_GRAPH = {
    "changed": true,
    "role": null,
    "analysis": true,
-   "dev": true,
+   "dev": false,
    "inModel": [
     "IFC-46"
    ],
-   "ord": 23,
+   "ord": 22,
    "side": "",
    "disc": ""
   },
@@ -654,7 +633,7 @@ window.NPA_GRAPH = {
    "inModel": [
     "IFC-92"
    ],
-   "ord": 24,
+   "ord": 23,
    "side": "",
    "disc": ""
   },
@@ -676,7 +655,7 @@ window.NPA_GRAPH = {
    "inModel": [
     "IFC-72"
    ],
-   "ord": 25,
+   "ord": 24,
    "side": "",
    "disc": ""
   },
@@ -694,14 +673,39 @@ window.NPA_GRAPH = {
    "sec": "5.1",
    "changed": false,
    "role": null,
-   "analysis": false,
+   "analysis": true,
    "dev": false,
    "inModel": [
     "IFC-73"
    ],
-   "ord": 26,
+   "ord": 25,
    "side": "",
    "disc": ""
+  },
+  {
+   "id": "IFC-97",
+   "label": "IFC-97",
+   "title": "Парковочные места в ЦИМ ПС",
+   "parts": [
+    "Парковочные места в ЦИМ ПС"
+   ],
+   "clauses": [
+    "5.2.2",
+    "5.2.14",
+    "5.2.15",
+    "5.2.16"
+   ],
+   "sec": "5.2",
+   "changed": true,
+   "role": null,
+   "analysis": true,
+   "dev": false,
+   "inModel": [
+    "IFC-97"
+   ],
+   "ord": 26,
+   "side": "",
+   "disc": "ps"
   },
   {
    "id": "IFC-50",
@@ -718,7 +722,7 @@ window.NPA_GRAPH = {
    "sec": "5.2",
    "changed": true,
    "role": null,
-   "analysis": true,
+   "analysis": false,
    "dev": false,
    "inModel": [
     "IFC-50"
@@ -741,7 +745,7 @@ window.NPA_GRAPH = {
    "sec": "5.2",
    "changed": true,
    "role": null,
-   "analysis": true,
+   "analysis": false,
    "dev": false,
    "inModel": [
     "IFC-51"
@@ -765,37 +769,12 @@ window.NPA_GRAPH = {
    "sec": "5.2",
    "changed": true,
    "role": null,
-   "analysis": false,
+   "analysis": true,
    "dev": false,
    "inModel": [
     "IFC-52"
    ],
    "ord": 29,
-   "side": "",
-   "disc": "ps"
-  },
-  {
-   "id": "IFC-97",
-   "label": "IFC-97",
-   "title": "Парковочные места в ЦИМ ПС",
-   "parts": [
-    "Парковочные места в ЦИМ ПС"
-   ],
-   "clauses": [
-    "5.2.2",
-    "5.2.14",
-    "5.2.15",
-    "5.2.16"
-   ],
-   "sec": "5.2",
-   "changed": true,
-   "role": null,
-   "analysis": true,
-   "dev": false,
-   "inModel": [
-    "IFC-97"
-   ],
-   "ord": 30,
    "side": "",
    "disc": "ps"
   },
@@ -818,7 +797,7 @@ window.NPA_GRAPH = {
    "inModel": [
     "IFC-98"
    ],
-   "ord": 31,
+   "ord": 30,
    "side": "",
    "disc": "ps"
   },
@@ -840,7 +819,7 @@ window.NPA_GRAPH = {
    "inModel": [
     "IFC-47"
    ],
-   "ord": 32,
+   "ord": 31,
    "side": "",
    "disc": "ps"
   },
@@ -862,7 +841,7 @@ window.NPA_GRAPH = {
    "inModel": [
     "IFC-101"
    ],
-   "ord": 33,
+   "ord": 32,
    "side": "",
    "disc": "ps"
   },
@@ -880,12 +859,12 @@ window.NPA_GRAPH = {
    "sec": "5.2",
    "changed": true,
    "role": null,
-   "analysis": false,
+   "analysis": true,
    "dev": false,
    "inModel": [
     "IFC-02"
    ],
-   "ord": 34,
+   "ord": 33,
    "side": "",
    "disc": "both"
   },
@@ -907,7 +886,7 @@ window.NPA_GRAPH = {
    "inModel": [
     "IFC-110"
    ],
-   "ord": 35,
+   "ord": 34,
    "side": "",
    "disc": "ps"
   },
@@ -929,7 +908,7 @@ window.NPA_GRAPH = {
    "inModel": [
     "IFC-59"
    ],
-   "ord": 36,
+   "ord": 35,
    "side": "",
    "disc": "ps"
   },
@@ -952,7 +931,7 @@ window.NPA_GRAPH = {
    "inModel": [
     "IFC-99"
    ],
-   "ord": 37,
+   "ord": 36,
    "side": "",
    "disc": "both"
   },
@@ -974,7 +953,7 @@ window.NPA_GRAPH = {
    "inModel": [
     "IFC-102"
    ],
-   "ord": 38,
+   "ord": 37,
    "side": "",
    "disc": "ps"
   },
@@ -997,7 +976,7 @@ window.NPA_GRAPH = {
    "inModel": [
     "IFC-60"
    ],
-   "ord": 39,
+   "ord": 38,
    "side": "",
    "disc": "ar"
   },
@@ -1014,12 +993,12 @@ window.NPA_GRAPH = {
    "sec": "5.3",
    "changed": true,
    "role": null,
-   "analysis": false,
+   "analysis": true,
    "dev": false,
    "inModel": [
     "IFC-64"
    ],
-   "ord": 40,
+   "ord": 39,
    "side": "",
    "disc": "ar"
   },
@@ -1043,7 +1022,7 @@ window.NPA_GRAPH = {
    "inModel": [
     "IFC-65-66"
    ],
-   "ord": 41,
+   "ord": 40,
    "side": "",
    "disc": "ar"
   },
@@ -1067,7 +1046,7 @@ window.NPA_GRAPH = {
    "inModel": [
     "IFC-107"
    ],
-   "ord": 42,
+   "ord": 41,
    "side": "",
    "disc": "ar"
   },
@@ -1089,7 +1068,7 @@ window.NPA_GRAPH = {
    "inModel": [
     "IFC-106"
    ],
-   "ord": 43,
+   "ord": 42,
    "side": "",
    "disc": "ar"
   },
@@ -1112,7 +1091,7 @@ window.NPA_GRAPH = {
    "inModel": [
     "IFC-68"
    ],
-   "ord": 44,
+   "ord": 43,
    "side": "",
    "disc": "ar"
   },
@@ -1134,7 +1113,7 @@ window.NPA_GRAPH = {
    "inModel": [
     "IFC-100"
    ],
-   "ord": 45,
+   "ord": 44,
    "side": "",
    "disc": "ar"
   },
@@ -1156,7 +1135,7 @@ window.NPA_GRAPH = {
    "inModel": [
     "IFC-111"
    ],
-   "ord": 46,
+   "ord": 45,
    "side": "",
    "disc": "ar"
   },
@@ -1179,7 +1158,7 @@ window.NPA_GRAPH = {
    "inModel": [
     "IFC-105"
    ],
-   "ord": 47,
+   "ord": 46,
    "side": "",
    "disc": "ar"
   },
@@ -1203,7 +1182,7 @@ window.NPA_GRAPH = {
    "inModel": [
     "IFC-104"
    ],
-   "ord": 48,
+   "ord": 47,
    "side": "",
    "disc": "ar"
   },
@@ -1221,12 +1200,12 @@ window.NPA_GRAPH = {
    "sec": "5.3",
    "changed": true,
    "role": null,
-   "analysis": false,
+   "analysis": true,
    "dev": false,
    "inModel": [
     "IFC-70"
    ],
-   "ord": 49,
+   "ord": 48,
    "side": "",
    "disc": "ar"
   },
@@ -1248,7 +1227,7 @@ window.NPA_GRAPH = {
    "inModel": [
     "IFC-71"
    ],
-   "ord": 50,
+   "ord": 49,
    "side": "",
    "disc": "ar"
   },
@@ -1270,7 +1249,7 @@ window.NPA_GRAPH = {
    "inModel": [
     "IFC-74"
    ],
-   "ord": 51,
+   "ord": 50,
    "side": "ved",
    "disc": ""
   },
@@ -1292,7 +1271,7 @@ window.NPA_GRAPH = {
    "inModel": [
     "IFC-75"
    ],
-   "ord": 52,
+   "ord": 51,
    "side": "ved",
    "disc": ""
   },
@@ -1318,7 +1297,7 @@ window.NPA_GRAPH = {
    "inModel": [
     "IFC-76"
    ],
-   "ord": 53,
+   "ord": 52,
    "side": "ved",
    "disc": ""
   },
@@ -1340,7 +1319,7 @@ window.NPA_GRAPH = {
    "inModel": [
     "IFC-86"
    ],
-   "ord": 54,
+   "ord": 53,
    "side": "",
    "disc": ""
   },
@@ -1366,6 +1345,28 @@ window.NPA_GRAPH = {
     "IFC-88-2",
     "IFC-88-3"
    ],
+   "ord": 54,
+   "side": "",
+   "disc": ""
+  },
+  {
+   "id": "IFC-112",
+   "label": "IFC-112",
+   "title": "Коды МССК, схожие по функциональному назначению",
+   "parts": [
+    "Коды МССК, схожие по функциональному назначению"
+   ],
+   "clauses": [
+    "6.2.4"
+   ],
+   "sec": "6.2",
+   "changed": false,
+   "role": null,
+   "analysis": false,
+   "dev": false,
+   "inModel": [
+    "IFC-112"
+   ],
    "ord": 55,
    "side": "",
    "disc": ""
@@ -1373,18 +1374,17 @@ window.NPA_GRAPH = {
   {
    "id": "IFC-95",
    "label": "IFC-95",
-   "title": "Правила заполнения отсутствующих значений / коды МССК",
+   "title": "Правила заполнения отсутствующих значений",
    "parts": [
-    "Правила заполнения отсутствующих значений / коды МССК"
+    "Правила заполнения отсутствующих значений"
    ],
    "clauses": [
-    "6.2.4",
     "6.2.5"
    ],
    "sec": "6.2",
    "changed": false,
    "role": null,
-   "analysis": false,
+   "analysis": true,
    "dev": false,
    "inModel": [
     "IFC-95"

@@ -336,6 +336,13 @@
   .al-after{font-size:11px;fill:var(--muted)}
   .al-ok .box{fill:rgba(47,158,88,.10);stroke:var(--ok);stroke-width:1.8}
   .al-fail .box{fill:rgba(214,69,69,.10);stroke:var(--fail);stroke-width:1.8}
+  .al-review .box,.al-err.review .box{fill:var(--panel);stroke:var(--warn);stroke-width:1.6}
+  .al-err.review .msg{fill:rgba(240,185,58,.09)}
+  .al-review .al-big,.al-err.review .al-x,.al-err.review .al-et{fill:var(--warn)}
+  .al-edge.review{stroke:var(--warn)} .al-lab.review{fill:var(--warn)}
+  .al-edge.continue{stroke-dasharray:5 3;opacity:.75}
+  #algoNotes{padding:8px 20px;border-bottom:1px solid var(--line);font-size:12px;line-height:1.5;color:var(--muted);max-height:16vh;overflow:auto}
+  #algoNotes b{color:var(--ink)} .al-doc .review{color:var(--warn)}
   .al-big{font:700 17px ui-monospace,"SF Mono",Menlo,Consolas,monospace}
   .al-ok .al-big{fill:var(--ok)} .al-fail .al-big{fill:var(--fail)}
   .al-edge{fill:none;stroke:var(--muted);stroke-width:1.6}
@@ -360,6 +367,7 @@
   .al-doc .ok{color:var(--ok)} .al-doc .no{color:var(--fail)}
   .al-src{display:inline-block;margin-left:10px;font-size:11px;font-weight:400;color:var(--muted);border:1px solid var(--line);border-radius:6px;padding:1px 7px;vertical-align:1px}
   .al-src.guess{border-style:dashed}
+  .al-src.rc{color:var(--warn);border-color:rgba(227,165,27,.5)}
   .al-inh{background:var(--panel);border:1px solid var(--line);border-radius:12px;padding:12px 16px;margin-bottom:16px;font-size:12.5px}
   .al-inh .cap{font-size:10px;text-transform:uppercase;letter-spacing:.08em;color:var(--muted);margin:2px 0 6px}
   .al-inh .cap+.fl{margin-bottom:10px}
@@ -470,7 +478,7 @@
       <label class="chk"><input type="checkbox" id="showGate" checked><span>Допуск IFC-01 ко всем проверкам<small>«файл должен читаться». Где IFC-01 — единственный родитель, линия видна всегда; остальные допуски повторяют цепочку и по умолчанию скрыты</small></span></label>
       <label class="chk"><input type="checkbox" id="showAgg" checked><span>Своды<small>точечные линии к IFC-21 и IFC-44: собирают итоги «прошла / не прошла» других проверок, сами ничего не проверяют и не блокируют</small></span></label>
       <label class="chk"><input type="checkbox" id="showImplied" checked><span>Связи в обход цепочки<small>настоящие зависимости любого вида, но порядок они не меняют: карточка и так стоит после родителя через другую цепочку, а линия лишь показывает, что она напрямую берёт у него данные</small></span></label>
-      <label class="chk"><input type="checkbox" id="showSt"><span>Статус реализации<small>кружок в углу карточки: реализована, в работе, есть аналитика; пунктирная рамка «логика предположена» видна всегда</small></span></label>
+      <label class="chk"><input type="checkbox" id="showSt"><span>Статус реализации<small>кружок в углу карточки: реализована, в работе, есть аналитика; пунктирная рамка «аналитики ещё нет» видна всегда</small></span></label>
     </fieldset>
 
 
@@ -543,14 +551,15 @@
 <div id="detail"></div>
 <div id="etip"></div>
 
-<div id="algo"><header><div><div class="code" id="algoCode"></div><div class="ttl" id="algoTitle"></div><small id="algoSub"></small></div><div class="hbtn"><div class="seg" id="algoViews" role="group" aria-label="Вид алгоритма"></div><button class="btn" id="algoFit">К центру</button><span class="x" id="algoClose" title="Закрыть (Esc)">×</span></div></header><details id="algoNorm" open></details><svg id="algoSvg"></svg><div id="algoHtml"></div></div>
+<div id="algo"><header><div><div class="code" id="algoCode"></div><div class="ttl" id="algoTitle"></div><small id="algoSub"></small></div><div class="hbtn"><div class="seg" id="algoViews" role="group" aria-label="Вид алгоритма"></div><button class="btn" id="algoFit">К центру</button><span class="x" id="algoClose" title="Закрыть (Esc)">×</span></div></header><details id="algoNorm" open></details><div id="algoNotes"></div><svg id="algoSvg"></svg><div id="algoHtml"></div></div>
 
 <div id="modal"><div class="win"><header><div><h2 id="modalTitle">Выводы анализа</h2><small id="insSub"></small></div><span class="x" id="closeModal">×</span></header><div class="body" id="insBody"></div></div></div>
 
 <script src="vendor/d3.v7.min.js"></script>
-<script src="data.js?v=71"></script>
-<script src="facts.js?v=71"></script>
-<script src="npa.js?v=71"></script>
+<script src="data.js?v=73"></script>
+<script src="algorithm-model.js?v=73"></script>
+<script src="facts.js?v=73"></script>
+<script src="npa.js?v=73"></script>
 <script>
 (() => {
 'use strict';
@@ -568,7 +577,7 @@ const RELS = { '16.10': 'Ближайший релиз', later: 'Позже / о
 const KIND_ORDER = ['gate', 'logic', 'scope', 'data', 'rule', 'agg'];
 // Короткий пример к каждому типу связи — всплывает при наведении на строку легенды
 const KIND_EX = {
-  gate: ['IFC-01 → IFC-04', 'Файл не открылся — схему IFC смотреть не в чем.', 'Дочерняя просто не может начаться без родителя.'],
+  gate: ['IFC-01 → IFC-25', 'Файл не открылся — единицы измерения смотреть не в чем.', 'Дочерняя просто не может начаться без родителя.'],
   logic: ['IFC-25 → IFC-26', 'Файл открыт, но единицы не в мм — сверять количества с геометрией бессмысленно, будет сплошной шум.', 'Технически выполнить можно, но результат ничего не значит.'],
   scope: ['IFC-11–19 → IFC-50', 'Из имени файла узнали: это ЦИМ ПС. Только такие файлы идут на проверку рельефа.', 'Родитель решает, какие файлы проверять.'],
   data: ['IFC-02 → IFC-59', 'IFC-02 составляет список «элемент → строка приложения 2», IFC-59 по этому списку проверяет атрибуты.', 'Родитель готовит выборку, дочерняя работает по ней.'],
@@ -1814,7 +1823,7 @@ function buildFilters() {
 // ───────── легенда ─────────
 // ───────── как читать вид — короткое описание под фильтрами ─────────
 const Q_TEXT = 'Сверху вниз в слое — очередь выполнения: сначала лёгкие проверки (заголовок, имена, значения атрибутов), потом средние (обход элементов, сверка с таблицами), в конце тяжёлые (геометрия, 3D). Развёртка режет слой на подстолбцы 3А, 3Б… — тогда очередь идёт слева направо.';
-const FAIL_TEXT = 'Не прошла проверка хотя бы по одному файлу — все её дочерние не выполняются. Пунктирная рамка — логика проверки ещё не написана, связи предположены.';
+const FAIL_TEXT = 'Не прошла проверка хотя бы по одному файлу — все её дочерние не выполняются. Пунктирная рамка — аналитики ещё нет, логика и связи предположены.';
 const VIEW_DESC = {
   cascade: ['<b>Слева направо</b> — от родительских проверок к дочерним: чем правее, тем больше проверок должно пройти раньше. Столбец — слой: проверки одного слоя друг от друга не зависят.', Q_TEXT, FAIL_TEXT],
   lanes: ['<b>Слева направо</b> — от родительских проверок к дочерним, по дорожкам разделов ЦИМ.', Q_TEXT, FAIL_TEXT],
@@ -1941,7 +1950,7 @@ function renderDetail() {
     <div style="color:var(--muted);font-size:12px">Пункт требований: ${esc(n.p)}</div>`;
   if (G.algo && G.algo[n.id]) h += `<div class="btns" style="margin:10px 0 4px"><button class="btn" id="openAlgo">Открыть алгоритм проверки</button></div>`;
   if (n.amb) h += `<div class="box amb"><b>⚠ Внимание.</b> ${esc(n.amb)}${m.desc.length ? `<br><br>Проверка родительская: если при сомнении она вернёт false, каскадом не выполнятся ещё <b>${m.desc.length}</b> дочерних.` : ''}</div>`;
-  if (n.logic) h += `<div class="box logic"><b>Предполагаемая логика.</b> ${esc(n.logic)}</div>`;
+  if (n.logic && n.st === 'idea') h += `<div class="box logic"><b>Предполагаемая логика.</b> ${esc(n.logic)}</div>`;
   if (n.note) h += `<div class="box note">${esc(n.note)}</div>`;
   h += `<div class="sub">Родители — что должно выполниться раньше (${parents.length}${gate ? ' + допуск' : ''})</div>`;
   h += parents.length ? parents.map(e => linkRow(e, 'in')).join('') : '<div class="hint" style="margin:0">нет — проверка корневая' + (gate ? ', кроме неявного допуска IFC-01' : '') + '</div>';
@@ -1960,12 +1969,12 @@ const GATE_ID = 'IFC-01';
 // ───────── алгоритм проверки (окно из карточки справа): схема и таблица решений ─────────
 const AL = { stepW: 196, gateW: 212, errW: 246, endW: 172, inW: 236, gapX: 64, gapY: 62 };
 const AL_VIEWS = [
-  ['h', 'Схема', 'Слева направо: какие файлы берём → шаги и развилки → true. Ошибки — под развилкой, которая их даёт; все сходятся в false.'],
-  ['table', 'Таблица решений', 'Все сценарии: какие ответы на развилках к какому итогу приводят. «—» — до этой развилки проверка не доходит.'],
+  ['h', 'Схема', 'Раздел и область → шаги и развилки → общий итог. Красный — нарушение, жёлтый — вопрос специалисту, пунктир — продолжение после замечания.'],
+  ['table', 'Таблица решений', 'Все правила развилок: ответ, результат и следующий шаг. Это не список взаимоисключающих ошибок: независимые замечания накапливаются.'],
 ];
 // откуда взята логика (модель/алгоритмы.yaml, поле «источник»)
 const AL_SRC = {
-  'карточка': 'по карточке проверки (в39)',
+  'карточка': 'по актуальной аналитике · ограничения ниже',
   'код': 'по коду чекера с поправками к в39',
   'требование': 'логики ещё нет — схема предположена по требованию в39',
 };
@@ -2039,25 +2048,12 @@ function alSize(x) {
 }
 // ── модель алгоритма: узлы по рядам, ошибки, рёбра ──
 function alModel(cid) {
-  const a = G.algo[cid], by = {};
-  const nodes = a.nodes.map(x => ({ ...x })), errs = a.errors.map(x => ({ ...x, t: 'err', row: 'E' }));
-  nodes.concat(errs).forEach(x => { by[x.id] = x; });
-  const last = {};
-  nodes.filter(x => x.t !== 'skip').forEach(x => { x.prev = last[x.row] || null; if (x.prev) x.prev.next = x; last[x.row] = x; });
-  const from = id => nodes.filter(p => p.br.some(b => b.to === id));
-  const OK = { id: '$ok', t: 'ok', row: 0, text: a.ok }, FAIL = { id: '$fail', t: 'fail', row: 'E', text: a.fail };
-  const cont = x => (x.goto && by[x.goto]) || x.next || OK;
-  const edges = [];
-  nodes.forEach(x => {
-    if (x.t === 'step') edges.push({ a: x, b: cont(x) });
-    else if (x.t === 'gate') x.br.forEach(b => edges.push({ a: x, b: b.to ? by[b.to] : cont(x), lab: b.lab }));
-  });
-  return { a, by, nodes, errs, OK, FAIL, from, edges, cont };
+  return IfcAlgorithm.create(G.algo[cid]);
 }
 // ── вход: какие файлы + что берём у других проверок (из связей графа) ──
 function alInput(cid) {
   const n = N[cid], ft = ftOf(cid), sec = n.sec;
-  const parts = ft !== 'ifc' ? [ft] : sec === 'both' ? ['ar', 'ps'] : sec === 'all' ? ['ar', 'ps', 'bf'] : [sec];
+  const parts = G.algo[cid].parts || (ft !== 'ifc' ? [ft] : sec === 'both' ? ['ar', 'ps'] : sec === 'all' ? ['ar', 'ps', 'bf'] : [sec]);
   const par = IN[cid].filter(e => e.k !== 'agg').sort((p, q) => (q.implicit - p.implicit) || N[p.from].depth - N[q.from].depth)
     .map(e => ({ label: N[e.from].label, k: e.k, via: e.implicit ? 'файл открылся — допуск к проверке' : e.via }));
   return { parts, files: G.algo[cid].files, par };
@@ -2088,12 +2084,12 @@ function alInPanel(g, inp, iw) {
 }
 function alDefs(svgA) {
   const defs = svgA.append('defs');
-  [['al-m', '--muted'], ['al-ok', '--ok'], ['al-no', '--fail']].forEach(([id, v]) => defs.append('marker').attr('id', id).attr('viewBox', '0 -4 8 8').attr('refX', 0).attr('refY', 0)
+  [['al-m', '--muted'], ['al-ok', '--ok'], ['al-no', '--fail'], ['al-review', '--warn']].forEach(([id, v]) => defs.append('marker').attr('id', id).attr('viewBox', '0 -4 8 8').attr('refX', 0).attr('refY', 0)
     .attr('markerUnits', 'userSpaceOnUse').attr('markerWidth', AR_L).attr('markerHeight', AR_L).attr('orient', 'auto')
     .append('path').attr('d', 'M0,-3.5L8,0L0,3.5Z').style('fill', `var(${v})`));
 }
 function alDrawNode(gn, x) {
-  const g = gn.append('g').attr('class', 'al-' + x.t).attr('transform', `translate(${x.x},${x.y})`);
+  const g = gn.append('g').attr('class', 'al-' + x.t + (x.status === 'review' ? ' review' : '')).attr('data-node', x.id).attr('transform', `translate(${x.x},${x.y})`);
   if (x.t === 'skip') {
     g.append('rect').attr('class', 'box').attr('width', x.w).attr('height', x.h).attr('rx', 9);
     const ty = x.h / 2 - x.L.length * 8 + 12;
@@ -2109,7 +2105,7 @@ function alDrawNode(gn, x) {
     if (x.C.length) alText(g, x.C, tx, ty + (x.L.length - 1) * 16 + 19, 13.5, 'al-code', an);
   } else if (x.t === 'err') {
     g.append('rect').attr('class', 'box').attr('width', x.w).attr('height', x.h).attr('rx', 9);
-    g.append('text').attr('class', 'al-x').attr('x', 14).attr('y', 26).text('✕');
+    g.append('text').attr('class', 'al-x').attr('x', 14).attr('y', 26).text(x.status === 'review' ? '?' : '✕');
     alText(g, x.T, 32, 26, 16, 'al-et');
     let yy = 26 + (x.T.length - 1) * 16;
     if (x.A.length) { alText(g, x.A, 14, yy + 17, 14, 'al-after'); yy += 3 + x.A.length * 14; }
@@ -2118,16 +2114,16 @@ function alDrawNode(gn, x) {
     alText(g, x.M, 19, yy + 17, 13.5, 'al-code al-msg');
   } else {
     g.append('rect').attr('class', 'box').attr('width', x.w).attr('height', x.h).attr('rx', 12);
-    g.append('text').attr('class', 'al-big').attr('x', x.w / 2).attr('y', 30).attr('text-anchor', 'middle').text(x.t === 'ok' ? '✓ true' : '✕ false');
+    g.append('text').attr('class', 'al-big').attr('x', x.w / 2).attr('y', 30).attr('text-anchor', 'middle').text(x.t === 'ok' ? '✓ true' : x.t === 'review' ? '? на проверку' : '✕ false');
     alText(g, x.P, x.w / 2, 50, 14, 'al-after', 'middle');
   }
 }
 // ── «Схема»: колонки — шаги по ходу алгоритма, ряды — основной путь, побочные ветки, ошибки ──
 function drawScheme(cid) {
-  const M = alModel(cid), { nodes, errs, OK, FAIL, from, edges, by, cont } = M;
+  const M = alModel(cid), { nodes, errs, OK, FAIL, from, edges, by, cont, terminals } = M;
   // колонки — по ходу алгоритма: у каждого шага и развилки своя (узлы побочной ветки не встают под развилку основного пути)
   const flow = nodes.filter(x => x.t !== 'skip');
-  const succ = x => (x.t === 'step' ? [cont(x)] : x.br.map(b => b.to ? by[b.to] : cont(x))).filter(y => y && (y.t === 'step' || y.t === 'gate'));
+  const succ = x => edges.filter(e => e.a === x).flatMap(e => e.b.t === 'err' ? [cont(e.b)] : [e.b]).filter(y => y && (y.t === 'step' || y.t === 'gate'));
   const indeg = new Map(flow.map(x => [x, 0]));
   flow.forEach(x => succ(x).forEach(y => indeg.set(y, indeg.get(y) + 1)));
   const ready = flow.filter(x => !indeg.get(x));
@@ -2143,9 +2139,9 @@ function drawScheme(cid) {
   skips.forEach(x => { x.row = 'E'; });
   const taken = new Set();
   terms.forEach(e => { let c = Math.max(...from(e.id).map(p => p.col)); while (taken.has(c)) c++; taken.add(c); e.col = c; });
-  const endCol = Math.max(...nodes.concat(errs).map(x => x.col)) + 1;
-  OK.col = FAIL.col = endCol;
-  const all = nodes.concat(errs, [OK], errs.length ? [FAIL] : []);
+  const endCol = Math.max(...nodes.concat(errs).map(x => x.col)) + terminals.length;
+  terminals.forEach((x, i) => { x.col = endCol - terminals.length + i + 1; });
+  const all = nodes.concat(errs, terminals);
   all.forEach(alSize);
   const inp = alInput(cid);
   // циклы: вложенность и охват (вместе с ошибками под своими развилками)
@@ -2162,11 +2158,14 @@ function drawScheme(cid) {
   all.forEach(x => { colW[x.col] = Math.max(colW[x.col] || 0, x.w); });
   for (let c = 0; c <= endCol; c++) { colW[c] = colW[c] || 60; colX[c] = c ? colX[c - 1] + colW[c - 1] + AL.gapX : AL.inW + 40; }
   // ряды: основной, побочные, ошибки
-  const rows = [...new Set(flow.map(x => x.row))].sort((m, q) => m - q).concat(terms.length ? ['E'] : []);
+  const rows = [...new Set(flow.map(x => x.row))].sort((m, q) => m - q).concat(all.some(x => x.row === 'E') ? ['E'] : []);
   const rowH = r => Math.max(...all.filter(x => x.row === r).map(x => x.h));
   const rowY = {}, rowC = {};
+  // переход через соседние узлы своего ряда (например «нет → к итогу») идёт над рядом, а не сквозь них
+  const over = e => e.a.row === e.b.row && e.a.row !== 'E' && all.some(x => x !== e.a && x !== e.b && x.row === e.a.row && x.col > e.a.col && x.col < e.b.col);
+  edges.forEach(e => { e.over = over(e); });
   let y = 16 + nLvl * 26;
-  rows.forEach(r => { if (r === 'E') y += 6; rowY[r] = y; rowC[r] = y + rowH(r) / 2; y += rowH(r) + AL.gapY; });
+  rows.forEach(r => { if (r === 'E') y += 6; if (edges.some(e => e.over && e.a.row === r)) y += 20; rowY[r] = y; rowC[r] = y + rowH(r) / 2; y += rowH(r) + AL.gapY; });
   const eTop = terms.length ? rowY.E : 0, eBot = terms.length ? rowY.E + rowH('E') : 0;
   all.forEach(x => {
     x.x = colX[x.col] + (colW[x.col] - x.w) / 2;
@@ -2187,6 +2186,18 @@ function drawScheme(cid) {
   const cy = x => x.y + x.h / 2, cx = x => x.x + x.w / 2;
   const route = e => {
     const { a, b } = e;
+    if (a.t === 'err') {
+      // Findings go below the flow, then rejoin the next independent test.
+      // They never assert an immediate global false or erase earlier findings.
+      const laneY = busY + 22 + errs.indexOf(a) * 23;
+      e.lp = [cx(a) + 8, laneY - 5, 'start'];
+      return [[cx(a), a.y + a.h], [cx(a), laneY], [b.x - 22, laneY], [b.x - 22, cy(b)], [b.x, cy(b)]];
+    }
+    if (e.over) {
+      const ly = rowY[a.row] - 10, m = b.x - 28;
+      e.lp = [cx(a) + 8, ly - 5, 'start'];
+      return [[cx(a), a.y], [cx(a), ly], [m, ly], [m, cy(b)], [b.x, cy(b)]];
+    }
     if (!e.down) {
       e.lp = [a.x + a.w + 7, cy(a) - 7, 'start'];
       if (b.row === a.row) return [[a.x + a.w, cy(a)], [b.x, cy(b)]];
@@ -2219,69 +2230,35 @@ function drawScheme(cid) {
   gi.attr('transform', `translate(0,${Math.min(first.y, cy0 - 30)})`);
   ge.append('path').attr('class', 'al-edge').attr('marker-end', 'url(#al-m)').attr('d', alPath([[AL.inW, cy0], [first.x, cy0]]));
   edges.forEach(e => {
-    const d = alPath(route(e)), cls = e.b.t === 'err' ? 'no' : e.b.t === 'ok' ? 'ok' : e.b.t === 'skip' ? 'sk' : '';
-    ge.append('path').attr('class', 'al-edge ' + cls).attr('d', d).attr('marker-end', `url(#${cls === 'no' ? 'al-no' : cls === 'ok' ? 'al-ok' : 'al-m'})`);
+    const d = alPath(route(e)), cls = e.b.status === 'review' || e.b.t === 'review' ? 'review' : e.b.t === 'err' || e.b.t === 'fail' ? 'no' : e.b.t === 'ok' ? 'ok' : e.b.t === 'skip' ? 'sk' : '';
+    ge.append('path').attr('class', 'al-edge ' + cls + (e.a.t === 'err' ? ' continue' : '')).attr('data-from', e.a.id).attr('data-to', e.b.id).attr('d', d).attr('marker-end', `url(#${cls === 'no' ? 'al-no' : cls === 'ok' ? 'al-ok' : cls === 'review' ? 'al-review' : 'al-m'})`);
     if (e.lab) ge.append('text').attr('class', 'al-lab ' + cls).attr('x', e.lp[0]).attr('y', e.lp[1]).attr('text-anchor', e.lp[2]).text(e.lab);
   });
-  // шина: все ошибки сходятся в false
-  if (errs.length) {
-    errs.forEach(x => ge.append('path').attr('class', 'al-bus').attr('d', alPath([[cx(x), x.y + x.h], [cx(x), busY]], false)));
-    const x0 = Math.min(...errs.map(cx));
-    ge.append('path').attr('class', 'al-bus').attr('marker-end', 'url(#al-no)').attr('d', alPath([[x0, busY], [cx(FAIL), busY], [cx(FAIL), FAIL.y + FAIL.h]]));
-    errs.forEach(x => ge.append('circle').attr('class', 'al-dot').attr('cx', cx(x)).attr('cy', busY).attr('r', 2.6));
-  }
   const gn = root.append('g');
   all.forEach(x => alDrawNode(gn, x));
 }
-// ── «Таблица решений»: все пути от первого шага до итога, циклы — как одна итерация ──
-function alPaths(cid) {
-  const a = G.algo[cid], by = {}, rows = {};
-  a.nodes.forEach(x => { by[x.id] = x; (rows[x.row] = rows[x.row] || []).push(x); });
-  a.errors.forEach(e => { by[e.id] = { ...e, t: 'err' }; });
-  Object.keys(rows).forEach(k => { rows[k] = rows[k].filter(x => x.t !== 'skip'); });
-  const nxt = x => { const r = rows[x.row]; return r[r.indexOf(x) + 1] || null; };
-  const ord = id => a.nodes.findIndex(x => x.id === id);
-  const OKT = { t: 'ok' }, paths = [];
-  const go = (x, conds) => {
-    if (x.t === 'ok' || x.t === 'err' || x.t === 'skip') { paths.push({ conds, end: x }); return; }
-    if (x.t === 'step') return go((x.goto && by[x.goto]) || nxt(x) || OKT, conds);
-    x.br.forEach((b, bi) => go(b.to ? by[b.to] : nxt(x) || OKT, conds.concat([{ id: x.id, lab: b.lab, bi }])));
-  };
-  go(rows[0][0], []);
-  const lastKey = p => p.conds.length ? ord(p.conds[p.conds.length - 1].id) * 10 + p.conds[p.conds.length - 1].bi : -1;
-  paths.sort((p, q) => (q.end.t === 'skip') - (p.end.t === 'skip') || (p.end.t === 'ok') - (q.end.t === 'ok') || lastKey(p) - lastKey(q));
-  const gates = a.nodes.filter(x => x.t === 'gate' && paths.some(p => p.conds.some(c => c.id === x.id)));
-  const loopOf = g => a.loops.filter(l => ord(l.from) <= ord(g.id) && ord(l.to) >= ord(g.id)).map(l => l.text.split(/:\s*/)[0]);
-  return { paths, gates, loopOf };
-}
+// ── Таблица использует те же рёбра, что схема, включая продолжения после ошибок ──
 function alInHtml(inp) {
   const pills = inp.parts.map(p => `<span class="lgtag t-${p}${EXT[p] ? ' ext' : ''}">${SEC_TAG[p]}</span>`).join('');
   return `<div class="al-inh"><div class="cap">Вход · какие файлы</div><div class="fl">${pills}<span>${esc(inp.files)}</span></div>`
     + (inp.par.length ? `<div class="cap">Что берём у других проверок</div><div class="par">${inp.par.map(p => `<div><b style="color:var(--k-${p.k})">${esc(p.label)}</b> ${esc(p.via)}</div>`).join('')}</div>` : '') + '</div>';
 }
 function alTableHtml(cid) {
-  const T = alPaths(cid), a = G.algo[cid];
-  // шапка: над развилками одного цикла — общая ячейка «↻ для каждого …»
-  const groups = [];
-  T.gates.forEach(g => { const key = T.loopOf(g).join(' · '), last = groups[groups.length - 1]; if (last && last.key === key) last.n++; else groups.push({ key, n: 1 }); });
-  const loopRow = groups.some(q => q.key) ? `<tr class="lp">${groups.map(q => `<th colspan="${q.n}"${q.key ? ' class="lg"' : ''}>${q.key ? `<small>↻ ${esc(q.key)}</small>` : ''}</th>`).join('')}</tr>` : '';
-  const span = loopRow ? ' rowspan="2"' : '';
-  let h = `<div class="al-doc">${alInHtml(alInput(cid))}<table class="al-tab"><thead><tr><th class="n"${span}>№</th>`
-    + (loopRow ? loopRow.replace('<tr class="lp">', '').replace('</tr>', '') + `<th class="res"${span}>Итог</th></tr><tr>` : '')
-    + T.gates.map(g => `<th>${esc(g.text)}</th>`).join('') + (loopRow ? '' : '<th class="res">Итог</th>') + '</tr></thead><tbody>';
-  T.paths.forEach((p, i) => {
-    const last = p.conds[p.conds.length - 1], ok = p.end.t === 'ok';
-    h += `<tr class="${ok ? 'ok' : 'no'}"><td class="n">${i + 1}</td>` + T.gates.map(g => {
-      const c = p.conds.find(x => x.id === g.id);
-      const cls = c === last ? (ok ? ' okk' : p.end.t === 'skip' ? ' skk' : ' key') : '';
-      return c ? `<td><span class="al-cell${cls}">${esc(c.lab)}</span></td>` : '<td class="dash">—</td>';
-    }).join('');
-    h += p.end.t === 'skip' ? `<td class="res"><b class="sk">⊘ не проверяется</b><small>${esc(p.end.text)}</small></td>`
-      : ok ? `<td class="res"><b class="ok">✓ true</b><small>${esc(a.ok)}</small></td>`
-      : `<td class="res"><b class="no">✕ ${esc(p.end.title)}</b>${p.end.after ? `<small>${esc(p.end.after)}</small>` : ''}<code>${esc(p.end.text)}</code></td>`;
-    h += '</tr>';
+  const a = G.algo[cid], rules = IfcAlgorithm.decisions(a);
+  const title = x => x.id === '$done' ? 'Завершить текущую итерацию; затем общий итог' : x.text;
+  let h = `<div class="al-doc">${alInHtml(alInput(cid))}`;
+  if (a.loops.length) h += `<div class="al-inh">${a.loops.map(l => `<div>↻ ${esc(l.text)}</div>`).join('')}</div>`;
+  h += '<table class="al-tab"><thead><tr><th class="n">№</th><th>Условие / развилка</th><th>Ответ</th><th class="res">Результат и продолжение</th></tr></thead><tbody>';
+  rules.forEach((r, i) => {
+    const t = r.target;
+    let result;
+    if (t.t === 'err') result = `<b class="${t.status === 'review' ? 'review' : 'no'}">${t.status === 'review' ? '? Вопрос специалисту' : '✕ Зафиксировать нарушение'}</b><small>${esc(t.text)}</small><small>Далее: ${esc(title(r.continuation))}</small>`;
+    else if (t.t === 'skip') result = `<b class="sk">⊘ Не проверяется</b><small>${esc(t.text)}</small>`;
+    else if (['ok', 'fail', 'review'].includes(t.t)) result = `<b class="${t.t === 'fail' ? 'no' : t.t}">${t.t === 'ok' ? '✓ true' : t.t === 'fail' ? '✕ false' : '? На проверку'}</b><small>${esc(t.text)}</small>`;
+    else result = `<b>→ ${esc(title(t))}</b>${t.code ? `<small>${esc(t.code)}</small>` : ''}`;
+    h += `<tr data-gate="${esc(r.gate.id)}"><td class="n">${i + 1}</td><td>${esc(r.gate.text)}${r.gate.code ? `<small>${esc(r.gate.code)}</small>` : ''}</td><td>${esc(r.answer)}</td><td class="res">${result}</td></tr>`;
   });
-  return h + `</tbody></table><div class="al-tnote">Итог проверки — <b class="ok">true</b>, если во всех итерациях циклов сценарий дошёл до true; иначе <b class="no">false</b> со всеми найденными ошибками.</div></div>`;
+  return h + '</tbody></table><div class="al-tnote">Правило применяется только при достижении его развилки по схеме. Ошибки и вопросы сохраняются; зависимые от отсутствующих данных шаги не выполняются. После всех применимых итераций: нарушения → false; только нерешённые вопросы → на проверку; без замечаний → true. Пропуск области не подтверждает соответствие её данных. Описания нарушений — смысл результата, не обещание дословного сообщения чекера.</div></div>';
 }
 // ── окно ──
 function alFit() {
@@ -2338,7 +2315,10 @@ function openAlgo(cid) {
   alCur = cid;
   const src = G.algo[cid].src;
   $('#algoCode').textContent = N[cid].label;
-  $('#algoTitle').innerHTML = `${esc(N[cid].n)}<span class="al-src ${src === 'требование' ? 'guess' : ''}">${esc(AL_SRC[src])}</span>`;
+  const rc = G.algo[cid].recheck;
+  $('#algoTitle').innerHTML = `${esc(N[cid].n)}<span class="al-src ${src === 'требование' ? 'guess' : ''}">${esc(AL_SRC[src])}</span>`
+    + (rc ? `<span class="al-src rc" title="Схема построена раньше, чем обновилась карточка — её ещё нужно сверить">${esc(rc)} — схема не сверена</span>` : '');
+  $('#algoNotes').innerHTML = `<b>Уточнения и границы схемы.</b> ${esc(G.algo[cid].notes || '')} <small>Схема показывает логику обработки, а не запускает проверку. Статус «на проверку» не является автоматической ошибкой; правила внешнего каскада этим не изменены.</small>`;
   const nb = $('#algoNorm');
   nb.innerHTML = alNormHtml(cid);
   nb.style.display = nb.innerHTML ? '' : 'none';
@@ -2410,7 +2390,7 @@ function insights() {
     p: `${lab('IFC-44')} и ${lab('IFC-21')} собирают статусы других проверок. При каскаде они пропускались бы при любом падении родителей и теряли смысл, поэтому в модели они помечены как «свод» и в каскаде не участвуют — их вердикт считается по статусам.`,
     h: chips(['IFC-44', 'IFC-21']) });
   list.push({ t: 'Общие правила чтения — не проверки-блокеры',
-    p: `${lab('IFC-72')}, ${lab('IFC-73')}, ${lab('IFC-95')} описывают, как читать имена наборов и значения. Их лучше реализовать общей функцией чтения, а не родителями: иначе одна неверная приставка набора спрячет содержательные ошибки атрибутных проверок.`,
+    p: `${lab('IFC-72')} и ${lab('IFC-73')} — самостоятельные проверки имён наборов и атрибутов, ${lab('IFC-95')} описывает, как читать пустые значения. Само правило чтения («только наборы RusSet_ и атрибуты RUS_», пустые значения) лучше реализовать общей функцией, а не родителями: иначе одна неверная приставка набора спрячет содержательные ошибки атрибутных проверок.`,
     h: chips(['IFC-72', 'IFC-73', 'IFC-95']) });
   list.push({ t: 'Укрупнение проверок расширяет каскад',
     p: `Объединение проверок (например, ${lab('IFC-22')}, ${lab('IFC-23')}, ${lab('IFC-24')} в одну «координацию» или ${lab('IFC-96')} с ${lab('IFC-01')}) делает родителя шире: любой сбой одной части блокирует всё, что зависит от остальных. Мелкие проверки — меньший радиус, но больше связей.`,
@@ -2448,7 +2428,7 @@ function glossary() {
     { t: 'Виды связей между проверками', p: 'Стрелка на схеме — не просто «после», а конкретная зависимость одного из шести видов:', h: `<div style="margin-top:4px">${kindLi}</div>` },
     { t: 'Обратить внимание', p: 'Значок ⚠ сразу после номера проверки и жёлтая плашка «Внимание» в карточке: там записан открытый вопрос. Значит: у этой проверки есть ситуации, где по имеющимся данным нельзя однозначно сказать «пройдено» или «не пройдено» — например, что-то в модели можно понять двумя способами, нормативный порог не задан явно, или нужного признака в модели просто нет. Пример — открытый вопрос в самой карточке. Если такая проверка ещё и родительская, сомнение каскадом гасит все её дочерние проверки — сколько именно, видно в самой карточке.' },
     { t: 'Основание связи: «в аналитике» / «по коду» / «предположение»', p: 'Серый или жёлтый значок рядом с каждой связью в карточке проверки — откуда взята эта связь.<br><br><b>«в аналитике»</b> — прямо написано в карточке проверки или в командной аналитике.<br><b>«по коду»</b> — не написано явно, но видно по тому, как связь реализована в существующем коде.<br><b>«предположение»</b> (жёлтый) — связь для проверки, у которой ещё нет ни кода, ни аналитики: логика продумана по смыслу нормы, но не подтверждена, стоит перепроверить, когда аналитика появится.' },
-    { t: 'Статус реализации проверки', p: 'Кружок в правом верхнем углу карточки на схеме.<br><br>🟢 заполненный — <b>реализована</b> в коде.<br>🟡 заполненный — <b>в работе / переработке</b>.<br>⚪ пунктирная обводка — <b>есть аналитика, кода нет</b>.<br>⚪ пунктирная обводка тоньше, рамка карточки штрихом — <b>аналитики нет, логика предположена</b> (в карточке — раздел «Предполагаемая логика»: как эта проверка могла бы работать и что бы использовала от других).' },
+    { t: 'Статус реализации проверки', p: 'Кружок в правом верхнем углу карточки на схеме. Статус — по таблице проверок (лист «IFC к 16.10») и карточкам аналитики.<br><br>🟢 заполненный — <b>реализована</b>: в таблице разработка «готово» или «сделано без аналитики».<br>🟡 заполненный — <b>в работе / переработке</b>: разработка «в процессе MR», «в работе» или «пауза», либо код уже был (прежней редакции или отмеченный раньше), а отметки о разработке в таблице сейчас нет.<br>⚪ кольцо — <b>есть аналитика, кода нет</b>: карточка проверки написана, разработки ещё нет.<br>⚪ пунктирное кольцо, рамка карточки штрихом — <b>аналитики нет, логика предположена</b> (в карточке — раздел «Предполагаемая логика»: как эта проверка могла бы работать и что бы использовала от других).' },
     { t: '«Предполагаемая логика» в карточке', p: 'Появляется только у проверок без аналитики. Это не задание и не решение по существу — черновая гипотеза, как проверку можно было бы реализовать и какие данные других проверок для этого понадобились бы, чтобы граф не обрывался в пустоте там, где норма в требованиях уже есть, а разбора ещё нет.' },
     { t: 'Потомков / предков (в «Рейтинге»)', p: '«Потомков» — сколько проверок перестанет выполняться, если эта не пройдёт. «Предков» — сколько проверок должно пройти раньше, чтобы эта вообще запустилась.' },
     { t: 'Своды', p: 'Проверки вроде «все параметры заполнены», которые не проверяют что-то своё, а просто собирают статусы других проверок в один общий результат. На схеме связи к ним идут пунктиром и подписаны «свод» — такие связи никогда не блокируют, при любом правиле каскада. По умолчанию показаны — галочка «Своды».' },
