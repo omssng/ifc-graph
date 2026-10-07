@@ -19,7 +19,7 @@ flowchart LR
   IFC_40_41["IFC-40/41<br/>Сетка осей"]
   IFC_28["IFC-28<br/>Уровни этажей и их отметки"]
   IFC_29["IFC-29<br/>Отметка 0,000 у первого этажа"]
-  IFC_30["IFC-30<br/>Уровни по отметке чистого пола"]
+  IFC_30["IFC-30<br/>Отметка уровня = его размещение"]
   IFC_35_39["IFC-35–39<br/>Наименование уровня"]
   IFC_43["IFC-43<br/>Элементы привязаны к уровням"]
   IFC_93["IFC-93<br/>Топология геометрии (non-manifold)"]
@@ -69,7 +69,6 @@ flowchart LR
   IFC_96 -.-> IFC_05
   IFC_05 -.-> IFC_89
   IFC_01 --> IFC_11_19
-  IFC_11_19 -.-> IFC_94
   IFC_01 --> IFC_93
   IFC_25 --> IFC_26
   IFC_93 --> IFC_26
@@ -79,9 +78,9 @@ flowchart LR
   IFC_25 -.-> IFC_24
   IFC_25 --> IFC_88_3
   IFC_93 --> IFC_88_3
-  IFC_93 -.-> IFC_42
+  IFC_93 --> IFC_42
   IFC_03 --> IFC_88_2
-  IFC_22 -.-> IFC_42
+  IFC_22 --> IFC_42
   IFC_42 -.-> IFC_88_1
   IFC_42 -.-> IFC_88_2
   IFC_94 -.-> IFC_88_1
@@ -94,42 +93,52 @@ flowchart LR
   IFC_46 -.-> IFC_92
   IFC_11_19 -.-> IFC_46
   IFC_11_19 -.-> IFC_02
+  IFC_11_19 -.-> IFC_88_1
   IFC_11_19 -.-> IFC_88_2
   IFC_11_19 -.-> IFC_50
   IFC_11_19 -.-> IFC_51
   IFC_11_19 -.-> IFC_52
+  IFC_11_19 -.-> IFC_97
+  IFC_11_19 -.-> IFC_98
   IFC_11_19 -.-> IFC_47
-  IFC_29 -.-> IFC_30
-  IFC_28 -.-> IFC_35_39
+  IFC_11_19 -.-> IFC_100
+  IFC_29 --> IFC_30
+  IFC_28 --> IFC_35_39
   IFC_30 -.-> IFC_43
   IFC_35_39 -.-> IFC_46
   IFC_35_39 -.-> IFC_100
   IFC_43 -.-> IFC_86
   IFC_02 -.-> IFC_59
   IFC_02 --> IFC_60
+  IFC_35_39 -.-> IFC_40_41
   IFC_40_41 --> IFC_60
+  IFC_02 -.-> IFC_102
+  IFC_72 -.-> IFC_59
+  IFC_72 -.-> IFC_70
   IFC_73 -.-> IFC_59
   IFC_73 -.-> IFC_70
+  IFC_72 -.-> IFC_71
+  IFC_72 -.-> IFC_102
   IFC_73 -.-> IFC_71
+  IFC_73 -.-> IFC_102
   IFC_95 -.-> IFC_59
   IFC_95 -.-> IFC_70
   IFC_95 -.-> IFC_71
   IFC_95 -.-> IFC_99
-  IFC_59 -.-> IFC_102
+  IFC_95 -.-> IFC_102
   IFC_47 -.-> IFC_59
   IFC_50 -.-> IFC_59
+  IFC_51 -.-> IFC_59
+  IFC_52 -.-> IFC_59
   IFC_97 -.-> IFC_59
   IFC_98 -.-> IFC_59
-  IFC_47 -.-> IFC_99
   IFC_50 -.-> IFC_101
+  IFC_51 -.-> IFC_101
+  IFC_52 -.-> IFC_101
   IFC_98 -.-> IFC_101
-  IFC_52 -.-> IFC_97
-  IFC_52 -.-> IFC_98
-  IFC_51 -.-> IFC_98
   IFC_60 -.-> IFC_64
   IFC_60 -.-> IFC_65_66
   IFC_60 -.-> IFC_68
-  IFC_60 -.-> IFC_100
   IFC_60 -.-> IFC_71
   IFC_65_66 -.-> IFC_88_3
   IFC_65_66 -.-> IFC_90
@@ -155,6 +164,10 @@ flowchart LR
   IFC_02 -.-> IFC_104
   IFC_60 -.-> IFC_107
   IFC_60 -.-> IFC_105
+  IFC_72 -.-> IFC_104
+  IFC_72 -.-> IFC_105
+  IFC_72 -.-> IFC_106
+  IFC_72 -.-> IFC_107
   IFC_73 -.-> IFC_104
   IFC_73 -.-> IFC_105
   IFC_73 -.-> IFC_106
@@ -174,6 +187,7 @@ flowchart LR
   IFC_108 -.-> IFC_59
   IFC_108 -.-> IFC_70
   IFC_108 -.-> IFC_71
+  IFC_108 -.-> IFC_102
   IFC_109 -.-> IFC_95
   IFC_96 --> IFC_74
   IFC_74 --> IFC_75
@@ -187,7 +201,5 @@ flowchart LR
   IFC_11_19 -.-> IFC_40_41
   IFC_11_19 -.-> IFC_95
   IFC_35_39 -.-> IFC_29
-  IFC_72 -.-> IFC_108
-  IFC_72 -.-> IFC_109
   IFC_112 -.-> IFC_59
   IFC_112 -.-> IFC_70
