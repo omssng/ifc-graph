@@ -1,7 +1,7 @@
 // Сгенерировано build_npa.py — руками не править.
 window.NPA_GRAPH = {
  "meta": {
-  "asof": "2026-10-06",
+  "asof": "2026-10-07",
   "source": "лист «IFC к 16.10» рабочей таблицы проверок"
  },
  "sections": [
@@ -96,8 +96,7 @@ window.NPA_GRAPH = {
    ],
    "clauses": [
     "4.1.1",
-    "4.1.2",
-    "4.1.3"
+    "4.1.2"
    ],
    "sec": "4.1",
    "changed": false,
@@ -212,11 +211,11 @@ window.NPA_GRAPH = {
    "ord": 4,
    "side": "",
    "disc": "",
-   "sa": "work",
-   "saT": "в работе",
+   "sa": "done",
+   "saT": "готово",
    "sd": "none",
    "sdT": "нет",
-   "analysis": false,
+   "analysis": true,
    "dev": false
   },
   {
@@ -241,8 +240,8 @@ window.NPA_GRAPH = {
    "disc": "",
    "sa": "done",
    "saT": "готово",
-   "sd": "none",
-   "sdT": "нет",
+   "sd": "work",
+   "sdT": "в работе",
    "analysis": true,
    "dev": false
   },
@@ -268,10 +267,10 @@ window.NPA_GRAPH = {
    "disc": "",
    "sa": "done",
    "saT": "готово",
-   "sd": "none",
-   "sdT": "нет",
+   "sd": "done",
+   "sdT": "готово",
    "analysis": true,
-   "dev": false
+   "dev": true
   },
   {
    "id": "IFC-05",
@@ -414,11 +413,11 @@ window.NPA_GRAPH = {
    "ord": 11,
    "side": "",
    "disc": "",
-   "sa": "work",
-   "saT": "в работе",
+   "sa": "done",
+   "saT": "готово",
    "sd": "none",
    "sdT": "нет",
-   "analysis": false,
+   "analysis": true,
    "dev": false
   },
   {
@@ -518,11 +517,11 @@ window.NPA_GRAPH = {
    "ord": 15,
    "side": "",
    "disc": "",
-   "sa": "work",
-   "saT": "в работе",
+   "sa": "done",
+   "saT": "готово",
    "sd": "none",
    "sdT": "нет",
-   "analysis": false,
+   "analysis": true,
    "dev": false
   },
   {
@@ -545,9 +544,9 @@ window.NPA_GRAPH = {
    "side": "",
    "disc": "",
    "sa": "done",
-   "saT": "готово, есть вопросы",
+   "saT": "готово",
    "sd": "done",
-   "sdT": "готово, есть вопрос",
+   "sdT": "готово, ждём ответа",
    "analysis": true,
    "dev": true
   },
@@ -572,8 +571,8 @@ window.NPA_GRAPH = {
    "disc": "",
    "sa": "done",
    "saT": "готово",
-   "sd": "none",
-   "sdT": "нет",
+   "sd": "work",
+   "sdT": "ждёт IFC-11–19, IFC-35–39",
    "analysis": true,
    "dev": false
   },
@@ -596,11 +595,11 @@ window.NPA_GRAPH = {
    "ord": 18,
    "side": "",
    "disc": "",
-   "sa": "none",
-   "saT": "нет",
+   "sa": "done",
+   "saT": "готово",
    "sd": "none",
    "sdT": "нет",
-   "analysis": false,
+   "analysis": true,
    "dev": false
   },
   {
@@ -787,35 +786,6 @@ window.NPA_GRAPH = {
    "dev": false
   },
   {
-   "id": "IFC-97",
-   "label": "IFC-97",
-   "title": "Парковочные места в ЦИМ ПС",
-   "parts": [
-    "Парковочные места в ЦИМ ПС"
-   ],
-   "clauses": [
-    "5.2.2",
-    "5.2.14",
-    "5.2.15",
-    "5.2.16"
-   ],
-   "sec": "5.2",
-   "changed": true,
-   "role": null,
-   "inModel": [
-    "IFC-97"
-   ],
-   "ord": 26,
-   "side": "",
-   "disc": "ps",
-   "sa": "done",
-   "saT": "готово",
-   "sd": "none",
-   "sdT": "нет",
-   "analysis": true,
-   "dev": false
-  },
-  {
    "id": "IFC-50",
    "label": "IFC-50",
    "title": "Проверка планировочного рельефа",
@@ -833,7 +803,7 @@ window.NPA_GRAPH = {
    "inModel": [
     "IFC-50"
    ],
-   "ord": 27,
+   "ord": 26,
    "side": "",
    "disc": "ps",
    "sa": "work",
@@ -860,7 +830,7 @@ window.NPA_GRAPH = {
    "inModel": [
     "IFC-51"
    ],
-   "ord": 28,
+   "ord": 27,
    "side": "",
    "disc": "ps",
    "sa": "work",
@@ -887,6 +857,35 @@ window.NPA_GRAPH = {
    "role": null,
    "inModel": [
     "IFC-52"
+   ],
+   "ord": 28,
+   "side": "",
+   "disc": "ps",
+   "sa": "done",
+   "saT": "готово",
+   "sd": "none",
+   "sdT": "нет",
+   "analysis": true,
+   "dev": false
+  },
+  {
+   "id": "IFC-97",
+   "label": "IFC-97",
+   "title": "Парковочные места в ЦИМ ПС",
+   "parts": [
+    "Парковочные места в ЦИМ ПС"
+   ],
+   "clauses": [
+    "5.2.2",
+    "5.2.14",
+    "5.2.15",
+    "5.2.16"
+   ],
+   "sec": "5.2",
+   "changed": true,
+   "role": null,
+   "inModel": [
+    "IFC-97"
    ],
    "ord": 29,
    "side": "",
@@ -1129,8 +1128,8 @@ window.NPA_GRAPH = {
    "ord": 38,
    "side": "",
    "disc": "ar",
-   "sa": "none",
-   "saT": "нет",
+   "sa": "work",
+   "saT": "в работе",
    "sd": "none",
    "sdT": "нет",
    "analysis": false,
